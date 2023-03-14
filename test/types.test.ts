@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { z } from "zod";
+import { z, ZodError } from "zod";
 
 import { resolveDOMMobxZodMeta, MobxZodObjectField } from "../src";
+import { MobxZodForm } from "../src/MobxZodForm";
 
 let TYPE_TESTS = false;
 
@@ -14,6 +15,7 @@ TYPE_TESTS &&
         deep: z.object({
           c: z.string(),
         }),
+        literalString: z.literal("literalString"),
       });
 
       const o: MobxZodObjectField<typeof schema> = {} as any;
@@ -24,6 +26,9 @@ TYPE_TESTS &&
 
       const _shouldGetDeepStringField: (typeof o.fields.deep.fields.c)["type"] =
         z.string();
+
+      const _shouldGetLiteralString: (typeof o.fields.literalString)["type"] =
+        z.literal("literalString");
     });
 
     it("should extend zod", () => {
@@ -35,6 +40,61 @@ TYPE_TESTS &&
 
       const _shouldGetString2: string = schema2._mobxMeta.description;
       const _shouldGetString3: string = schema2._mobxMeta.label;
+    });
+
+    it("should create discriminated union", () => {
+      const ZodUnion = z.discriminatedUnion("tag", [
+        z.object({ tag: z.literal("A"), weeks: z.number() }),
+        z.object({ tag: z.literal("B"), months: z.number() }),
+      ]);
+
+      type ZodUnion = typeof ZodUnion;
+
+      type ZodUnionTag = ZodUnion["options"][number]["shape"]["tag"]["_output"];
+
+      const _zodUnionTag: ZodUnionTag = Math.random() < 0.5 ? "A" : "B";
+
+      const stringUnionForm = new MobxZodForm(
+        z.discriminatedUnion("tag", [
+          z.object({ tag: z.literal("A"), weeks: z.number() }),
+          z.object({ tag: z.literal("B"), months: z.number() }),
+        ])
+      );
+
+      const _getStringUnionDiscriminator: "A" | "B" =
+        stringUnionForm.root._discriminatorOutput;
+
+      const stringUnionFieldsResult = stringUnionForm.root.fieldsResult;
+
+      const _getZodError: false | ZodError =
+        stringUnionFieldsResult.success === false &&
+        stringUnionFieldsResult.error;
+
+      if (
+        stringUnionFieldsResult.success === true &&
+        stringUnionFieldsResult.data.discriminator === "A"
+      ) {
+        const _getNumber: number =
+          stringUnionFieldsResult.data.fields.weeks.type["_output"];
+      }
+
+      if (
+        stringUnionFieldsResult.success === true &&
+        stringUnionFieldsResult.data.discriminator === "B"
+      ) {
+        const _getNumber: number =
+          stringUnionFieldsResult.data.fields.months.type["_output"];
+      }
+
+      const booleanUnionForm = new MobxZodForm(
+        z.discriminatedUnion("success", [
+          z.object({ success: z.literal(true), weeks: z.number() }),
+          z.object({ success: z.literal(false), months: z.number() }),
+        ])
+      );
+
+      const _getBooleanUnionDiscriminator: true | false =
+        booleanUnionForm.root._discriminatorOutput;
     });
   });
 

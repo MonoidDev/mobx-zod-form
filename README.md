@@ -5,21 +5,15 @@ Data-first form builder based on [MobX](https://mobx.js.org/) & [Zod](https://zo
 ## Supported types
 
 1. `ZodString`
-
 2. `ZodNumber`
-
 3. `ZodBoolean`
-
-4. `ZodObject`
-
-5. `ZodArray`
-
-6. `ZodDefault`
-
-7. `z.discriminatedUnion`
-   
-8. `z.optional`
-
-9. `z.nullable`
+4. `ZodEnum`
+5. `ZodLiteral`
+6. `ZodObject`
+7. `ZodArray`
+8. `ZodDefault`
+9. `z.discriminatedUnion`
+10. `z.optional`
+11.  `z.nullable`
  
-10. Custom atomic types.
+12. Custom atomic types.

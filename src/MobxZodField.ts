@@ -7,6 +7,11 @@ import {
   ZodArray,
   ZodIssue,
   ZodTypeAny,
+  SafeParseReturnType,
+  SafeParseSuccess,
+  SafeParseError,
+  ZodDiscriminatedUnionOption,
+  ZodLiteral,
 } from "zod";
 
 import {
@@ -16,7 +21,14 @@ import {
 } from "./MobxZodFieldImpl";
 import { MobxZodForm, InputSetActionOptions } from "./MobxZodForm";
 import { MobxZodMeta } from "./MobxZodMeta";
-import type { MobxZodArray, MobxZodObject, MobxZodTypes } from "./types";
+import { IdxOf } from "./type-utils";
+import type {
+  MobxZodArray,
+  MobxZodDiscriminatedUnion,
+  MobxZodLiteral,
+  MobxZodObject,
+  MobxZodTypes,
+} from "./types";
 
 export interface MobxZodField<T extends ZodTypeAny> {
   type: T;
@@ -57,12 +69,18 @@ export interface MobxZodField<T extends ZodTypeAny> {
   _walk: (handler: (f: MobxZodField<any>) => void) => void;
 }
 
-export type MapZodTypeToField<T extends MobxZodTypes> = T extends MobxZodObject
+export type MapZodTypeToField<T extends MobxZodTypes> = T extends
+  | ZodString
+  | ZodNumber
+  | ZodBoolean
+  | MobxZodLiteral
+  ? MobxZodField<T>
+  : T extends MobxZodObject
   ? MobxZodObjectField<T>
   : T extends MobxZodArray
   ? MobxZodArrayField<T>
-  : T extends ZodString | ZodNumber | ZodBoolean
-  ? MobxZodField<T>
+  : T extends MobxZodDiscriminatedUnion
+  ? MobxZodDiscriminatedUnionField<T>
   : never;
 
 export type MobxZodObjectFieldFields<T extends MobxZodObject> = {
@@ -92,6 +110,38 @@ export interface MobxZodArrayField<T extends MobxZodArray>
   ) => void;
 }
 
+export type MobxZodDiscriminatedUnionFieldFieldsSuccess<
+  Discriminator extends string,
+  Options extends ZodDiscriminatedUnionOption<string>[]
+> = {
+  [K in IdxOf<Options>]: Options[K] extends MobxZodObject
+    ? MapZodTypeToField<Options[K]> & {
+        discriminator: Options[K]["shape"][Discriminator]["_output"];
+      }
+    : never;
+}[IdxOf<Options>];
+
+export interface MobxZodDiscriminatedUnionField<
+  T extends MobxZodDiscriminatedUnion
+> extends MobxZodField<T> {
+  _discriminator: T["discriminator"];
+  _discriminatorType: T["options"][number]["shape"][T["discriminator"]];
+  _discriminatorInput: this["_discriminatorType"]["_input"];
+  _discriminatorOutput: this["_discriminatorType"]["_output"];
+  discriminatorParsed: SafeParseReturnType<
+    this["_discriminatorInput"],
+    this["_discriminatorOutput"]
+  >;
+  fieldsResult:
+    | SafeParseError<unknown>
+    | SafeParseSuccess<
+        MobxZodDiscriminatedUnionFieldFieldsSuccess<
+          this["_discriminator"],
+          T["options"]
+        >
+      >;
+}
+
 export const createFieldForType = <T extends MobxZodTypes>(
   type: T,
   form: MobxZodForm<any>,
@@ -100,7 +150,8 @@ export const createFieldForType = <T extends MobxZodTypes>(
   if (
     type instanceof ZodString ||
     type instanceof ZodNumber ||
-    type instanceof ZodBoolean
+    type instanceof ZodBoolean ||
+    type instanceof ZodLiteral
   ) {
     return new MobxZodBaseFieldImpl<typeof type>(type, form, path) as any;
   } else if (type instanceof ZodObject) {
