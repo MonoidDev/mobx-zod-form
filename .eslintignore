@@ -1,0 +1,7 @@
+babel.config.js
+.eslintrc.cjs
+tailwind.config.cjs
+tailwind.config.js
+vite.config.ts
+dist/
+lib/
