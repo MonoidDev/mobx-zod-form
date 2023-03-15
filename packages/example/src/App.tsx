@@ -1,8 +1,7 @@
 import { observer } from "mobx-react";
+import { empty, MobxZodField } from "mobx-zod-form";
+import { useForm } from "mobx-zod-form-react";
 import { z, ZodNumber, ZodString } from "zod";
-
-import { empty, MobxZodField } from "../../src";
-import { useForm } from "../../src/react";
 
 import "./App.css";
 
@@ -21,7 +20,7 @@ const TextInput = observer(
         ))}
       </div>
     );
-  }
+  },
 );
 
 const Form1 = () => {
@@ -30,7 +29,7 @@ const Form1 = () => {
       username: z.string().min(1),
       password: z.string().min(6),
     }),
-    { validateOnMount: false }
+    { validateOnMount: false },
   );
 
   return (
@@ -49,7 +48,7 @@ const Form2 = () => {
     }),
     {
       validateOnMount: true,
-    }
+    },
   );
 
   return (
@@ -67,9 +66,9 @@ const FormArray1 = () => {
         z.object({
           name: z.string().min(1),
           age: z.number().min(5),
-        })
+        }),
       ),
-    })
+    }),
   );
 
   return (

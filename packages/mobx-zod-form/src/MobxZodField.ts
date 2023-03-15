@@ -8,10 +8,9 @@ import {
   ZodIssue,
   ZodTypeAny,
   SafeParseReturnType,
-  SafeParseSuccess,
-  SafeParseError,
   ZodDiscriminatedUnionOption,
   ZodLiteral,
+  ZodError,
 } from "zod";
 
 import {
@@ -115,11 +114,27 @@ export type MobxZodDiscriminatedUnionFieldFieldsSuccess<
   Options extends ZodDiscriminatedUnionOption<string>[]
 > = {
   [K in IdxOf<Options>]: Options[K] extends MobxZodObject
-    ? MapZodTypeToField<Options[K]> & {
+    ? MobxZodObjectField<Options[K]>["fields"] & {
         discriminator: Options[K]["shape"][Discriminator]["_output"];
       }
     : never;
 }[IdxOf<Options>];
+
+export type MobxZodDiscriminatedUnionFieldsResult<
+  Discriminator extends string,
+  Options extends ZodDiscriminatedUnionOption<string>[]
+> =
+  | {
+      success: false;
+      error: ZodError<unknown>;
+    }
+  | {
+      success: true;
+      fields: MobxZodDiscriminatedUnionFieldFieldsSuccess<
+        Discriminator,
+        Options
+      >;
+    };
 
 export interface MobxZodDiscriminatedUnionField<
   T extends MobxZodDiscriminatedUnion
@@ -132,14 +147,10 @@ export interface MobxZodDiscriminatedUnionField<
     this["_discriminatorInput"],
     this["_discriminatorOutput"]
   >;
-  fieldsResult:
-    | SafeParseError<unknown>
-    | SafeParseSuccess<
-        MobxZodDiscriminatedUnionFieldFieldsSuccess<
-          this["_discriminator"],
-          T["options"]
-        >
-      >;
+  fieldsResult: MobxZodDiscriminatedUnionFieldsResult<
+    this["_discriminator"],
+    T["options"]
+  >;
 }
 
 export const createFieldForType = <T extends MobxZodTypes>(

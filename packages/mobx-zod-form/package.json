@@ -1,0 +1,44 @@
+{
+  "name": "mobx-zod-form",
+  "version": "0.0.1",
+  "type": "commonjs",
+  "main": "./lib/index.js",
+  "types": "./lib/index.d.ts",
+  "module": "./lib/index.mjs",
+  "exports": {
+    ".": {
+      "import": "./lib/index.mjs",
+      "require": "./lib/index.js",
+      "default": "./lib/index.js"
+    }
+  },
+  "files": [
+    "src/",
+    "lib/"
+  ],
+  "author": "Chenyu Wang",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hanayashiki/mobx-zod-form"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "scripts": {
+    "dev": "tsx src/index.ts",
+    "build": "tsup src/index.ts --external react --format esm,cjs --splitting -d lib/ && tsc -p tsconfig.build.json",
+    "lint": "tsc && eslint ./src --ext .ts,.tsx",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "peerDependencies": {
+    "mobx": "^6.8.0",
+    "zod": "^3.21.2",
+    "react": "^18.2.0"
+  }
+}

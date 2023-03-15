@@ -11,14 +11,16 @@
   "dependencies": {
     "mobx": "^6.8.0",
     "mobx-react": "^7.6.0",
+    "mobx-zod-form": "*",
+    "mobx-zod-form-react": "*",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "zod": "^3.21.4"
   },
   "devDependencies": {
     "@types/react": "^18.0.27",
     "@types/react-dom": "^18.0.10",
     "@vitejs/plugin-react": "^3.1.0",
-    "typescript": "^4.9.3",
     "vite": "^4.1.0"
   }
 }

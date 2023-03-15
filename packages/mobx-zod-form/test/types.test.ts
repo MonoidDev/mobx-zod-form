@@ -72,18 +72,18 @@ TYPE_TESTS &&
 
       if (
         stringUnionFieldsResult.success === true &&
-        stringUnionFieldsResult.data.discriminator === "A"
+        stringUnionFieldsResult.fields.discriminator === "A"
       ) {
         const _getNumber: number =
-          stringUnionFieldsResult.data.fields.weeks.type["_output"];
+          stringUnionFieldsResult.fields.weeks.type["_output"];
       }
 
       if (
         stringUnionFieldsResult.success === true &&
-        stringUnionFieldsResult.data.discriminator === "B"
+        stringUnionFieldsResult.fields.discriminator === "B"
       ) {
         const _getNumber: number =
-          stringUnionFieldsResult.data.fields.months.type["_output"];
+          stringUnionFieldsResult.fields.months.type["_output"];
       }
 
       const booleanUnionForm = new MobxZodForm(

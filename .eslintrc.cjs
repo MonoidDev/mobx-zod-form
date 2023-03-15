@@ -37,6 +37,6 @@ module.exports = {
     // @see: https://v4.mui.com/zh/guides/minimizing-bundle-size/
   },
   parserOptions: {
-    project: ['./tsconfig.json'],
+    project: ['./tsconfig.json', './packages/*/tsconfig.json'],
   },
 };
