@@ -1,6 +1,6 @@
+import { empty, MobxZodField } from "@monoid-dev/mobx-zod-form";
+import { useForm } from "@monoid-dev/mobx-zod-form-react";
 import { observer } from "mobx-react";
-import { empty, MobxZodField } from "mobx-zod-form";
-import { useForm } from "mobx-zod-form-react";
 import { z, ZodNumber, ZodString } from "zod";
 
 import "./App.css";

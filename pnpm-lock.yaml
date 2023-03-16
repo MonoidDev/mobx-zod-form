@@ -32,22 +32,22 @@ importers:
 
   packages/example:
     specifiers:
+      '@monoid-dev/mobx-zod-form': '*'
+      '@monoid-dev/mobx-zod-form-react': '*'
       '@types/react': ^18.0.27
       '@types/react-dom': ^18.0.10
       '@vitejs/plugin-react': ^3.1.0
       mobx: ^6.8.0
       mobx-react: ^7.6.0
-      mobx-zod-form: '*'
-      mobx-zod-form-react: '*'
       react: ^18.2.0
       react-dom: ^18.2.0
       vite: ^4.1.0
       zod: ^3.21.4
     dependencies:
+      '@monoid-dev/mobx-zod-form': link:../mobx-zod-form
+      '@monoid-dev/mobx-zod-form-react': link:../mobx-zod-form-react
       mobx: 6.8.0
       mobx-react: 7.6.0_woojb62cqeyk443mbl7msrwu2e
-      mobx-zod-form: link:../mobx-zod-form
-      mobx-zod-form-react: link:../mobx-zod-form-react
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
       zod: 3.21.4
@@ -67,14 +67,14 @@ importers:
 
   packages/mobx-zod-form-react:
     specifiers:
+      '@monoid-dev/mobx-zod-form': ~0.0.1
       '@types/react': ^18.0.28
       mobx: ^6.8.0
-      mobx-zod-form: ~0.0.1
       react: ^18.2.0
       zod: ^3.21.2
     dependencies:
+      '@monoid-dev/mobx-zod-form': link:../mobx-zod-form
       mobx: 6.8.0
-      mobx-zod-form: link:../mobx-zod-form
       react: 18.2.0
       zod: 3.21.4
     devDependencies:

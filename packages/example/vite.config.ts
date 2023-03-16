@@ -5,6 +5,6 @@ import { defineConfig } from "vite";
 export default defineConfig({
   plugins: [react()],
   optimizeDeps: {
-    exclude: ["mobx-zod-form"],
+    exclude: ["@monoid-dev/mobx-zod-form"],
   },
 });

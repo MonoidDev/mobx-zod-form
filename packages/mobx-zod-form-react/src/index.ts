@@ -1,7 +1,7 @@
 import { useMemo, useEffect } from "react";
 
-import { MobxZodForm, MobxZodFormOptions } from "mobx-zod-form";
-import { type MobxZodTypes } from "mobx-zod-form";
+import { MobxZodForm, MobxZodFormOptions } from "@monoid-dev/mobx-zod-form";
+import { type MobxZodTypes } from "@monoid-dev/mobx-zod-form";
 
 export const useForm = <T extends MobxZodTypes>(
   schema: T,

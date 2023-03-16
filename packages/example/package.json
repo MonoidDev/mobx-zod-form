@@ -11,8 +11,8 @@
   "dependencies": {
     "mobx": "^6.8.0",
     "mobx-react": "^7.6.0",
-    "mobx-zod-form": "*",
-    "mobx-zod-form-react": "*",
+    "@monoid-dev/mobx-zod-form": "*",
+    "@monoid-dev/mobx-zod-form-react": "*",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "zod": "^3.21.4"

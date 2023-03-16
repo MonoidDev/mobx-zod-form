@@ -36,7 +36,7 @@
     "test": "echo 'no tests'"
   },
   "dependencies": {
-    "mobx-zod-form": "~0.0.1"
+    "@monoid-dev/mobx-zod-form": "~0.0.1"
   },
   "publishConfig": {
     "access": "public"
