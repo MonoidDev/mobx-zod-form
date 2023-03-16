@@ -27,7 +27,7 @@
   },
   "scripts": {
     "dev": "tsx src/index.ts",
-    "build": "tsup src/index.ts --external react --format esm,cjs --splitting -d lib/ && tsc -p tsconfig.build.json",
+    "build": "tsup src/index.ts --format esm,cjs --splitting -d lib/ && tsc -p tsconfig.build.json",
     "lint": "tsc && eslint ./src --ext .ts,.tsx",
     "test": "vitest run"
   },
@@ -38,7 +38,6 @@
   },
   "peerDependencies": {
     "mobx": "^6.8.0",
-    "zod": "^3.21.2",
-    "react": "^18.2.0"
+    "zod": "^3.21.2"
   }
 }

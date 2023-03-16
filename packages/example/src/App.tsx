@@ -59,7 +59,7 @@ const Form2 = () => {
   );
 };
 
-const FormArray1 = () => {
+const FormArray1 = observer(() => {
   const form = useForm(
     z.object({
       users: z.array(
@@ -92,7 +92,7 @@ const FormArray1 = () => {
       />
     </div>
   );
-};
+});
 
 function App() {
   return (

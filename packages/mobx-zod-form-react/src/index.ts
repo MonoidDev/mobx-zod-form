@@ -9,7 +9,7 @@ export const useForm = <T extends MobxZodTypes>(
 ) => {
   const form = useMemo(() => new MobxZodForm(schema, options), []);
   useEffect(() => {
-    return form.startValidationTask();
+    return form.startValidationWorker();
   }, []);
 
   return form;

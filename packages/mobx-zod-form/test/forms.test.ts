@@ -14,7 +14,7 @@ describe("form tests", () => {
         setActionOptions: {
           validateSync: true,
         },
-      }
+      },
     );
 
     const observeInput = observeForm((observe) => {
@@ -36,7 +36,7 @@ describe("form tests", () => {
         setActionOptions: {
           validateSync: true,
         },
-      }
+      },
     );
 
     const ob = observeForm((observe) => {
@@ -60,7 +60,7 @@ describe("form tests", () => {
       z.object({
         username: z.string(),
         password: z.string(),
-      })
+      }),
     );
 
     const observeUsername = observeForm((ob) => {
@@ -98,7 +98,7 @@ describe("form tests", () => {
         setActionOptions: {
           validateSync: true,
         },
-      }
+      },
     );
 
     const obUsername = observeForm((observe) => {
@@ -135,7 +135,7 @@ describe("form tests", () => {
         setActionOptions: {
           validateSync: true,
         },
-      }
+      },
     );
 
     const obIdAt0 = observeForm((observe) => {
@@ -189,14 +189,14 @@ describe("form tests", () => {
           z.object({
             a: z.number(),
             b: z.number(),
-          })
+          }),
         ),
       }),
       {
         setActionOptions: {
           validateSync: true,
         },
-      }
+      },
     );
 
     form.root.fields.ids.push(1, 2, 3);
@@ -222,11 +222,11 @@ describe("form tests", () => {
       {
         a: 5,
         b: 6,
-      }
+      },
     );
 
     expect(
-      form.root.fields.objects.elements.map((e) => e.fields.a.path)
+      form.root.fields.objects.elements.map((e) => e.fields.a.path),
     ).toMatchObject([
       ["objects", 0, "a"],
       ["objects", 1, "a"],
@@ -236,7 +236,7 @@ describe("form tests", () => {
     form.root.fields.objects.splice(1, 1, []);
 
     expect(
-      form.root.fields.objects.elements.map((e) => e.fields.a.path)
+      form.root.fields.objects.elements.map((e) => e.fields.a.path),
     ).toMatchObject([
       ["objects", 0, "a"],
       ["objects", 1, "a"],
@@ -252,7 +252,7 @@ describe("form tests", () => {
         setActionOptions: {
           validateSync: true,
         },
-      }
+      },
     );
 
     const obLength = observeForm((observe) => {

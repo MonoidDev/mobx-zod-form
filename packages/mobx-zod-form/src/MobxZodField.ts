@@ -28,6 +28,7 @@ import type {
   MobxZodObject,
   MobxZodTypes,
 } from "./types";
+import { DiscriminatorType } from "./zod-extra";
 
 export interface MobxZodField<T extends ZodTypeAny> {
   type: T;
@@ -105,16 +106,17 @@ export interface MobxZodArrayField<T extends MobxZodArray>
     start: number,
     deleteCount: number,
     values: this["_elementOutput"][],
-    options?: InputSetActionOptions
+    options?: InputSetActionOptions,
   ) => void;
 }
 
+// Omit the discriminator field because it is special in forms
 export type MobxZodDiscriminatedUnionFieldFieldsSuccess<
   Discriminator extends string,
-  Options extends ZodDiscriminatedUnionOption<string>[]
+  Options extends ZodDiscriminatedUnionOption<string>[],
 > = {
   [K in IdxOf<Options>]: Options[K] extends MobxZodObject
-    ? MobxZodObjectField<Options[K]>["fields"] & {
+    ? Omit<MobxZodObjectField<Options[K]>["fields"], Discriminator> & {
         discriminator: Options[K]["shape"][Discriminator]["_output"];
       }
     : never;
@@ -122,7 +124,7 @@ export type MobxZodDiscriminatedUnionFieldFieldsSuccess<
 
 export type MobxZodDiscriminatedUnionFieldsResult<
   Discriminator extends string,
-  Options extends ZodDiscriminatedUnionOption<string>[]
+  Options extends ZodDiscriminatedUnionOption<string>[],
 > =
   | {
       success: false;
@@ -136,27 +138,38 @@ export type MobxZodDiscriminatedUnionFieldsResult<
       >;
     };
 
-export interface MobxZodDiscriminatedUnionField<
-  T extends MobxZodDiscriminatedUnion
-> extends MobxZodField<T> {
+/**
+ * Various computed types for DiscriminatedUnion
+ */
+export interface MobxZodDiscriminatedUnionFieldTypes<
+  T extends MobxZodDiscriminatedUnion,
+> {
   _discriminator: T["discriminator"];
-  _discriminatorType: T["options"][number]["shape"][T["discriminator"]];
+  _discriminatorType: DiscriminatorType<T>;
   _discriminatorInput: this["_discriminatorType"]["_input"];
   _discriminatorOutput: this["_discriminatorType"]["_output"];
-  discriminatorParsed: SafeParseReturnType<
-    this["_discriminatorInput"],
-    this["_discriminatorOutput"]
+  _discriminatorParsedResult: SafeParseReturnType<
+    this["_discriminatorOutput"],
+    this["_discriminatorInput"]
   >;
-  fieldsResult: MobxZodDiscriminatedUnionFieldsResult<
+  _fieldsResult: MobxZodDiscriminatedUnionFieldsResult<
     this["_discriminator"],
     T["options"]
   >;
 }
 
+export interface MobxZodDiscriminatedUnionField<
+  T extends MobxZodDiscriminatedUnion,
+> extends MobxZodField<T> {
+  _types: MobxZodDiscriminatedUnionFieldTypes<T>;
+  discriminatorField: MobxZodField<DiscriminatorType<T>>;
+  fieldsResult: this["_types"]["_fieldsResult"];
+}
+
 export const createFieldForType = <T extends MobxZodTypes>(
   type: T,
   form: MobxZodForm<any>,
-  path: ParsePath
+  path: ParsePath,
 ): MapZodTypeToField<T> => {
   if (
     type instanceof ZodString ||

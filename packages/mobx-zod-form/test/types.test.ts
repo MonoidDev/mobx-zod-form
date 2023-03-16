@@ -3,6 +3,7 @@ import { z, ZodError } from "zod";
 
 import { resolveDOMMobxZodMeta, MobxZodObjectField } from "../src";
 import { MobxZodForm } from "../src/MobxZodForm";
+import { discriminatorType } from "../src/zod-extra";
 
 let TYPE_TESTS = false;
 
@@ -58,17 +59,17 @@ TYPE_TESTS &&
         z.discriminatedUnion("tag", [
           z.object({ tag: z.literal("A"), weeks: z.number() }),
           z.object({ tag: z.literal("B"), months: z.number() }),
-        ])
+        ]),
       );
 
       const _getStringUnionDiscriminator: "A" | "B" =
-        stringUnionForm.root._discriminatorOutput;
+        stringUnionForm.root._types._discriminatorOutput;
 
       const stringUnionFieldsResult = stringUnionForm.root.fieldsResult;
 
-      const _getZodError: false | ZodError =
-        stringUnionFieldsResult.success === false &&
-        stringUnionFieldsResult.error;
+      if (stringUnionFieldsResult.success === false) {
+        const _getZodError: ZodError = stringUnionFieldsResult.error;
+      }
 
       if (
         stringUnionFieldsResult.success === true &&
@@ -90,11 +91,18 @@ TYPE_TESTS &&
         z.discriminatedUnion("success", [
           z.object({ success: z.literal(true), weeks: z.number() }),
           z.object({ success: z.literal(false), months: z.number() }),
-        ])
+        ]),
       );
 
       const _getBooleanUnionDiscriminator: true | false =
-        booleanUnionForm.root._discriminatorOutput;
+        booleanUnionForm.root._types._discriminatorOutput;
+
+      const stringUnionDiscriminatorType = discriminatorType(
+        stringUnionForm.root.type,
+      );
+
+      const _getStringUnionDiscriminator2: "A" | "B" =
+        stringUnionDiscriminatorType._output;
     });
   });
 
@@ -106,15 +114,15 @@ describe("field tests", () => {
     });
 
     expect(resolveDOMMobxZodMeta(schema.shape.string).decode("string")).toBe(
-      "string"
+      "string",
     );
     // Wrong input should be passed as-is, for zod to throw an error.
     expect(resolveDOMMobxZodMeta(schema.shape.string).decode(12345)).toBe(
-      12345
+      12345,
     );
 
     expect(resolveDOMMobxZodMeta(schema.shape.number).decode("12345")).toBe(
-      12345
+      12345,
     );
     expect(resolveDOMMobxZodMeta(schema.shape.number).decode("x")).toBe("x");
 
@@ -122,7 +130,7 @@ describe("field tests", () => {
       resolveDOMMobxZodMeta(schema).decode({
         string: "string",
         number: "12345",
-      })
+      }),
     ).toMatchObject({
       string: "string",
       number: 12345,
@@ -133,7 +141,7 @@ describe("field tests", () => {
     expect(
       resolveDOMMobxZodMeta(array).decode([
         { string: "string", number: "12345" },
-      ])
+      ]),
     ).toMatchObject([
       {
         string: "string",
@@ -142,7 +150,7 @@ describe("field tests", () => {
     ]);
 
     expect(resolveDOMMobxZodMeta(array).decode("not-an-array")).toBe(
-      "not-an-array"
+      "not-an-array",
     );
   });
 
@@ -155,11 +163,11 @@ describe("field tests", () => {
     expect(resolveDOMMobxZodMeta(z.boolean()).encode(true)).toBe(true);
 
     expect(
-      resolveDOMMobxZodMeta(z.number().array()).encode([1, 2, 3])
+      resolveDOMMobxZodMeta(z.number().array()).encode([1, 2, 3]),
     ).toMatchObject(["1", "2", "3"]);
 
     expect(
-      resolveDOMMobxZodMeta(z.string().array()).encode(["1", "2", "3", ""])
+      resolveDOMMobxZodMeta(z.string().array()).encode(["1", "2", "3", ""]),
     ).toMatchObject(["1", "2", "3", ""]);
   });
 
@@ -167,13 +175,13 @@ describe("field tests", () => {
     expect(resolveDOMMobxZodMeta(z.string()).getInitialOutput()).toBe("");
 
     expect(resolveDOMMobxZodMeta(z.number()).getInitialOutput()).toBe(
-      undefined
+      undefined,
     );
 
     expect(
       resolveDOMMobxZodMeta(
-        z.object({ a: z.string(), b: z.number(), c: z.array(z.number()) })
-      ).getInitialOutput()
+        z.object({ a: z.string(), b: z.number(), c: z.array(z.number()) }),
+      ).getInitialOutput(),
     ).toMatchObject({
       a: "",
       b: undefined,

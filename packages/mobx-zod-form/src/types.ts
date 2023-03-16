@@ -13,6 +13,8 @@ import type {
   Primitive,
 } from "zod";
 
+import { DiscriminatorType } from "./zod-extra";
+
 export type MobxZodLiteral = ZodLiteral<Primitive>;
 
 export type MobxZodArray = ZodArray<ZodTypeAny, ArrayCardinality>;
@@ -36,5 +38,6 @@ export type MobxZodTypes =
   | MobxZodPrimitiveTypes
   | MobxZodObject
   | MobxZodArray
+  | DiscriminatorType<MobxZodDiscriminatedUnion>
   | MobxZodDiscriminatedUnion;
 // | MobxZodDefault;

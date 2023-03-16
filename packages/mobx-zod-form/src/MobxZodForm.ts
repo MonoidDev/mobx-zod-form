@@ -1,5 +1,17 @@
-import { action, computed, makeObservable, observable, when } from "mobx";
-import { type ZodIssue, type ParsePath, type SafeParseReturnType } from "zod";
+import {
+  action,
+  computed,
+  makeObservable,
+  observable,
+  runInAction,
+  when,
+} from "mobx";
+import {
+  z,
+  type ZodIssue,
+  type ParsePath,
+  type SafeParseReturnType,
+} from "zod";
 
 import { getPathId, setPath, shallowEqual, visitPath } from "./js-utils";
 import { createFieldForType, type MapZodTypeToField } from "./MobxZodField";
@@ -16,13 +28,25 @@ export interface SetActionOptions {
 }
 
 export interface MobxZodFormOptions<T extends MobxZodTypes> {
-  initialOutput?: T;
+  initialOutput?: z.infer<T>;
   validateOnMount?: boolean;
   setActionOptions?: InputSetActionOptions;
 }
 
+interface ValidationTask {
+  resolve?: () => void;
+  reject?: (e: any) => void;
+  prior?: boolean;
+}
+
 export class MobxZodForm<T extends MobxZodTypes> {
   _rawInput: unknown;
+
+  _isDirty: boolean = false;
+
+  _submitCount: number = 0;
+
+  _isSubmitting: boolean = false;
 
   schemaMobxZodMeta: MobxZodMeta;
 
@@ -30,11 +54,11 @@ export class MobxZodForm<T extends MobxZodTypes> {
 
   _currentSetActionOptions?: SetActionOptions;
 
-  _pendingValidation: boolean = false;
+  _validationTasks: ValidationTask[] = [];
 
   constructor(
     public readonly schema: T,
-    public readonly _options: MobxZodFormOptions<T> = {}
+    public readonly _options: MobxZodFormOptions<T> = {},
   ) {
     this.schemaMobxZodMeta = resolveDOMMobxZodMeta(schema);
 
@@ -48,32 +72,61 @@ export class MobxZodForm<T extends MobxZodTypes> {
 
     makeObservable(this, {
       _rawInput: observable,
+      _isDirty: observable,
+      _submitCount: observable,
+      _isSubmitting: observable,
       root: observable,
-      _pendingValidation: observable,
+      _validationTasks: observable,
+      isDirty: computed,
+      submitCount: computed,
+      isSubmitting: computed,
       input: computed,
       parsed: computed,
       validate: action,
       _setRawInputAt: action,
+      _notifyChange: action,
     });
   }
 
-  startValidationTask() {
+  flushValidationTasks() {
+    try {
+      this.validate();
+      this._validationTasks.forEach((p) => p.resolve?.());
+    } catch (e) {
+      this._validationTasks.forEach((p) => p.reject?.(e));
+      throw e;
+    } finally {
+      this._validationTasks.length = 0;
+    }
+  }
+
+  startValidationWorker() {
+    if (this.options.setActionOptions.validateSync) {
+      throw new Error(
+        "You have set validateSync: true, so probably you do not want to start a async validation worker. ",
+      );
+    }
+
     let validationTaskCancelled = false;
 
     const task = async () => {
       while (true) {
-        await when(() => this._pendingValidation);
+        await when(() => this._validationTasks.length > 0);
 
         if (validationTaskCancelled) {
           return;
         }
 
-        await new Promise<void>((r) => {
-          requestIdleCallback(() => {
-            this.validate();
-            r();
+        if (this._validationTasks.some((t) => t.prior)) {
+          this.flushValidationTasks();
+        } else {
+          await new Promise<void>((r) => {
+            requestIdleCallback(() => {
+              this.flushValidationTasks();
+              r();
+            });
           });
-        });
+        }
       }
     };
 
@@ -101,6 +154,18 @@ export class MobxZodForm<T extends MobxZodTypes> {
     return this._rawInput;
   }
 
+  get isDirty() {
+    return this._isDirty;
+  }
+
+  get submitCount() {
+    return this._submitCount;
+  }
+
+  get isSubmitting() {
+    return this._isSubmitting;
+  }
+
   get input(): T["_input"] {
     return this.schemaMobxZodMeta.decode(this._rawInput);
   }
@@ -121,6 +186,8 @@ export class MobxZodForm<T extends MobxZodTypes> {
       setPath(this._rawInput, path, value);
     }
 
+    this._isDirty = true;
+
     this._notifyChange();
   }
 
@@ -128,7 +195,7 @@ export class MobxZodForm<T extends MobxZodTypes> {
     if (this.resolveCurrentSetActionOptions().validateSync) {
       this.validate();
     } else {
-      this._pendingValidation = true;
+      this._validationTasks.push({});
     }
   }
 
@@ -140,33 +207,29 @@ export class MobxZodForm<T extends MobxZodTypes> {
    * Errors are compared against their error messages.
    */
   validate() {
-    try {
-      const newOutput = this.parsed;
+    const newOutput = this.parsed;
 
-      const issues = newOutput.success ? [] : newOutput.error.issues;
+    const issues = newOutput.success ? [] : newOutput.error.issues;
 
-      const pathToIssues: Map<string, ZodIssue[]> = new Map();
+    const pathToIssues: Map<string, ZodIssue[]> = new Map();
 
-      for (const issue of issues) {
-        const pathId = getPathId(issue.path);
-        pathToIssues.set(pathId, [...(pathToIssues.get(pathId) ?? []), issue]);
-      }
-      this.root._walk((field) => {
-        const newFieldIssues = pathToIssues.get(getPathId(field.path)) ?? [];
-        field._issues = newFieldIssues;
-
-        if (
-          !shallowEqual(
-            newFieldIssues.map((e) => e.message),
-            field.errorMessages
-          )
-        ) {
-          field._errorMessages = newFieldIssues.map((e) => e.message);
-        }
-      });
-    } finally {
-      this._pendingValidation = false;
+    for (const issue of issues) {
+      const pathId = getPathId(issue.path);
+      pathToIssues.set(pathId, [...(pathToIssues.get(pathId) ?? []), issue]);
     }
+    this.root._walk((field) => {
+      const newFieldIssues = pathToIssues.get(getPathId(field.path)) ?? [];
+      field._issues = newFieldIssues;
+
+      if (
+        !shallowEqual(
+          newFieldIssues.map((e) => e.message),
+          field.errorMessages,
+        )
+      ) {
+        field._errorMessages = newFieldIssues.map((e) => e.message);
+      }
+    });
   }
 
   withSetActionOptions(options: InputSetActionOptions, action: () => void) {
@@ -182,5 +245,34 @@ export class MobxZodForm<T extends MobxZodTypes> {
 
   resolveCurrentSetActionOptions(): SetActionOptions {
     return this._currentSetActionOptions ?? this.options.setActionOptions;
+  }
+
+  async handleSubmit(onSubmit: () => Promise<void> | void) {
+    try {
+      let validationPromise!: Promise<void>;
+
+      runInAction(() => {
+        this._isSubmitting = true;
+        this._submitCount++;
+        if (!this.options.setActionOptions.validateSync) {
+          validationPromise = new Promise<void>((resolve, reject) => {
+            this._validationTasks.push({ resolve, reject, prior: true });
+          });
+        } else {
+          this.validate();
+          validationPromise = Promise.resolve();
+        }
+      });
+
+      await validationPromise;
+
+      this.root._walk((f) => f.setTouched(true));
+
+      await onSubmit();
+    } finally {
+      runInAction(() => {
+        this._isSubmitting = false;
+      });
+    }
   }
 }

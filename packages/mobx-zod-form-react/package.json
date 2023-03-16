@@ -36,7 +36,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "mobx-zod-form": "*"
+    "mobx-zod-form": "~0.0.1"
   },
   "publishConfig": {
     "access": "public"

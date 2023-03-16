@@ -17,3 +17,6 @@ Data-first form builder based on [MobX](https://mobx.js.org/) & [Zod](https://zo
 11.  `z.nullable`
  
 12. Custom atomic types.
+
+## Features
+
