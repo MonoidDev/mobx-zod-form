@@ -33,9 +33,9 @@ jobs:
           name: Publish All
           command: |
             npx nx run-many --target=build
-            PWD="$(pwd)"
-            cd $PWD/packages/mobx-zod-form && pnpm run publish || true
-            cd $PWD/packages/mobx-zod-form-react && pnpm run publish || true
+            ROOT="$(pwd)"
+            cd $ROOT/packages/mobx-zod-form && pnpm run publish || true
+            cd $ROOT/packages/mobx-zod-form-react && pnpm run publish || true
 
 
 workflows:
