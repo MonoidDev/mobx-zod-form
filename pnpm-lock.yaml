@@ -69,7 +69,7 @@ importers:
     specifiers:
       '@types/react': ^18.0.28
       mobx: ^6.8.0
-      mobx-zod-form: '*'
+      mobx-zod-form: ~0.0.1
       react: ^18.2.0
       zod: ^3.21.2
     dependencies:

@@ -1,6 +1,6 @@
 {
-  "name": "mobx-zod-form-react",
-  "version": "0.0.1",
+  "name": "@monoid-dev/mobx-zod-form-react",
+  "version": "0.0.5",
   "type": "commonjs",
   "main": "./lib/index.js",
   "module": "./lib/index.mjs",
@@ -24,7 +24,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/hanayashiki/mobx-zod-form"
+    "url": "https://github.com/MonoidDev/mobx-zod-form"
   },
   "engines": {
     "node": ">=16.0.0"

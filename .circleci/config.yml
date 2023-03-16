@@ -1,0 +1,45 @@
+version: 2.1
+
+jobs:
+  publish: # this can be any name you choose
+    docker:
+      - image: node:19
+
+    steps:
+      - checkout
+      - restore_cache:
+          name: Restore pnpm Package Cache
+          keys:
+            - pnpm-packages-{{ checksum "pnpm-lock.yaml" }}
+      - run:
+          name: Install pnpm package manager
+          command: |
+            corepack enable
+            corepack prepare pnpm@latest-7 --activate
+      - run:
+          name: Install Dependencies
+          command: |
+            pnpm install
+      - save_cache:
+          name: Save pnpm Package Cache
+          key: pnpm-packages-{{ checksum "pnpm-lock.yaml" }}
+          paths:
+            - node_modules
+      - run:
+          name: Run Tests
+          command: |
+            npx nx run-many --target=test
+      - run:
+          name: Publish All
+          command: |
+            npx nx run-many --target=build
+            
+            npm config set '//registry.npmjs.org/:_authToken' "${NPM_TOKEN}"
+            pnpm publish -r --no-git-checks
+
+
+workflows:
+  version: 2
+  build_and_deploy:
+    jobs:
+      - publish
