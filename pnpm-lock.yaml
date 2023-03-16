@@ -59,8 +59,8 @@ importers:
 
   packages/mobx-zod-form:
     specifiers:
-      mobx: ^6.8.0
-      zod: ^3.21.2
+      mobx: ~6.8.0
+      zod: ~3.21.2
     dependencies:
       mobx: 6.8.0
       zod: 3.21.4
@@ -68,10 +68,10 @@ importers:
   packages/mobx-zod-form-react:
     specifiers:
       '@monoid-dev/mobx-zod-form': ~0.0.1
-      '@types/react': ^18.0.28
-      mobx: ^6.8.0
-      react: ^18.2.0
-      zod: ^3.21.2
+      '@types/react': ~18.0.28
+      mobx: ~6.8.0
+      react: ~18.2.0
+      zod: ~3.21.2
     dependencies:
       '@monoid-dev/mobx-zod-form': link:../mobx-zod-form
       mobx: 6.8.0

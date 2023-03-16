@@ -1,6 +1,6 @@
 {
   "name": "@monoid-dev/mobx-zod-form-react",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "type": "commonjs",
   "main": "./lib/index.js",
   "module": "./lib/index.mjs",
@@ -42,11 +42,11 @@
     "access": "public"
   },
   "peerDependencies": {
-    "mobx": "^6.8.0",
-    "react": "^18.2.0",
-    "zod": "^3.21.2"
+    "mobx": "~6.8.0",
+    "react": "~18.2.0",
+    "zod": "~3.21.2"
   },
   "devDependencies": {
-    "@types/react": "^18.0.28"
+    "@types/react": "~18.0.28"
   }
 }

@@ -13,9 +13,9 @@ import {
   type SafeParseReturnType,
 } from "zod";
 
+import { resolveDOMFormMeta, type FormMeta } from "./FormMeta";
 import { getPathId, setPath, shallowEqual, visitPath } from "./js-utils";
 import { createFieldForType, type MapZodTypeToField } from "./MobxZodField";
-import { resolveDOMMobxZodMeta, type MobxZodMeta } from "./MobxZodMeta";
 import { type MobxZodTypes } from "./types";
 
 export interface InputSetActionOptions {
@@ -48,7 +48,7 @@ export class MobxZodForm<T extends MobxZodTypes> {
 
   _isSubmitting: boolean = false;
 
-  schemaMobxZodMeta: MobxZodMeta;
+  schemaMobxZodMeta: FormMeta;
 
   root: MapZodTypeToField<T>;
 
@@ -60,7 +60,7 @@ export class MobxZodForm<T extends MobxZodTypes> {
     public readonly schema: T,
     public readonly _options: MobxZodFormOptions<T> = {},
   ) {
-    this.schemaMobxZodMeta = resolveDOMMobxZodMeta(schema);
+    this.schemaMobxZodMeta = resolveDOMFormMeta(schema);
 
     this._rawInput = this.schemaMobxZodMeta.encode(this.options.initialOutput);
 

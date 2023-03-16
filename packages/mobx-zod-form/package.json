@@ -1,6 +1,6 @@
 {
   "name": "@monoid-dev/mobx-zod-form",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "type": "commonjs",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
@@ -37,7 +37,7 @@
     "access": "public"
   },
   "peerDependencies": {
-    "mobx": "^6.8.0",
-    "zod": "^3.21.2"
+    "mobx": "~6.8.0",
+    "zod": "~3.21.2"
   }
 }

@@ -13,13 +13,13 @@ import {
   ZodError,
 } from "zod";
 
+import { FormMeta } from "./FormMeta";
 import {
   MobxZodArrayFieldImpl,
   MobxZodBaseFieldImpl,
   MobxZodObjectFieldImpl,
 } from "./MobxZodFieldImpl";
 import { MobxZodForm, InputSetActionOptions } from "./MobxZodForm";
-import { MobxZodMeta } from "./MobxZodMeta";
 import { IdxOf } from "./type-utils";
 import type {
   MobxZodArray,
@@ -37,7 +37,7 @@ export interface MobxZodField<T extends ZodTypeAny> {
    * Useful for SSR and tracking array field elements.
    */
   readonly uniqueId: number;
-  readonly mobxZodMeta: MobxZodMeta;
+  readonly mobxZodMeta: FormMeta;
   path: ParsePath;
   /**
    * The original input, e.g. from DOM string.

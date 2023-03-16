@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { z, ZodError } from "zod";
 
-import { resolveDOMMobxZodMeta, MobxZodObjectField } from "../src";
+import { resolveDOMFormMeta, MobxZodObjectField } from "../src";
 import { MobxZodForm } from "../src/MobxZodForm";
 import { discriminatorType } from "../src/zod-extra";
 
@@ -33,14 +33,14 @@ TYPE_TESTS &&
     });
 
     it("should extend zod", () => {
-      const schema = z.object({ a: z.number().mobxMeta({ label: "label" }) });
+      const schema = z.object({ a: z.number().formMeta({ label: "label" }) });
 
-      const _shouldGetString: string = schema.shape.a._mobxMeta.label;
+      const _shouldGetString: string = schema.shape.a._formMeta.label;
 
-      const schema2 = schema.shape.a.mobxMeta({ description: "description" });
+      const schema2 = schema.shape.a.formMeta({ description: "description" });
 
-      const _shouldGetString2: string = schema2._mobxMeta.description;
-      const _shouldGetString3: string = schema2._mobxMeta.label;
+      const _shouldGetString2: string = schema2._formMeta.description;
+      const _shouldGetString3: string = schema2._formMeta.label;
     });
 
     it("should create discriminated union", () => {
@@ -113,21 +113,21 @@ describe("field tests", () => {
       number: z.number(),
     });
 
-    expect(resolveDOMMobxZodMeta(schema.shape.string).decode("string")).toBe(
+    expect(resolveDOMFormMeta(schema.shape.string).decode("string")).toBe(
       "string",
     );
     // Wrong input should be passed as-is, for zod to throw an error.
-    expect(resolveDOMMobxZodMeta(schema.shape.string).decode(12345)).toBe(
+    expect(resolveDOMFormMeta(schema.shape.string).decode(12345)).toBe(
       12345,
     );
 
-    expect(resolveDOMMobxZodMeta(schema.shape.number).decode("12345")).toBe(
+    expect(resolveDOMFormMeta(schema.shape.number).decode("12345")).toBe(
       12345,
     );
-    expect(resolveDOMMobxZodMeta(schema.shape.number).decode("x")).toBe("x");
+    expect(resolveDOMFormMeta(schema.shape.number).decode("x")).toBe("x");
 
     expect(
-      resolveDOMMobxZodMeta(schema).decode({
+      resolveDOMFormMeta(schema).decode({
         string: "string",
         number: "12345",
       }),
@@ -139,7 +139,7 @@ describe("field tests", () => {
     const array = schema.array();
 
     expect(
-      resolveDOMMobxZodMeta(array).decode([
+      resolveDOMFormMeta(array).decode([
         { string: "string", number: "12345" },
       ]),
     ).toMatchObject([
@@ -149,37 +149,37 @@ describe("field tests", () => {
       },
     ]);
 
-    expect(resolveDOMMobxZodMeta(array).decode("not-an-array")).toBe(
+    expect(resolveDOMFormMeta(array).decode("not-an-array")).toBe(
       "not-an-array",
     );
   });
 
   it("should encode values", () => {
-    expect(resolveDOMMobxZodMeta(z.number()).encode(12345)).toBe("12345");
-    expect(resolveDOMMobxZodMeta(z.number()).encode(undefined)).toBe("");
+    expect(resolveDOMFormMeta(z.number()).encode(12345)).toBe("12345");
+    expect(resolveDOMFormMeta(z.number()).encode(undefined)).toBe("");
 
-    expect(resolveDOMMobxZodMeta(z.string()).encode("12345")).toBe("12345");
+    expect(resolveDOMFormMeta(z.string()).encode("12345")).toBe("12345");
 
-    expect(resolveDOMMobxZodMeta(z.boolean()).encode(true)).toBe(true);
+    expect(resolveDOMFormMeta(z.boolean()).encode(true)).toBe(true);
 
     expect(
-      resolveDOMMobxZodMeta(z.number().array()).encode([1, 2, 3]),
+      resolveDOMFormMeta(z.number().array()).encode([1, 2, 3]),
     ).toMatchObject(["1", "2", "3"]);
 
     expect(
-      resolveDOMMobxZodMeta(z.string().array()).encode(["1", "2", "3", ""]),
+      resolveDOMFormMeta(z.string().array()).encode(["1", "2", "3", ""]),
     ).toMatchObject(["1", "2", "3", ""]);
   });
 
   it("should get initial output", () => {
-    expect(resolveDOMMobxZodMeta(z.string()).getInitialOutput()).toBe("");
+    expect(resolveDOMFormMeta(z.string()).getInitialOutput()).toBe("");
 
-    expect(resolveDOMMobxZodMeta(z.number()).getInitialOutput()).toBe(
+    expect(resolveDOMFormMeta(z.number()).getInitialOutput()).toBe(
       undefined,
     );
 
     expect(
-      resolveDOMMobxZodMeta(
+      resolveDOMFormMeta(
         z.object({ a: z.string(), b: z.number(), c: z.array(z.number()) }),
       ).getInitialOutput(),
     ).toMatchObject({

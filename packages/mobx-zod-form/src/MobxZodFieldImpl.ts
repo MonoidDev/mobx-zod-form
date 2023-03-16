@@ -1,6 +1,7 @@
 import { action, computed, makeObservable, observable } from "mobx";
 import type { ParsePath, ZodIssue, ZodTypeAny } from "zod";
 
+import { resolveDOMFormMeta, FormMeta } from "./FormMeta";
 import {
   createFieldForType,
   MobxZodArrayField,
@@ -11,7 +12,6 @@ import {
   MobxZodObjectFieldFields,
 } from "./MobxZodField";
 import type { MobxZodForm, InputSetActionOptions } from "./MobxZodForm";
-import { resolveDOMMobxZodMeta, MobxZodMeta } from "./MobxZodMeta";
 import {
   type MobxZodDiscriminatedUnion,
   type MobxZodTypes,
@@ -23,7 +23,7 @@ import { discriminatorType } from "./zod-extra";
 export class MobxZodBaseFieldImpl<T extends MobxZodTypes>
   implements MobxZodField<T>
 {
-  mobxZodMeta: MobxZodMeta;
+  mobxZodMeta: FormMeta;
   _issues: ZodIssue[] = [];
   _errorMessages: string[] = [];
   _touched: boolean = false;
@@ -37,7 +37,7 @@ export class MobxZodBaseFieldImpl<T extends MobxZodTypes>
     public readonly form: MobxZodForm<any>,
     public path: ParsePath,
   ) {
-    this.mobxZodMeta = resolveDOMMobxZodMeta(this.type);
+    this.mobxZodMeta = resolveDOMFormMeta(this.type);
     makeObservable(this, {
       _issues: observable,
       _errorMessages: observable,
