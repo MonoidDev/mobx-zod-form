@@ -33,12 +33,8 @@ jobs:
           name: Publish All
           command: |
             npx nx run-many --target=build
-            ROOT="$(pwd)"
-
-            npm config set '//registry.npmjs.org/:_authToken' "${NPM_TOKEN}"
-
-            cd $ROOT/packages/mobx-zod-form && pnpm publish || true
-            cd $ROOT/packages/mobx-zod-form-react && pnpm publish || true
+            
+            pnpm publish -r --no-git-checks
 
 
 workflows:
