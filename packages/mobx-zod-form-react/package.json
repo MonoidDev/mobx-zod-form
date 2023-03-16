@@ -1,6 +1,6 @@
 {
   "name": "@monoid-dev/mobx-zod-form-react",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "type": "commonjs",
   "main": "./lib/index.js",
   "module": "./lib/index.mjs",
@@ -31,7 +31,7 @@
   },
   "scripts": {
     "dev": "tsx src/index.ts",
-    "build": "tsup src/index.ts --external react --format esm,cjs -d lib/ && tsc -p tsconfig.build.json",
+    "build": "tsup src/index.tsx --external react --format esm,cjs -d lib/ && tsc -p tsconfig.build.json",
     "lint": "tsc && eslint ./src --ext .ts,.tsx",
     "test": "echo 'no tests'"
   },

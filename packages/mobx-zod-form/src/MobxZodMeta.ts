@@ -31,13 +31,13 @@ declare module "zod" {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     Def extends ZodTypeDef = ZodTypeDef,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    Input = Output
+    Input = Output,
   > {
     _mobxMeta: Readonly<{}>;
 
     mobxMeta<T extends Partial<MobxZodMeta>, Z extends ZodTypeAny>(
       this: Z,
-      meta: T
+      meta: T,
     ): Expand<
       Z & {
         _mobxMeta: Expand<T & Z["mobxMeta"]>;
@@ -45,7 +45,7 @@ declare module "zod" {
     >;
 
     eraseMobxMeta<Z extends ZodTypeAny>(
-      this: Z
+      this: Z,
     ): Expand<
       Z & {
         _mobxMeta: Partial<MobxZodMeta>;
@@ -61,12 +61,16 @@ declare module "zod" {
 export function extendZodWithMobxZodForm(zod: typeof z) {
   if (zod.ZodType.prototype.mobxMeta !== undefined) {
     console.warn(
-      "`extendZodWithMobxZodForm` is already called on the same z object. You probably should not call it twice."
+      "`extendZodWithMobxZodForm` is already called on the same z object. You probably should not call it twice.",
     );
     return;
   }
 
-  zod.ZodType.prototype._mobxMeta = {};
+  Object.defineProperty(zod.ZodType.prototype, "_mobxMeta", {
+    get() {
+      return this._def._mobxMeta || {}; // To match type definition '_mobxMeta: Readonly<{}>'
+    },
+  });
 
   zod.ZodType.prototype.mobxMeta = function (meta: any) {
     const o = new (this as any).constructor({
@@ -74,12 +78,6 @@ export function extendZodWithMobxZodForm(zod: typeof z) {
       _mobxMeta: {
         ...this._mobxMeta,
         ...meta,
-      },
-    });
-
-    Object.defineProperty(o, "_mobxMeta", {
-      get() {
-        return o._def._mobxMeta;
       },
     });
 
@@ -92,7 +90,7 @@ export function extendZodWithMobxZodForm(zod: typeof z) {
  * Encodes number as decimal strings, and other as-is.
  */
 export const resolveDOMMobxZodMeta = (type: ZodTypeAny): MobxZodMeta => {
-  const inputMobxZodMeta = type._def.mobxZodMeta;
+  const inputMobxZodMeta = type._mobxMeta as MobxZodMeta;
 
   return {
     ...inputMobxZodMeta,
@@ -128,13 +126,13 @@ export const resolveDOMMobxZodMeta = (type: ZodTypeAny): MobxZodMeta => {
             Object.entries(type.shape).map(([key, value]) => [
               key,
               resolveDOMMobxZodMeta(value as any).decode(input[key]),
-            ])
+            ]),
           );
         }
       } else if (type instanceof ZodArray) {
         if (Array.isArray(input)) {
           return input.map((v) =>
-            resolveDOMMobxZodMeta(type.element as any).decode(v)
+            resolveDOMMobxZodMeta(type.element as any).decode(v),
           );
         }
       }
@@ -170,7 +168,7 @@ export const resolveDOMMobxZodMeta = (type: ZodTypeAny): MobxZodMeta => {
           Object.entries(type.shape).map(([key, value]) => [
             key,
             resolveDOMMobxZodMeta(value as any).encode(output[key]),
-          ])
+          ]),
         );
       } else if (type instanceof ZodArray) {
         if (type === empty) {
@@ -178,7 +176,7 @@ export const resolveDOMMobxZodMeta = (type: ZodTypeAny): MobxZodMeta => {
         }
 
         return output.map((o: any) =>
-          resolveDOMMobxZodMeta(type.element as any).encode(o)
+          resolveDOMMobxZodMeta(type.element as any).encode(o),
         );
       }
 
@@ -196,7 +194,7 @@ export const resolveDOMMobxZodMeta = (type: ZodTypeAny): MobxZodMeta => {
           Object.entries(type.shape).map(([key, value]) => [
             key,
             resolveDOMMobxZodMeta(value as any).getInitialOutput(),
-          ])
+          ]),
         );
       } else if (type instanceof ZodArray) {
         return [];

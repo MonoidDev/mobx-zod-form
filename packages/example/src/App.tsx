@@ -1,5 +1,9 @@
 import { empty, MobxZodField } from "@monoid-dev/mobx-zod-form";
-import { useForm } from "@monoid-dev/mobx-zod-form-react";
+import {
+  FormContextProvider,
+  useForm,
+  useFormContext,
+} from "@monoid-dev/mobx-zod-form-react";
 import { observer } from "mobx-react";
 import { z, ZodNumber, ZodString } from "zod";
 
@@ -94,12 +98,46 @@ const FormArray1 = observer(() => {
   );
 });
 
+const FormContext1Type = z.object({
+  username: z.string().min(1),
+  password: z.string().min(6),
+  inner: z.string().min(1),
+});
+
+const FormContext1Children = observer(() => {
+  const form = useFormContext(FormContext1Type);
+
+  return <TextInput field={form.root.fields.inner} />;
+});
+
+const FormContext1 = observer(() => {
+  const form = useForm(
+    z.object({
+      username: z.string().min(1),
+      password: z.string().min(6),
+      inner: z.string().min(1),
+    }),
+    { validateOnMount: false },
+  );
+
+  return (
+    <FormContextProvider form={form}>
+      <div style={{ border: `1px solid black` }}>
+        <TextInput field={form.root.fields.username} />
+        <TextInput field={form.root.fields.password} />
+        <FormContext1Children />
+      </div>
+    </FormContextProvider>
+  );
+});
+
 function App() {
   return (
     <div className="App">
       <Form1 />
       <Form2 />
       <FormArray1 />
+      <FormContext1 />
     </div>
   );
 }
