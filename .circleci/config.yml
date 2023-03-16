@@ -33,7 +33,7 @@ jobs:
           name: Publish All
           command: |
             npx nx run-many --target=build
-            PWD=$(pwd)
+            PWD="$(pwd)"
             cd $PWD/packages/mobx-zod-form && pnpm run publish || true
             cd $PWD/packages/mobx-zod-form-react && pnpm run publish || true
 
