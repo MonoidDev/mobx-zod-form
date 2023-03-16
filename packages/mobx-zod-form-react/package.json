@@ -33,7 +33,7 @@
     "dev": "tsx src/index.ts",
     "build": "tsup src/index.ts --external react --format esm,cjs -d lib/ && tsc -p tsconfig.build.json",
     "lint": "tsc && eslint ./src --ext .ts,.tsx",
-    "test": "vitest run"
+    "test": "echo 'no tests'"
   },
   "dependencies": {
     "mobx-zod-form": "~0.0.1"
