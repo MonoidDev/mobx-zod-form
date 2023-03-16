@@ -34,8 +34,11 @@ jobs:
           command: |
             npx nx run-many --target=build
             ROOT="$(pwd)"
-            cd $ROOT/packages/mobx-zod-form && pnpm run publish || true
-            cd $ROOT/packages/mobx-zod-form-react && pnpm run publish || true
+
+            npm config set '//registry.npmjs.org/:_authToken' "${NPM_TOKEN}"
+
+            cd $ROOT/packages/mobx-zod-form && pnpm publish || true
+            cd $ROOT/packages/mobx-zod-form-react && pnpm publish || true
 
 
 workflows:
