@@ -31,7 +31,7 @@ import { discriminatorType } from "./zod-extra";
 export class MobxZodBaseFieldImpl<T extends MobxZodTypes>
   implements MobxZodField<T>
 {
-  mobxZodMeta: FormMeta;
+  formMeta: FormMeta;
   _issues: ZodIssue[] = [];
   _errorMessages: string[] = [];
   _touched: boolean = false;
@@ -45,7 +45,7 @@ export class MobxZodBaseFieldImpl<T extends MobxZodTypes>
     public readonly form: MobxZodForm<any>,
     public path: ParsePath,
   ) {
-    this.mobxZodMeta = this.type.getFormMeta();
+    this.formMeta = this.type.getFormMeta();
     makeObservable(this, {
       _issues: observable,
       _errorMessages: observable,
@@ -67,7 +67,7 @@ export class MobxZodBaseFieldImpl<T extends MobxZodTypes>
   }
 
   get input() {
-    return this.mobxZodMeta.decode(this.rawInput);
+    return this.formMeta.decode(this.rawInput);
   }
 
   get issues() {
@@ -92,7 +92,7 @@ export class MobxZodBaseFieldImpl<T extends MobxZodTypes>
   }
 
   setOutput(value: unknown) {
-    this.form._setRawInputAt(this.path, this.mobxZodMeta.encode(value));
+    this.form._setRawInputAt(this.path, this.formMeta.encode(value));
     this.onInputChange();
   }
 

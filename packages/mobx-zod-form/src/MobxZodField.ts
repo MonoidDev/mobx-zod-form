@@ -42,7 +42,7 @@ export interface MobxZodField<T extends ZodTypeAny> {
    * Useful for SSR and tracking array field elements.
    */
   readonly uniqueId: number;
-  readonly mobxZodMeta: FormMeta;
+  readonly formMeta: FormMeta;
   path: ParsePath;
   /**
    * The original input, e.g. from DOM string.
