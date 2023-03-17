@@ -20,6 +20,7 @@ TYPE_TESTS &&
           c: z.string(),
         }),
         literalString: z.literal("literalString"),
+        enum: z.enum(["A", "B", "C"]),
       });
 
       const o: MobxZodObjectField<typeof schema> = {} as any;
@@ -33,6 +34,12 @@ TYPE_TESTS &&
 
       const _shouldGetLiteralString: (typeof o.fields.literalString)["type"] =
         z.literal("literalString");
+
+      const _shouldGetEnum: (typeof o.fields.enum)["type"] = z.enum([
+        "A",
+        "B",
+        "C",
+      ]);
     });
 
     it("should extend zod", () => {

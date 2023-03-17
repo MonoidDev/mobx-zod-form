@@ -11,6 +11,7 @@ import {
   ZodDiscriminatedUnionOption,
   ZodLiteral,
   ZodError,
+  ZodEnum,
 } from "zod";
 
 import { FormMeta } from "./FormMeta";
@@ -73,6 +74,7 @@ export type MapZodTypeToField<T extends MobxZodTypes> = T extends
   | ZodString
   | ZodNumber
   | ZodBoolean
+  | ZodEnum<[string, ...string[]]>
   | MobxZodLiteral
   ? MobxZodField<T>
   : T extends MobxZodObject
@@ -175,6 +177,7 @@ export const createFieldForType = <T extends MobxZodTypes>(
     type instanceof ZodString ||
     type instanceof ZodNumber ||
     type instanceof ZodBoolean ||
+    type instanceof ZodEnum ||
     type instanceof ZodLiteral
   ) {
     return new MobxZodBaseFieldImpl<typeof type>(type, form, path) as any;

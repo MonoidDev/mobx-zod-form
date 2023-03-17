@@ -1,6 +1,6 @@
 {
   "name": "@monoid-dev/mobx-zod-form",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "type": "commonjs",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",

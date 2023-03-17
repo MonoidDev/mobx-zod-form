@@ -11,6 +11,7 @@ import type {
   ZodDiscriminatedUnionOption,
   ZodLiteral,
   Primitive,
+  ZodEnum,
 } from "zod";
 
 import { DiscriminatorType } from "./zod-extra";
@@ -32,6 +33,7 @@ export type MobxZodPrimitiveTypes =
   | ZodString
   | ZodNumber
   | ZodBoolean
+  | ZodEnum<[string, ...string[]]>
   | MobxZodLiteral;
 
 export type MobxZodTypes =
