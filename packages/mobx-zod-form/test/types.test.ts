@@ -170,6 +170,23 @@ describe("field tests", () => {
     expect(resolveDOMFormMeta(z.string().nullable()).decode(undefined)).toBe(
       null,
     );
+    expect(
+      resolveDOMFormMeta(
+        z
+          .object({
+            name: z.string(),
+            url: z.string(),
+          })
+          .optional()
+          .nullable(),
+      ).encode({
+        name: "name",
+        url: "url",
+      }),
+    ).toMatchObject({
+      name: "name",
+      url: "url",
+    });
   });
 
   it("should encode values", () => {

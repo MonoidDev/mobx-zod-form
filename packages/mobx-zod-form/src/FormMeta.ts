@@ -181,7 +181,7 @@ export const resolveDOMFormMeta = (type: ZodTypeAny): FormMeta => {
         if (output === empty || output == null) {
           return this.getInitialOutput();
         } else {
-          return resolveDOMFormMeta(type.unwrap()).encode(type);
+          return resolveDOMFormMeta(type.unwrap()).encode(output);
         }
       } else if (type instanceof ZodObject) {
         if (output === empty) {
