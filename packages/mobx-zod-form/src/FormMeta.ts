@@ -9,8 +9,6 @@ import {
   ZodTypeDef,
 } from "zod";
 
-import { Expand } from "./type-utils";
-
 export interface MobxZodMetaOptional {
   label?: string;
   description?: string;
@@ -33,24 +31,22 @@ declare module "zod" {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     Input = Output,
   > {
-    _formMeta: Readonly<{}>;
+    _formMeta: FormMeta;
 
+    /**
+     * Extend the form meta of the type. You can retrieve it later with `getFormMeta`.
+     * Sorry we cannot better type the returning type,
+     * which means you'll get optional properties when you use them,
+     * because `zod` does not give us a chance to use generic here.
+     * @param this type
+     * @param meta custom partial form meta
+     */
     formMeta<T extends Partial<FormMeta>, Z extends ZodTypeAny>(
       this: Z,
       meta: T,
-    ): Expand<
-      Z & {
-        _formMeta: Expand<T & Z["formMeta"]>;
-      }
-    >;
+    ): Z;
 
-    eraseformMeta<Z extends ZodTypeAny>(
-      this: Z,
-    ): Expand<
-      Z & {
-        _formMeta: Partial<FormMeta>;
-      }
-    >;
+    getFormMeta(): FormMeta;
   }
 }
 
@@ -82,6 +78,10 @@ export function extendZodWithMobxZodForm(zod: typeof z) {
     });
 
     return o;
+  };
+
+  zod.ZodType.prototype.getFormMeta = function () {
+    return resolveDOMFormMeta(this);
   };
 }
 

@@ -1,7 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { z } from "zod";
 
+import { setup } from "./utils";
 import { MobxZodForm } from "../src";
+
+setup();
 
 describe("form utils tests", () => {
   it("should set dirty", () => {

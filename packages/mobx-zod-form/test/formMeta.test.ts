@@ -2,7 +2,6 @@ import { describe, expect, it } from "vitest";
 import { z } from "zod";
 
 import { setup } from "./utils";
-import { resolveDOMFormMeta } from "../src";
 
 setup();
 
@@ -19,10 +18,8 @@ describe("formMeta tests", () => {
     const described = labeled.formMeta({ description: "..." });
     expect(described._formMeta.description).toBe("...");
 
-    const labeledAndRefined = resolveDOMFormMeta(
-      z.number().formMeta({ label: "refined" }).min(1),
-    );
+    const labeledAndRefined = z.number().formMeta({ label: "refined" }).min(1);
 
-    expect(labeledAndRefined.label).toBe("refined");
+    expect(labeledAndRefined.getFormMeta().label).toBe("refined");
   });
 });

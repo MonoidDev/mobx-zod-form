@@ -1,9 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { z, ZodError } from "zod";
 
+import { setup } from "./utils";
 import { resolveDOMFormMeta, MobxZodObjectField } from "../src";
 import { MobxZodForm } from "../src/MobxZodForm";
 import { discriminatorType } from "../src/zod-extra";
+
+setup();
 
 let TYPE_TESTS = false;
 
@@ -35,12 +38,14 @@ TYPE_TESTS &&
     it("should extend zod", () => {
       const schema = z.object({ a: z.number().formMeta({ label: "label" }) });
 
-      const _shouldGetString: string = schema.shape.a._formMeta.label;
+      const _shouldGetString: string | undefined =
+        schema.shape.a._formMeta.label;
 
       const schema2 = schema.shape.a.formMeta({ description: "description" });
 
-      const _shouldGetString2: string = schema2._formMeta.description;
-      const _shouldGetString3: string = schema2._formMeta.label;
+      const _shouldGetString2: string | undefined =
+        schema2._formMeta.description;
+      const _shouldGetString3: string | undefined = schema2._formMeta.label;
     });
 
     it("should create discriminated union", () => {
@@ -117,13 +122,9 @@ describe("field tests", () => {
       "string",
     );
     // Wrong input should be passed as-is, for zod to throw an error.
-    expect(resolveDOMFormMeta(schema.shape.string).decode(12345)).toBe(
-      12345,
-    );
+    expect(resolveDOMFormMeta(schema.shape.string).decode(12345)).toBe(12345);
 
-    expect(resolveDOMFormMeta(schema.shape.number).decode("12345")).toBe(
-      12345,
-    );
+    expect(resolveDOMFormMeta(schema.shape.number).decode("12345")).toBe(12345);
     expect(resolveDOMFormMeta(schema.shape.number).decode("x")).toBe("x");
 
     expect(
@@ -139,9 +140,7 @@ describe("field tests", () => {
     const array = schema.array();
 
     expect(
-      resolveDOMFormMeta(array).decode([
-        { string: "string", number: "12345" },
-      ]),
+      resolveDOMFormMeta(array).decode([{ string: "string", number: "12345" }]),
     ).toMatchObject([
       {
         string: "string",
@@ -174,9 +173,7 @@ describe("field tests", () => {
   it("should get initial output", () => {
     expect(resolveDOMFormMeta(z.string()).getInitialOutput()).toBe("");
 
-    expect(resolveDOMFormMeta(z.number()).getInitialOutput()).toBe(
-      undefined,
-    );
+    expect(resolveDOMFormMeta(z.number()).getInitialOutput()).toBe(undefined);
 
     expect(
       resolveDOMFormMeta(

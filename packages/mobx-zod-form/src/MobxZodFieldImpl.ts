@@ -1,7 +1,7 @@
 import { action, computed, makeObservable, observable } from "mobx";
 import type { ParsePath, ZodIssue, ZodTypeAny } from "zod";
 
-import { resolveDOMFormMeta, FormMeta } from "./FormMeta";
+import { FormMeta } from "./FormMeta";
 import {
   createFieldForType,
   MobxZodArrayField,
@@ -37,7 +37,7 @@ export class MobxZodBaseFieldImpl<T extends MobxZodTypes>
     public readonly form: MobxZodForm<any>,
     public path: ParsePath,
   ) {
-    this.mobxZodMeta = resolveDOMFormMeta(this.type);
+    this.mobxZodMeta = this.type.getFormMeta();
     makeObservable(this, {
       _issues: observable,
       _errorMessages: observable,

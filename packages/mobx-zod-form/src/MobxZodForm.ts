@@ -13,7 +13,7 @@ import {
   type SafeParseReturnType,
 } from "zod";
 
-import { resolveDOMFormMeta, type FormMeta } from "./FormMeta";
+import { type FormMeta } from "./FormMeta";
 import { getPathId, setPath, shallowEqual, visitPath } from "./js-utils";
 import { createFieldForType, type MapZodTypeToField } from "./MobxZodField";
 import { type MobxZodTypes } from "./types";
@@ -60,7 +60,7 @@ export class MobxZodForm<T extends MobxZodTypes> {
     public readonly schema: T,
     public readonly _options: MobxZodFormOptions<T> = {},
   ) {
-    this.schemaMobxZodMeta = resolveDOMFormMeta(schema);
+    this.schemaMobxZodMeta = schema.getFormMeta();
 
     this._rawInput = this.schemaMobxZodMeta.encode(this.options.initialOutput);
 
