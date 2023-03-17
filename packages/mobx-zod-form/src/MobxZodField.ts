@@ -12,6 +12,8 @@ import {
   ZodLiteral,
   ZodError,
   ZodEnum,
+  ZodOptional,
+  ZodNullable,
 } from "zod";
 
 import { FormMeta } from "./FormMeta";
@@ -19,10 +21,12 @@ import {
   MobxZodArrayFieldImpl,
   MobxZodBaseFieldImpl,
   MobxZodObjectFieldImpl,
+  MobxZodOmittableFieldImpl,
 } from "./MobxZodFieldImpl";
 import { MobxZodForm, InputSetActionOptions } from "./MobxZodForm";
 import { IdxOf } from "./type-utils";
 import type {
+  MobxOmittableTypes,
   MobxZodArray,
   MobxZodDiscriminatedUnion,
   MobxZodLiteral,
@@ -59,6 +63,10 @@ export interface MobxZodField<T extends ZodTypeAny> {
   /**
    * Issues associated with this field
    */
+  /**
+   * When this field's value has changed involuntarily, e.g. the parent field has called 'setRawInput'
+   */
+  onInputChange(): void;
   issues: readonly ZodIssue[];
   _issues: ZodIssue[];
   touched: boolean;
@@ -77,6 +85,10 @@ export type MapZodTypeToField<T extends MobxZodTypes> = T extends
   | ZodEnum<[string, ...string[]]>
   | MobxZodLiteral
   ? MobxZodField<T>
+  : T extends ZodOptional<ZodTypeAny>
+  ? MobxZodOptionalField<T>
+  : T extends ZodNullable<ZodTypeAny>
+  ? MobxZodNullableField<T>
   : T extends MobxZodObject
   ? MobxZodObjectField<T>
   : T extends MobxZodArray
@@ -168,6 +180,22 @@ export interface MobxZodDiscriminatedUnionField<
   fieldsResult: this["_types"]["_fieldsResult"];
 }
 
+export type MobxZodOmittableFieldTypes<T extends MobxOmittableTypes> = {
+  _innerField: MapZodTypeToField<T["_def"]["innerType"]>;
+};
+
+export interface MobxZodOmittableField<T extends MobxOmittableTypes>
+  extends MobxZodField<T> {
+  _types: MobxZodOmittableFieldTypes<T>;
+  innerField: this["_types"]["_innerField"] | undefined;
+}
+
+export interface MobxZodOptionalField<T extends MobxOmittableTypes>
+  extends MobxZodOmittableField<T> {}
+
+export interface MobxZodNullableField<T extends MobxOmittableTypes>
+  extends MobxZodOmittableField<T> {}
+
 export const createFieldForType = <T extends MobxZodTypes>(
   type: T,
   form: MobxZodForm<any>,
@@ -181,12 +209,15 @@ export const createFieldForType = <T extends MobxZodTypes>(
     type instanceof ZodLiteral
   ) {
     return new MobxZodBaseFieldImpl<typeof type>(type, form, path) as any;
+  } else if (type instanceof ZodOptional || type instanceof ZodNullable) {
+    return new MobxZodOmittableFieldImpl<typeof type>(type, form, path) as any;
   } else if (type instanceof ZodObject) {
     return new MobxZodObjectFieldImpl<typeof type>(type, form, path) as any;
   } else if (type instanceof ZodArray) {
     return new MobxZodArrayFieldImpl<typeof type>(type, form, path) as any;
   }
 
-  // TODO: better error display
-  throw new Error("type is not handled");
+  throw new Error(
+    `type ${type.constructor.name} is not handled. Check the type at ${path}. For a list of supported Zod types, see TODO`,
+  );
 };

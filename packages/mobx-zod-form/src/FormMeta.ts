@@ -2,8 +2,11 @@ import {
   z,
   ZodArray,
   ZodBoolean,
+  ZodEnum,
+  ZodNullable,
   ZodNumber,
   ZodObject,
+  ZodOptional,
   ZodString,
   ZodTypeAny,
   ZodTypeDef,
@@ -90,13 +93,13 @@ export function extendZodWithMobxZodForm(zod: typeof z) {
  * Encodes number as decimal strings, and other as-is.
  */
 export const resolveDOMFormMeta = (type: ZodTypeAny): FormMeta => {
-  const inputMobxZodMeta = type._formMeta as FormMeta;
+  const inputFormMeta = type._formMeta as FormMeta;
 
   return {
-    ...inputMobxZodMeta,
+    ...inputFormMeta,
     decode(input) {
-      if (inputMobxZodMeta?.decode) {
-        return inputMobxZodMeta.decode(input);
+      if (inputFormMeta?.decode) {
+        return inputFormMeta.decode(input);
       }
 
       if (type instanceof ZodString) {
@@ -120,6 +123,24 @@ export const resolveDOMFormMeta = (type: ZodTypeAny): FormMeta => {
         }
 
         return input;
+      } else if (type instanceof ZodOptional || type instanceof ZodNullable) {
+        if (input == null) {
+          return this.getInitialOutput();
+        }
+
+        const innerType = type.unwrap();
+        const innerDecoded = resolveDOMFormMeta(innerType).decode(input);
+
+        // For innerType is empty string
+        if (innerType instanceof ZodString && !innerDecoded) {
+          return this.getInitialOutput();
+        }
+
+        if (innerDecoded == null) {
+          return this.getInitialOutput();
+        }
+
+        return innerDecoded;
       } else if (type instanceof ZodObject) {
         if (typeof input === "object") {
           return Object.fromEntries(
@@ -140,8 +161,8 @@ export const resolveDOMFormMeta = (type: ZodTypeAny): FormMeta => {
       return input;
     },
     encode(output: any) {
-      if (inputMobxZodMeta?.encode) {
-        return inputMobxZodMeta.encode(output);
+      if (inputFormMeta?.encode) {
+        return inputFormMeta.encode(output);
       }
 
       if (type instanceof ZodString) {
@@ -156,6 +177,12 @@ export const resolveDOMFormMeta = (type: ZodTypeAny): FormMeta => {
         }
 
         return output == undefined ? "" : String(output);
+      } else if (type instanceof ZodOptional || type instanceof ZodNullable) {
+        if (output === empty || output == null) {
+          return this.getInitialOutput();
+        } else {
+          return resolveDOMFormMeta(type.unwrap()).encode(type);
+        }
       } else if (type instanceof ZodObject) {
         if (output === empty) {
           return Object.entries(type.shape).map(([key, value]) => [
@@ -189,6 +216,12 @@ export const resolveDOMFormMeta = (type: ZodTypeAny): FormMeta => {
         return undefined;
       } else if (type instanceof ZodBoolean) {
         return false;
+      } else if (type instanceof ZodEnum) {
+        return type.options[0];
+      } else if (type instanceof ZodOptional) {
+        return undefined;
+      } else if (type instanceof ZodNullable) {
+        return null;
       } else if (type instanceof ZodObject) {
         return Object.fromEntries(
           Object.entries(type.shape).map(([key, value]) => [

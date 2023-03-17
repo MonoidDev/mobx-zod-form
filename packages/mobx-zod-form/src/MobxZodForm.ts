@@ -187,7 +187,6 @@ export class MobxZodForm<T extends MobxZodTypes> {
     }
 
     this._isDirty = true;
-
     this._notifyChange();
   }
 

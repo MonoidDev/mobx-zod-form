@@ -271,4 +271,26 @@ describe("form tests", () => {
 
     expect(obLength.observed).toMatchObject([0, 1, 2, 3]);
   });
+
+  it("should react on field changes for omittable types", () => {
+    const form = new MobxZodForm(
+      z.object({
+        optional: z.string().optional(),
+        nullable: z.string().nullable(),
+      }),
+    );
+
+    const obOptional = observeForm((ob) =>
+      ob(!!form.root.fields.optional.innerField),
+    );
+    const obNullable = observeForm((ob) =>
+      ob(!!form.root.fields.nullable.innerField),
+    );
+
+    form.root.fields.optional.setOutput("filled");
+    form.root.fields.nullable.setOutput("filled");
+
+    expect(obOptional.observed).toMatchObject([false, true]);
+    expect(obNullable.observed).toMatchObject([false, true]);
+  });
 });

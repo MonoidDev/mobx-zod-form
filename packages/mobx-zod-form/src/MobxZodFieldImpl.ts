@@ -1,5 +1,11 @@
 import { action, computed, makeObservable, observable } from "mobx";
-import type { ParsePath, ZodIssue, ZodTypeAny } from "zod";
+import type {
+  ParsePath,
+  ZodIssue,
+  ZodNullable,
+  ZodOptional,
+  ZodTypeAny,
+} from "zod";
 
 import { FormMeta } from "./FormMeta";
 import {
@@ -10,6 +16,8 @@ import {
   MobxZodField,
   MobxZodObjectField,
   MobxZodObjectFieldFields,
+  MobxZodOmittableField,
+  MobxZodOmittableFieldTypes,
 } from "./MobxZodField";
 import type { MobxZodForm, InputSetActionOptions } from "./MobxZodForm";
 import {
@@ -50,6 +58,7 @@ export class MobxZodBaseFieldImpl<T extends MobxZodTypes>
       setOutput: action,
       setTouched: action,
       _updatePath: action,
+      onInputChange: action,
     });
   }
 
@@ -78,11 +87,17 @@ export class MobxZodBaseFieldImpl<T extends MobxZodTypes>
   }
 
   setRawInput(value: unknown) {
-    return this.form._setRawInputAt(this.path, value);
+    this.form._setRawInputAt(this.path, value);
+    this.onInputChange();
   }
 
   setOutput(value: unknown) {
-    return this.form._setRawInputAt(this.path, this.mobxZodMeta.encode(value));
+    this.form._setRawInputAt(this.path, this.mobxZodMeta.encode(value));
+    this.onInputChange();
+  }
+
+  onInputChange(): void {
+    return;
   }
 
   _updatePath(newPath: ParsePath) {
@@ -91,6 +106,53 @@ export class MobxZodBaseFieldImpl<T extends MobxZodTypes>
 
   _walk(f: (field: MobxZodField<any>) => void) {
     f(this);
+  }
+}
+
+export class MobxZodOmittableFieldImpl<
+    T extends ZodOptional<ZodTypeAny> | ZodNullable<ZodTypeAny>,
+  >
+  extends MobxZodBaseFieldImpl<T>
+  implements MobxZodOmittableField<T>
+{
+  _types!: MobxZodOmittableFieldTypes<T>;
+  _innerField: this["_types"]["_innerField"] | undefined =
+    this.createMaybeField() as any;
+
+  constructor(
+    public readonly type: T,
+    public readonly form: MobxZodForm<any>,
+    public path: ParsePath,
+  ) {
+    super(type, form, path);
+
+    makeObservable(this, {
+      _innerField: observable,
+      innerField: computed,
+    });
+  }
+
+  createMaybeField() {
+    if (this.rawInput == null) {
+      return undefined;
+    } else {
+      return createFieldForType(this.type.unwrap(), this.form, this.path);
+    }
+  }
+
+  get innerField() {
+    return this._innerField;
+  }
+
+  onInputChange(): void {
+    const oldOmitted = this._innerField === undefined;
+    const newOmitted = this.rawInput == null;
+
+    if (newOmitted) {
+      this._innerField = undefined;
+    } else if (oldOmitted) {
+      this._innerField = this.createMaybeField() as any;
+    }
   }
 }
 
@@ -118,6 +180,10 @@ export class MobxZodObjectFieldImpl<T extends MobxZodObject>
   _walk(f: (field: MobxZodField<any>) => void) {
     super._walk(f);
     Object.values(this.fields).forEach((field) => field._walk(f));
+  }
+
+  onInputChange(): void {
+    Object.values(this.fields).forEach((field) => field.onInputChange());
   }
 }
 
@@ -210,6 +276,11 @@ export class MobxZodArrayFieldImpl<T extends MobxZodArray>
     this.rawInput.splice(start, deleteCount, ...values);
     this.form._notifyChange();
   }
+
+  onInputChange(): void {
+    // TODO: align the new input with fields.
+    this._elements.forEach((f) => f.onInputChange());
+  }
 }
 
 export class MobxZodDiscriminatedUnionFieldImpl<
@@ -286,5 +357,9 @@ export class MobxZodDiscriminatedUnionFieldImpl<
         error: discriminatorParsed.error,
       };
     }
+  }
+
+  onInputChange(): void {
+    // TODO: align the new input with fields.
   }
 }

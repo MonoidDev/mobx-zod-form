@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { z, ZodError } from "zod";
 
 import { setup } from "./utils";
-import { resolveDOMFormMeta, MobxZodObjectField } from "../src";
+import { resolveDOMFormMeta, MobxZodObjectField, empty } from "../src";
 import { MobxZodForm } from "../src/MobxZodForm";
 import { discriminatorType } from "../src/zod-extra";
 
@@ -21,25 +21,31 @@ TYPE_TESTS &&
         }),
         literalString: z.literal("literalString"),
         enum: z.enum(["A", "B", "C"]),
+        nullable: z.string().nullable(),
+        optional: z.string().optional(),
       });
 
       const o: MobxZodObjectField<typeof schema> = {} as any;
 
-      const _shouldGetStringField: (typeof o.fields.a)["type"] = z.string();
+      const _shouldGetStringField: typeof o.fields.a.type = z.string();
 
-      const _shouldGetNumberField: (typeof o.fields.b)["type"] = z.number();
+      const _shouldGetNumberField: typeof o.fields.b.type = z.number();
 
-      const _shouldGetDeepStringField: (typeof o.fields.deep.fields.c)["type"] =
+      const _shouldGetDeepStringField: typeof o.fields.deep.fields.c.type =
         z.string();
 
-      const _shouldGetLiteralString: (typeof o.fields.literalString)["type"] =
+      const _shouldGetLiteralString: typeof o.fields.literalString.type =
         z.literal("literalString");
 
-      const _shouldGetEnum: (typeof o.fields.enum)["type"] = z.enum([
-        "A",
-        "B",
-        "C",
-      ]);
+      const _shouldGetEnum: typeof o.fields.enum.type = z.enum(["A", "B", "C"]);
+
+      const _shouldGetNullable: typeof o.fields.nullable.type = z
+        .string()
+        .nullable();
+
+      const _shouldGetOptional: typeof o.fields.optional.type = z
+        .string()
+        .optional();
     });
 
     it("should extend zod", () => {
@@ -158,6 +164,12 @@ describe("field tests", () => {
     expect(resolveDOMFormMeta(array).decode("not-an-array")).toBe(
       "not-an-array",
     );
+
+    expect(resolveDOMFormMeta(z.string().nullable()).decode("")).toBe(null);
+    expect(resolveDOMFormMeta(z.string().nullable()).decode(null)).toBe(null);
+    expect(resolveDOMFormMeta(z.string().nullable()).decode(undefined)).toBe(
+      null,
+    );
   });
 
   it("should encode values", () => {
@@ -175,6 +187,8 @@ describe("field tests", () => {
     expect(
       resolveDOMFormMeta(z.string().array()).encode(["1", "2", "3", ""]),
     ).toMatchObject(["1", "2", "3", ""]);
+
+    expect(resolveDOMFormMeta(z.string().nullable()).encode(empty)).toBe(null);
   });
 
   it("should get initial output", () => {
