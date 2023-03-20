@@ -8,6 +8,7 @@ import type {
 } from "zod";
 
 import { FormMeta } from "./FormMeta";
+import { parseResultValueEqual } from "./js-utils";
 import {
   createFieldForType,
   MobxZodArrayField,
@@ -26,7 +27,7 @@ import {
   type MobxZodArray,
   type MobxZodObject,
 } from "./types";
-import { discriminatorType } from "./zod-extra";
+import { DiscriminatorType, discriminatorType } from "./zod-extra";
 
 export class MobxZodBaseFieldImpl<T extends MobxZodTypes>
   implements MobxZodField<T>
@@ -51,14 +52,13 @@ export class MobxZodBaseFieldImpl<T extends MobxZodTypes>
       _errorMessages: observable,
       _touched: observable,
       rawInput: computed,
-      input: computed,
       issues: computed,
       touched: computed,
       setRawInput: action,
       setOutput: action,
       setTouched: action,
       _updatePath: action,
-      onInputChange: action,
+      _onInputChange: action,
     });
   }
 
@@ -66,8 +66,8 @@ export class MobxZodBaseFieldImpl<T extends MobxZodTypes>
     return this.form._getRawInputAt(this.path);
   }
 
-  get input() {
-    return this.formMeta.decode(this.rawInput);
+  get decodeResult() {
+    return this.formMeta.safeDecode(this.rawInput);
   }
 
   get issues() {
@@ -88,15 +88,15 @@ export class MobxZodBaseFieldImpl<T extends MobxZodTypes>
 
   setRawInput(value: unknown) {
     this.form._setRawInputAt(this.path, value);
-    this.onInputChange();
+    this._onInputChange();
   }
 
   setOutput(value: unknown) {
     this.form._setRawInputAt(this.path, this.formMeta.encode(value));
-    this.onInputChange();
+    this._onInputChange();
   }
 
-  onInputChange(): void {
+  _onInputChange(): void {
     return;
   }
 
@@ -108,7 +108,6 @@ export class MobxZodBaseFieldImpl<T extends MobxZodTypes>
     f(this);
   }
 }
-
 export class MobxZodOmittableFieldImpl<
     T extends ZodOptional<ZodTypeAny> | ZodNullable<ZodTypeAny>,
   >
@@ -144,7 +143,7 @@ export class MobxZodOmittableFieldImpl<
     return this._innerField;
   }
 
-  onInputChange(): void {
+  _onInputChange(): void {
     const oldOmitted = this._innerField === undefined;
     const newOmitted = this.rawInput == null;
 
@@ -179,11 +178,15 @@ export class MobxZodObjectFieldImpl<T extends MobxZodObject>
 
   _walk(f: (field: MobxZodField<any>) => void) {
     super._walk(f);
-    Object.values(this.fields).forEach((field) => field._walk(f));
+    Object.values(this.fields).forEach((field: MobxZodField<any>) =>
+      field._walk(f),
+    );
   }
 
-  onInputChange(): void {
-    Object.values(this.fields).forEach((field) => field.onInputChange());
+  _onInputChange(): void {
+    Object.values(this.fields).forEach((field: MobxZodField<any>) =>
+      field._onInputChange(),
+    );
   }
 }
 
@@ -277,9 +280,49 @@ export class MobxZodArrayFieldImpl<T extends MobxZodArray>
     this.form._notifyChange();
   }
 
-  onInputChange(): void {
-    // TODO: align the new input with fields.
-    this._elements.forEach((f) => f.onInputChange());
+  _onInputChange(): void {
+    const oldLength = this._elements.length;
+    if (this.decodeResult.success) {
+      const newLength = this.decodeResult.data.length;
+
+      if (newLength > oldLength) {
+        // Create new fields for new elements
+        this._elements.push(
+          ...new Array(newLength - oldLength)
+            .fill(1)
+            .map((_, i) =>
+              createFieldForType(this.type.element, this.form, [
+                ...this.path,
+                oldLength + i,
+              ]),
+            ),
+        );
+      } else {
+        // Delete extra fields
+        this._elements.splice(newLength, oldLength - newLength);
+      }
+
+      this._elements.forEach((f) => f._onInputChange());
+    } else {
+      this._elements.splice(0, oldLength);
+    }
+  }
+}
+
+export class MobxZodDiscriminatorFieldImpl<
+  T extends DiscriminatorType<MobxZodDiscriminatedUnion>,
+> extends MobxZodBaseFieldImpl<T> {
+  constructor(
+    public readonly type: T,
+    public readonly form: MobxZodForm<any>,
+    public path: ParsePath,
+    public parentField: MobxZodBaseFieldImpl<any>,
+  ) {
+    super(type, form, path);
+  }
+
+  _onInputChange(): void {
+    this.parentField._onInputChange();
   }
 }
 
@@ -290,7 +333,9 @@ export class MobxZodDiscriminatedUnionFieldImpl<
   implements MobxZodDiscriminatedUnionField<T>
 {
   _types!: MobxZodDiscriminatedUnionFieldTypes<T>;
-  _fields: Record<string, MobxZodField<ZodTypeAny>> = this._createFields();
+
+  _currentDiscriminatorParsed!: this["_types"]["_discriminatorParsedResult"];
+  _fields!: Record<string, MobxZodField<ZodTypeAny>>;
 
   discriminatorField: MobxZodField<this["_types"]["_discriminatorType"]>;
 
@@ -301,12 +346,16 @@ export class MobxZodDiscriminatedUnionFieldImpl<
   ) {
     super(type, form, path);
     makeObservable(this, {
+      _currentDiscriminatorParsed: observable,
+      _fields: observable,
       fieldsResult: computed,
       _rawDisciminator: computed,
       _discriminatorParsed: computed,
+      _updateFieldsForDiscriminator: action,
     });
 
     this.discriminatorField = this._createDiscriminatorField();
+    this._updateFieldsForDiscriminator();
   }
 
   get _rawDisciminator(): any {
@@ -318,10 +367,12 @@ export class MobxZodDiscriminatedUnionFieldImpl<
   }
 
   _createDiscriminatorField() {
-    return new MobxZodBaseFieldImpl(discriminatorType(this.type), this.form, [
-      ...this.path,
-      this.type.discriminator,
-    ]);
+    return new MobxZodDiscriminatorFieldImpl(
+      discriminatorType(this.type),
+      this.form,
+      [...this.path, this.type.discriminator],
+      this,
+    );
   }
 
   _createFields(): Record<string, MobxZodField<ZodTypeAny>> {
@@ -332,7 +383,7 @@ export class MobxZodDiscriminatedUnionFieldImpl<
 
       return Object.fromEntries(
         Object.keys(currentOption.shape)
-          .filter((key) => key === this.type.discriminator)
+          .filter((key) => key !== this.type.discriminator)
           .map((key) => [
             key,
             createFieldForType(this.type, this.form, [...this.path, key]),
@@ -349,7 +400,10 @@ export class MobxZodDiscriminatedUnionFieldImpl<
     if (discriminatorParsed.success) {
       return {
         success: true,
-        fields: this._fields as any,
+        fields: {
+          ...this._fields,
+          discriminator: discriminatorParsed.data,
+        } as any,
       };
     } else {
       return {
@@ -359,7 +413,37 @@ export class MobxZodDiscriminatedUnionFieldImpl<
     }
   }
 
-  onInputChange(): void {
-    // TODO: align the new input with fields.
+  _updateFieldsForDiscriminator() {
+    this._currentDiscriminatorParsed = this._discriminatorParsed;
+    this._fields = this._createFields();
+  }
+
+  _onInputChange(): void {
+    if (
+      parseResultValueEqual(
+        this._currentDiscriminatorParsed,
+        this._discriminatorParsed,
+      )
+    ) {
+      return;
+    }
+    this._updateFieldsForDiscriminator();
+
+    if (
+      this._currentDiscriminatorParsed.success &&
+      !this.decodeResult.success
+    ) {
+      this.setOutput(
+        this.type.optionsMap
+          .get(this._currentDiscriminatorParsed.data)!
+          .getFormMeta()
+          .getInitialOutput(),
+      );
+    }
+
+    this.discriminatorField._onInputChange();
+    Object.values(this._fields).forEach((f) => {
+      f._onInputChange();
+    });
   }
 }

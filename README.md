@@ -11,12 +11,13 @@ Data-first form builder based on [MobX](https://mobx.js.org/) & [Zod](https://zo
 5. `ZodOptional`
 6. `ZodNullable`
 7. `ZodLiteral`
-8. `ZodObject`
-9. `ZodArray`
-10. `ZodDefault`
-11. `z.discriminatedUnion`
+8. `ZodAny`
+9. `ZodObject`
+10. `ZodArray`
+11. `ZodDefault`
+12. `z.discriminatedUnion`
 
-12. Custom atomic types.
+13. Custom atomic types.
 
 ## Features
 

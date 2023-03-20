@@ -11,7 +11,7 @@ export type DiscriminatorType<T extends MobxZodDiscriminatedUnion> = ZodType<
 export const discriminatorType = <T extends MobxZodDiscriminatedUnion>(
   type: T,
 ): DiscriminatorType<T> => {
-  return z
+  const result = z
     .custom<MobxZodDiscriminatedUnionFieldTypes<T>["_discriminatorOutput"]>()
     .superRefine((arg, ctx) => {
       // @see https://github.com/colinhacks/zod/blob/6dad90785398885f7b058f5c0760d5ae5476b833/src/types.ts#L2929
@@ -25,4 +25,6 @@ export const discriminatorType = <T extends MobxZodDiscriminatedUnion>(
         return z.INVALID;
       }
     });
+
+  return result;
 };

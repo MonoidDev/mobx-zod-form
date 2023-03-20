@@ -14,12 +14,16 @@ import {
   ZodEnum,
   ZodOptional,
   ZodNullable,
+  ZodDiscriminatedUnion,
 } from "zod";
 
-import { FormMeta } from "./FormMeta";
+import { MobxFatalError } from "./errors";
+import { FormMeta, SafeDecodeResult } from "./FormMeta";
+import { getPathId } from "./js-utils";
 import {
   MobxZodArrayFieldImpl,
   MobxZodBaseFieldImpl,
+  MobxZodDiscriminatedUnionFieldImpl,
   MobxZodObjectFieldImpl,
   MobxZodOmittableFieldImpl,
 } from "./MobxZodFieldImpl";
@@ -51,7 +55,7 @@ export interface MobxZodField<T extends ZodTypeAny> {
   /**
    * The input converted from rawInput, e.g. for a number field, "01234" is converted to 1234
    */
-  input: T["_input"];
+  decodeResult: SafeDecodeResult<unknown, T["_input"]>;
   /**
    * Set the raw input, triggering the form validation
    */
@@ -66,7 +70,7 @@ export interface MobxZodField<T extends ZodTypeAny> {
   /**
    * When this field's value has changed involuntarily, e.g. the parent field has called 'setRawInput'
    */
-  onInputChange(): void;
+  _onInputChange(): void;
   issues: readonly ZodIssue[];
   _issues: ZodIssue[];
   touched: boolean;
@@ -215,9 +219,15 @@ export const createFieldForType = <T extends MobxZodTypes>(
     return new MobxZodObjectFieldImpl<typeof type>(type, form, path) as any;
   } else if (type instanceof ZodArray) {
     return new MobxZodArrayFieldImpl<typeof type>(type, form, path) as any;
+  } else if (type instanceof ZodDiscriminatedUnion) {
+    return new MobxZodDiscriminatedUnionFieldImpl(type, form, path) as any;
   }
 
-  throw new Error(
-    `type ${type.constructor.name} is not handled. Check the type at ${path}. For a list of supported Zod types, see TODO`,
+  throw new MobxFatalError(
+    `type ${
+      type.constructor.name
+    } is not handled. Check the type at ${JSON.stringify(
+      getPathId(path),
+    )}. For a list of supported Zod types, see TODO`,
   );
 };

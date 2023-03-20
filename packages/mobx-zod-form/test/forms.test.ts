@@ -1,8 +1,10 @@
+import { toJS } from "mobx";
 import { describe, expect, it } from "vitest";
 import { z } from "zod";
 
 import { observeForm } from "./utils";
 import { setup } from "./utils";
+import { unwrapDecodeResult } from "../src";
 import { MobxZodForm } from "../src/MobxZodForm";
 
 setup();
@@ -21,7 +23,7 @@ describe("form tests", () => {
     );
 
     const observeInput = observeForm((observe) => {
-      observe(form.root.fields.username.input);
+      observe(unwrapDecodeResult(form.root.fields.username.decodeResult));
     });
 
     form.root.fields.username.setRawInput("fuck you");
@@ -67,11 +69,11 @@ describe("form tests", () => {
     );
 
     const observeUsername = observeForm((ob) => {
-      ob(form.root.fields.username.input);
+      ob(unwrapDecodeResult(form.root.fields.username.decodeResult));
     });
 
     const observePassword = observeForm((ob) => {
-      ob(form.root.fields.password.input);
+      ob(unwrapDecodeResult(form.root.fields.password.decodeResult));
     });
 
     form.root.fields.username.setRawInput("hello");
@@ -142,7 +144,9 @@ describe("form tests", () => {
     );
 
     const obIdAt0 = observeForm((observe) => {
-      observe(form.root.input.ids[0]);
+      observe(
+        form.root.decodeResult.success && form.root.decodeResult.data.ids[0],
+      );
     });
 
     const obIdAt0Issues = observeForm((observe) => {
@@ -292,5 +296,90 @@ describe("form tests", () => {
 
     expect(obOptional.observed).toMatchObject([false, true]);
     expect(obNullable.observed).toMatchObject([false, true]);
+  });
+
+  it("should react on parent input change for arrays", () => {
+    const form = new MobxZodForm(
+      z.object({
+        array: z.number().array(),
+      }),
+      {
+        initialOutput: { array: [1, 2, 3] },
+      },
+    );
+
+    const obElements = observeForm((ob) => ob(form.root.fields.array.length));
+
+    form.root.setOutput({
+      array: [],
+    });
+
+    form.root.setOutput({
+      array: [1, 2, 3, 4],
+    });
+
+    expect(obElements.observed).toMatchObject([3, 0, 4]);
+  });
+
+  it("should react on discriminated union", () => {
+    const form = new MobxZodForm(
+      z.discriminatedUnion("answer", [
+        z.object({
+          answer: z.literal("OK"),
+        }),
+        z.object({
+          answer: z.literal("NO"),
+          reason: z.string().min(1),
+        }),
+      ]),
+      {
+        setActionOptions: {
+          validateSync: true,
+        },
+      },
+    );
+
+    expect(form.rawInput).toMatchObject({
+      answer: "OK",
+    });
+
+    form.root.discriminatorField.setOutput("NO");
+    // Should auto-fill reason with initial value
+    expect(toJS(form.rawInput)).toMatchObject({
+      answer: "NO",
+      reason: "",
+    });
+
+    form.root.setOutput({
+      answer: "NO",
+      reason: "xyz",
+    });
+
+    expect(toJS(form.rawInput)).toMatchObject({
+      answer: "NO",
+      reason: "xyz",
+    });
+
+    if (
+      form.root.fieldsResult.success &&
+      form.root.fieldsResult.fields.discriminator === "NO"
+    ) {
+      expect(form.root.fieldsResult.fields.reason.rawInput).toBe("xyz");
+    } else {
+      throw new Error("unexpected field value");
+    }
+
+    form.root.discriminatorField.setOutput("OK");
+
+    expect(toJS(form.rawInput)).toMatchObject({
+      answer: "OK",
+    });
+
+    form.root.discriminatorField.setOutput("NO");
+
+    expect(toJS(form.rawInput)).toMatchObject({
+      answer: "NO",
+      reason: "xyz",
+    });
   });
 });

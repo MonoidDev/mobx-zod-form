@@ -134,11 +134,21 @@ describe("field tests", () => {
     expect(resolveDOMFormMeta(schema.shape.string).decode("string")).toBe(
       "string",
     );
-    // Wrong input should be passed as-is, for zod to throw an error.
-    expect(resolveDOMFormMeta(schema.shape.string).decode(12345)).toBe(12345);
+
+    expect(
+      resolveDOMFormMeta(schema.shape.string).safeDecode(12345),
+    ).toMatchObject({
+      success: false,
+      input: 12345,
+    });
 
     expect(resolveDOMFormMeta(schema.shape.number).decode("12345")).toBe(12345);
-    expect(resolveDOMFormMeta(schema.shape.number).decode("x")).toBe("x");
+    expect(
+      resolveDOMFormMeta(schema.shape.number).safeDecode("x"),
+    ).toMatchObject({
+      success: false,
+      input: "x",
+    });
 
     expect(
       resolveDOMFormMeta(schema).decode({
@@ -154,16 +164,12 @@ describe("field tests", () => {
 
     expect(
       resolveDOMFormMeta(array).decode([{ string: "string", number: "12345" }]),
-    ).toMatchObject([
-      {
-        string: "string",
-        number: 12345,
-      },
-    ]);
+    ).toMatchObject([{ string: "string", number: 12345 }]);
 
-    expect(resolveDOMFormMeta(array).decode("not-an-array")).toBe(
-      "not-an-array",
-    );
+    expect(resolveDOMFormMeta(array).safeDecode("not-an-array")).toMatchObject({
+      success: false,
+      input: "not-an-array",
+    });
 
     expect(resolveDOMFormMeta(z.string().nullable()).decode("")).toBe(null);
     expect(resolveDOMFormMeta(z.string().nullable()).decode(null)).toBe(null);
@@ -205,7 +211,66 @@ describe("field tests", () => {
       resolveDOMFormMeta(z.string().array()).encode(["1", "2", "3", ""]),
     ).toMatchObject(["1", "2", "3", ""]);
 
+    expect(z.number().array().getFormMeta().encode(empty)).toMatchObject([]);
+
     expect(resolveDOMFormMeta(z.string().nullable()).encode(empty)).toBe(null);
+
+    expect(
+      z
+        .discriminatedUnion("answer", [
+          z.object({
+            answer: z.literal("OK"),
+          }),
+          z.object({
+            answer: z.literal("NO"),
+            reason: z.string().min(1),
+          }),
+        ])
+        .getFormMeta()
+        .encode(empty),
+    ).toMatchObject({
+      answer: "OK",
+    });
+
+    expect(
+      z
+        .discriminatedUnion("answer", [
+          z.object({
+            answer: z.literal("OK"),
+          }),
+          z.object({
+            answer: z.literal("NO"),
+            reason: z.string().min(1),
+          }),
+        ])
+        .getFormMeta()
+        .encode({
+          answer: "OK",
+        }),
+    ).toMatchObject({
+      answer: "OK",
+    });
+
+    expect(
+      z
+        .discriminatedUnion("answer", [
+          z.object({
+            answer: z.literal("OK"),
+          }),
+          z.object({
+            answer: z.literal("NO"),
+            reason: z.string().min(1),
+          }),
+        ])
+        .getFormMeta()
+        .encode({
+          answer: "NO",
+          reason: "no comments",
+        }),
+    ).toMatchObject({
+      answer: "NO",
+      reason: "no comments",
+    });
   });
 
   it("should get initial output", () => {

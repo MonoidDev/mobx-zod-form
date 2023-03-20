@@ -1,8 +1,12 @@
 import {
   z,
+  ZodAny,
   ZodArray,
   ZodBoolean,
+  ZodDiscriminatedUnion,
+  ZodEffects,
   ZodEnum,
+  ZodLiteral,
   ZodNullable,
   ZodNumber,
   ZodObject,
@@ -12,14 +16,42 @@ import {
   ZodTypeDef,
 } from "zod";
 
-export interface MobxZodMetaOptional {
+import { MobxFatalError, MobxZodDecodeError } from "./errors";
+
+export type SafeDecodeResultSuccess<Decoded> = {
+  success: true;
+  data: Decoded;
+};
+
+export type SafeDecodeResultError<RawInput> = {
+  success: false;
+  input: RawInput;
+};
+
+export type SafeDecodeResult<RawInput, Decoded> =
+  | SafeDecodeResultSuccess<Decoded>
+  | SafeDecodeResultError<RawInput>;
+
+export const unwrapDecodeResult = <RawInput, Decoded>(
+  result: SafeDecodeResult<RawInput, Decoded>,
+): Decoded => {
+  if (result.success) {
+    return result.data;
+  } else {
+    throw new MobxZodDecodeError(result);
+  }
+};
+
+export interface FormMeta {
   label?: string;
   description?: string;
-}
+  encode: (output: unknown) => any;
 
-export interface FormMeta extends MobxZodMetaOptional {
-  encode: (input: unknown) => any;
-  decode: (output: any) => any;
+  safeDecode: (
+    input: unknown,
+    passthrough?: boolean, // Whether to pass failed input as data. Useful to be handled by zod.
+  ) => SafeDecodeResult<unknown, any>;
+  decode: (input: any) => any;
   /**
    * @returns Get the initial output.
    */
@@ -93,17 +125,22 @@ export function extendZodWithMobxZodForm(zod: typeof z) {
  * Encodes number as decimal strings, and other as-is.
  */
 export const resolveDOMFormMeta = (type: ZodTypeAny): FormMeta => {
-  const inputFormMeta = type._formMeta as FormMeta;
+  const inputFormMeta = type._formMeta as Partial<FormMeta>;
 
   return {
     ...inputFormMeta,
-    decode(input) {
-      if (inputFormMeta?.decode) {
-        return inputFormMeta.decode(input);
+    safeDecode(input, passthrough: boolean = false) {
+      if (inputFormMeta?.safeDecode) {
+        return inputFormMeta.safeDecode(input, passthrough);
       }
 
       if (type instanceof ZodString) {
-        return input;
+        if (typeof input === "string") {
+          return {
+            success: true,
+            data: input,
+          };
+        }
       } else if (type instanceof ZodNumber) {
         if (typeof input === "string") {
           // Decode string-like input
@@ -113,52 +150,162 @@ export const resolveDOMFormMeta = (type: ZodTypeAny): FormMeta => {
             const parsed = Number.parseFloat(trimmed);
 
             if (!Number.isNaN(parsed) && Number.isFinite(parsed)) {
-              return parsed;
-            } else {
-              return input;
+              return {
+                success: true,
+                data: parsed,
+              };
             }
-          } else {
-            return undefined;
           }
+        } else if (typeof input === "number") {
+          return {
+            success: true,
+            data: input,
+          };
         }
-
-        return input;
+      } else if (type instanceof ZodBoolean) {
+        if (typeof type === "boolean") {
+          return {
+            success: true,
+            data: input,
+          };
+        }
       } else if (type instanceof ZodOptional || type instanceof ZodNullable) {
         if (input == null) {
-          return this.getInitialOutput();
+          return {
+            success: true,
+            data: this.getInitialOutput(),
+          };
         }
 
         const innerType = type.unwrap();
-        const innerDecoded = resolveDOMFormMeta(innerType).decode(input);
+        const innerDecoded = resolveDOMFormMeta(innerType).safeDecode(input);
 
-        // For innerType is empty string
-        if (innerType instanceof ZodString && !innerDecoded) {
-          return this.getInitialOutput();
+        // For innerType is empty string, cast it to null
+        if (
+          innerType instanceof ZodString &&
+          innerDecoded.success &&
+          !innerDecoded.data
+        ) {
+          return {
+            success: true,
+            data: this.getInitialOutput(),
+          };
         }
 
         if (innerDecoded == null) {
-          return this.getInitialOutput();
+          return {
+            success: true,
+            data: this.getInitialOutput(),
+          };
         }
 
         return innerDecoded;
+      } else if (type instanceof ZodLiteral) {
+        if (input === type.value) {
+          return {
+            success: true,
+            data: input,
+          };
+        }
+      } else if (type instanceof ZodAny) {
+        return {
+          success: true,
+          data: input,
+        };
       } else if (type instanceof ZodObject) {
-        if (typeof input === "object") {
-          return Object.fromEntries(
-            Object.entries(type.shape).map(([key, value]) => [
-              key,
-              resolveDOMFormMeta(value as any).decode(input[key]),
-            ]),
-          );
+        if (typeof input === "object" && input !== null) {
+          try {
+            const decoded = Object.fromEntries(
+              Object.entries(type.shape).map(([key, value]) => [
+                key,
+                unwrapDecodeResult(
+                  resolveDOMFormMeta(value as any).safeDecode(
+                    (input as Record<string, any>)[key],
+                    passthrough,
+                  ),
+                ),
+              ]),
+            );
+            return {
+              success: true,
+              data: decoded,
+            };
+          } catch (e) {
+            if (e instanceof MobxZodDecodeError) {
+              return {
+                success: false,
+                input,
+              };
+            }
+            throw e;
+          }
         }
       } else if (type instanceof ZodArray) {
         if (Array.isArray(input)) {
-          return input.map((v) =>
-            resolveDOMFormMeta(type.element as any).decode(v),
+          try {
+            return {
+              success: true,
+              data: input.map(
+                (v) =>
+                  unwrapDecodeResult(
+                    resolveDOMFormMeta(type.element as any).safeDecode(
+                      v,
+                      passthrough,
+                    ),
+                  ),
+                passthrough,
+              ),
+            };
+          } catch (e) {
+            if (e instanceof MobxZodDecodeError) {
+              return {
+                success: false,
+                input,
+              };
+            }
+            throw e;
+          }
+        }
+      } else if (type instanceof ZodDiscriminatedUnion) {
+        const discriminatorData = (input as any)?.[type.discriminator];
+        const currentOption = type.optionsMap.get(discriminatorData);
+
+        if (currentOption) {
+          return resolveDOMFormMeta(currentOption).safeDecode(
+            input,
+            passthrough,
           );
         }
+      } else if (type instanceof ZodEffects) {
+        return resolveDOMFormMeta(type.innerType()).safeDecode(
+          input,
+          passthrough,
+        );
+      } else {
+        throw new MobxFatalError(
+          `${type.constructor.name} is not handled. Is that type supported?`,
+        );
       }
 
-      return input;
+      if (!passthrough) {
+        return {
+          success: false,
+          input,
+        };
+      } else {
+        return {
+          success: true,
+          data: input,
+        };
+      }
+    },
+    decode(input) {
+      if (inputFormMeta?.decode) {
+        return inputFormMeta.decode(input);
+      }
+
+      const decodeResult = this.safeDecode(input);
+      return unwrapDecodeResult(decodeResult);
     },
     encode(output: any) {
       if (inputFormMeta?.encode) {
@@ -177,18 +324,21 @@ export const resolveDOMFormMeta = (type: ZodTypeAny): FormMeta => {
         }
 
         return output == undefined ? "" : String(output);
+      } else if (type instanceof ZodBoolean) {
+        return output;
       } else if (type instanceof ZodOptional || type instanceof ZodNullable) {
         if (output === empty || output == null) {
           return this.getInitialOutput();
         } else {
           return resolveDOMFormMeta(type.unwrap()).encode(output);
         }
+      } else if (type instanceof ZodLiteral) {
+        return output;
+      } else if (type instanceof ZodAny) {
+        return output;
       } else if (type instanceof ZodObject) {
         if (output === empty) {
-          return Object.entries(type.shape).map(([key, value]) => [
-            key,
-            resolveDOMFormMeta(value as any).encode(empty),
-          ]);
+          return this.getInitialOutput();
         }
 
         return Object.fromEntries(
@@ -198,16 +348,31 @@ export const resolveDOMFormMeta = (type: ZodTypeAny): FormMeta => {
           ]),
         );
       } else if (type instanceof ZodArray) {
-        if (type === empty) {
+        if (output === empty) {
           return [];
         }
 
         return output.map((o: any) =>
           resolveDOMFormMeta(type.element as any).encode(o),
         );
+      } else if (type instanceof ZodDiscriminatedUnion) {
+        if (output === empty) {
+          return this.getInitialOutput();
+        }
+
+        const currentDiscriminator = output[type.discriminator];
+        const currentOption = type.optionsMap.get(currentDiscriminator);
+
+        if (currentOption) {
+          return resolveDOMFormMeta(currentOption).encode(output);
+        }
+      } else if (type instanceof ZodEffects) {
+        return resolveDOMFormMeta(type.innerType()).encode(output);
       }
 
-      return output;
+      throw new MobxFatalError(
+        `${type.constructor.name} is not handled. Is that type supported?`,
+      );
     },
     getInitialOutput() {
       if (type instanceof ZodString) {
@@ -222,6 +387,10 @@ export const resolveDOMFormMeta = (type: ZodTypeAny): FormMeta => {
         return undefined;
       } else if (type instanceof ZodNullable) {
         return null;
+      } else if (type instanceof ZodLiteral) {
+        return type.value;
+      } else if (type instanceof ZodAny) {
+        return undefined;
       } else if (type instanceof ZodObject) {
         return Object.fromEntries(
           Object.entries(type.shape).map(([key, value]) => [
@@ -231,7 +400,16 @@ export const resolveDOMFormMeta = (type: ZodTypeAny): FormMeta => {
         );
       } else if (type instanceof ZodArray) {
         return [];
+      } else if (type instanceof ZodDiscriminatedUnion) {
+        const defaultOption = type.options[0];
+        return resolveDOMFormMeta(defaultOption).encode(empty);
+      } else if (type instanceof ZodEffects) {
+        return resolveDOMFormMeta(type.innerType()).getInitialOutput();
       }
+
+      throw new MobxFatalError(
+        `${type.constructor.name} is not handled. Is that type supported?`,
+      );
     },
   };
 };

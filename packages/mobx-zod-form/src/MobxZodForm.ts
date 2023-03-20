@@ -13,7 +13,11 @@ import {
   type SafeParseReturnType,
 } from "zod";
 
-import { type FormMeta } from "./FormMeta";
+import {
+  SafeDecodeResult,
+  unwrapDecodeResult,
+  type FormMeta,
+} from "./FormMeta";
 import { getPathId, setPath, shallowEqual, visitPath } from "./js-utils";
 import { createFieldForType, type MapZodTypeToField } from "./MobxZodField";
 import { type MobxZodTypes } from "./types";
@@ -48,7 +52,7 @@ export class MobxZodForm<T extends MobxZodTypes> {
 
   _isSubmitting: boolean = false;
 
-  schemaMobxZodMeta: FormMeta;
+  schemaFormMeta: FormMeta;
 
   root: MapZodTypeToField<T>;
 
@@ -60,9 +64,9 @@ export class MobxZodForm<T extends MobxZodTypes> {
     public readonly schema: T,
     public readonly _options: MobxZodFormOptions<T> = {},
   ) {
-    this.schemaMobxZodMeta = schema.getFormMeta();
+    this.schemaFormMeta = schema.getFormMeta();
 
-    this._rawInput = this.schemaMobxZodMeta.encode(this.options.initialOutput);
+    this._rawInput = this.schemaFormMeta.encode(this.options.initialOutput);
 
     this.root = createFieldForType(this.schema, this, []);
 
@@ -81,6 +85,7 @@ export class MobxZodForm<T extends MobxZodTypes> {
       submitCount: computed,
       isSubmitting: computed,
       input: computed,
+      looseInput: computed,
       parsed: computed,
       validate: action,
       _setRawInputAt: action,
@@ -142,7 +147,7 @@ export class MobxZodForm<T extends MobxZodTypes> {
       initialOutput:
         "initialOutput" in this._options
           ? this._options.initialOutput
-          : this.schemaMobxZodMeta.getInitialOutput(),
+          : this.schemaFormMeta.getInitialOutput(),
       validateOnMount: this._options.validateOnMount ?? false,
       setActionOptions: {
         validateSync: this._options.setActionOptions?.validateSync ?? false,
@@ -166,12 +171,20 @@ export class MobxZodForm<T extends MobxZodTypes> {
     return this._isSubmitting;
   }
 
-  get input(): T["_input"] {
-    return this.schemaMobxZodMeta.decode(this._rawInput);
+  get input(): SafeDecodeResult<unknown, T["_input"]> {
+    return this.schemaFormMeta.safeDecode(this._rawInput);
+  }
+
+  get looseInput(): SafeDecodeResult<unknown, unknown> {
+    return this.schemaFormMeta.safeDecode(this._rawInput, true);
   }
 
   get parsed(): SafeParseReturnType<T["_input"], T["_output"]> {
-    return this.schema.safeParse(this.input);
+    if (this.input.success) {
+      return this.schema.safeParse(this.input.data);
+    } else {
+      return this.schema.safeParse(unwrapDecodeResult(this.looseInput));
+    }
   }
 
   _getRawInputAt(path: ParsePath): unknown {
