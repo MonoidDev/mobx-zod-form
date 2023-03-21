@@ -6,6 +6,7 @@ lib
 tmp
 /out-tsc
 .next
+.out
 
 # dependencies
 node_modules
