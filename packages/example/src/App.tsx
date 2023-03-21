@@ -1,4 +1,9 @@
-import { empty, MobxZodField } from "@monoid-dev/mobx-zod-form";
+import {
+  empty,
+  MobxZodField,
+  extendZodWithMobxZodForm,
+  MobxZodObjectField,
+} from "@monoid-dev/mobx-zod-form";
 import {
   FormContextProvider,
   useForm,
@@ -7,6 +12,8 @@ import {
 import { observer } from "mobx-react";
 import { z, ZodNumber, ZodString } from "zod";
 
+extendZodWithMobxZodForm(z);
+
 import "./App.css";
 
 const TextInput = observer(
@@ -14,6 +21,7 @@ const TextInput = observer(
     return (
       <div>
         <input
+          placeholder={field.path.at(-1)?.toString()}
           value={field.rawInput as string}
           onChange={(e) => field.setRawInput(e.target.value)}
         />
@@ -27,20 +35,46 @@ const TextInput = observer(
   },
 );
 
-const Form1 = () => {
+const Form = () => {
   const form = useForm(
     z.object({
       username: z.string().min(1),
       password: z.string().min(6),
     }),
-    { validateOnMount: false },
   );
 
   return (
-    <div style={{ border: `1px solid black` }}>
+    <form style={{ border: `1px solid black` }}>
       <TextInput field={form.root.fields.username} />
       <TextInput field={form.root.fields.password} />
-    </div>
+      <button
+        onClick={() => {
+          form.handleSubmit(() => console.info(form.parsed));
+        }}
+      >
+        Submit
+      </button>
+    </form>
+  );
+};
+
+const FormDecode = () => {
+  const fields = useForm(
+    z.object({
+      name: z.string().min(1),
+      age: z.number(),
+    }),
+  ).root.fields;
+
+  if (fields.age.decodeResult.success) {
+    console.info("Age is:", fields.age.decodeResult.data); // <-- number, not string
+  }
+
+  return (
+    <form style={{ border: `1px solid black` }}>
+      <TextInput field={fields.name} />
+      <TextInput field={fields.age} />
+    </form>
   );
 };
 
@@ -131,13 +165,58 @@ const FormContext1 = observer(() => {
   );
 });
 
+const CreditCardSchema = z.object({
+  cardNumber: z.string().min(1),
+  secureCode: z.string().min(1),
+  expirationMonth: z.number().min(1).max(12),
+  expirationYear: z.number().min(new Date().getFullYear()).max(9999),
+});
+
+type CreditCardSchema = z.infer<typeof CreditCardSchema>;
+
+const CreditCardInput = (props: {
+  field: MobxZodObjectField<typeof CreditCardSchema>;
+}) => {
+  const {
+    field: { fields },
+  } = props;
+
+  return (
+    <div style={{ border: "1px solid red" }}>
+      <div>Input your card info:</div>
+      <TextInput field={fields.cardNumber} />
+      <TextInput field={fields.secureCode} />
+      <TextInput field={fields.expirationMonth} />
+      <TextInput field={fields.expirationYear} />
+    </div>
+  );
+};
+
+const ComposableForm = () => {
+  const fields = useForm(
+    z.object({
+      bookName: z.string().min(1),
+      creditCard: CreditCardSchema,
+    }),
+  ).root.fields;
+
+  return (
+    <div style={{ border: `1px solid black` }}>
+      <TextInput field={fields.bookName} />
+      <CreditCardInput field={fields.creditCard} />
+    </div>
+  );
+};
+
 function App() {
   return (
     <div className="App">
-      <Form1 />
+      <Form />
+      <FormDecode />
       <Form2 />
       <FormArray1 />
       <FormContext1 />
+      <ComposableForm />
     </div>
   );
 }

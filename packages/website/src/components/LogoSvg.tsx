@@ -1,0 +1,43 @@
+export const LogoSvg = () => (
+  <svg
+    width="36"
+    height="36"
+    viewBox="0 0 1024 1024"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      d="M0 128C0 57.3076 57.3076 0 128 0H896C966.692 0 1024 57.3076 1024 128V896C1024 966.692 966.692 1024 896 1024H128C57.3076 1024 0 966.692 0 896V128Z"
+      fill="#273139"
+    />
+    <path
+      d="M241 365.519L377.01 229.163H622.416L760 365.519L496.168 642L241 365.519Z"
+      fill="#4097E7"
+    />
+    <path
+      d="M376.854 229.163H622.571M377.173 229L241 365.519L496.168 642L760 365.519L622.252 229"
+      stroke="#4097E7"
+      strokeWidth="18"
+      strokeLinecap="round"
+    />
+    <path
+      d="M326.5 626.926L131 423.426"
+      stroke="#40E76F"
+      strokeOpacity="0.5"
+      strokeWidth="75"
+      strokeLinecap="round"
+    />
+    <path
+      d="M497 806L301.5 602.5"
+      stroke="#64EE8B"
+      strokeWidth="75"
+      strokeLinecap="round"
+    />
+    <path
+      d="M497.5 806L870.5 423.5"
+      stroke="#64EE8B"
+      strokeWidth="75"
+      strokeLinecap="round"
+    />
+  </svg>
+);

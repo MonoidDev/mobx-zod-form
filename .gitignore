@@ -5,6 +5,7 @@ dist
 lib
 tmp
 /out-tsc
+.next
 
 # dependencies
 node_modules

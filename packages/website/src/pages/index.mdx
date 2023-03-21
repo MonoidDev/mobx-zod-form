@@ -1,0 +1,265 @@
+import { Callout, Steps } from 'nextra-theme-docs'
+
+# Introduction
+
+## What is Mobx Zod Form?
+
+Mobx Zod Form is a data-first form builder based on two amazing libraries: `mobx` and `zod`.
+
+You first define your form in `zod`:
+
+```tsx
+import { MobxZodField } from "@monoid-dev/mobx-zod-form";
+import { z, ZodNumber, ZodString } from "zod";
+
+// Necessary step to setup zod with mobx-zod-form power!
+extendZodWithMobxZodForm(z);
+
+const Form = () => {
+  const form = useForm(
+    z.object({
+      username: z.string().min(1),
+      password: z.string().min(6),
+    }),
+  );
+
+  // ...
+};
+```
+
+Define your field controller component:
+
+```tsx
+import { observer } from "mobx-react";
+
+const TextInput = observer(
+  ({ field }: { field: MobxZodField<ZodString | ZodNumber> }) => {
+    return (
+      <div>
+        <input
+          placeholder={field.path.at(-1)?.toString()}
+          value={field.rawInput as string}
+          onChange={(e) => field.setRawInput(e.target.value)}
+        />
+        {field.errorMessages.map((e, i) => (
+          <div style={{ color: "red" }} key={i}>
+            {e}
+          </div>
+        ))}
+      </div>
+    );
+  },
+);
+```
+
+Connect your `form` to your field controllers:
+
+```tsx
+const Form = () => {
+  const form = useForm(
+    z.object({
+      username: z.string().min(1),
+      password: z.string().min(6),
+    }),
+  );
+
+  return (
+    <form style={{ border: `1px solid black` }}>
+      <TextInput field={form.root.fields.username} />
+      <TextInput field={form.root.fields.password} />
+      <button
+        onClick={() => {
+          form.handleSubmit(() => console.info(form.parsed));
+        }}
+      >
+        Submit
+      </button>
+    </form>
+  );
+};
+```
+
+Then you just created an end-to-end safe form widget!
+
+## How is Mobx Zod Form different from other libs?
+
+### No magic-strings
+
+Some libraries, like `formik` and `react-final-form`, force user to use the path to the field to connect the field with the input:
+
+```tsx
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { Formik, Field, Form } from 'formik';
+
+const Basic = () => (
+  <div>
+    <h1>Sign Up</h1>
+    <Formik
+      initialValues={{
+        firstName: '',
+        lastName: '',
+        email: '',
+      }}
+      onSubmit={async (values) => {
+        await new Promise((r) => setTimeout(r, 500));
+        alert(JSON.stringify(values, null, 2));
+      }}
+    >
+      <Form>
+        <label htmlFor="firstName">First Name</label>
+        <Field id="firstName" name="firstName" placeholder="Jane" />
+
+        <label htmlFor="lastName">Last Name</label>
+        <Field id="lastName" name="lastName" placeholder="Doe" />
+
+        <label htmlFor="email">Email</label>
+        <Field
+          id="email"
+          name="email"
+          placeholder="jane@acme.com"
+          type="email"
+        />
+        <button type="submit">Submit</button>
+      </Form>
+    </Formik>
+  </div>
+);
+
+ReactDOM.render(<Basic />, document.getElementById('root'));
+```
+
+Although they entitle them as supporting TypeScript, the following code is not really type-safe:
+
+```tsx
+<Field id="firstName" name="firstName" placeholder="Jane" />
+<Field id="lastName" name="lastName" placeholder="Doe" />
+```
+
+Not only does the user need to write `id="firstName"` and `name="firstName"` with the same `"firstName"` twice, but also the user does this with NO type-checks. For a form with a handful of fields, that might be just convenient enough, but our experience of maintaining a huge number of forms proves this not really feasible.
+
+### Decode, not raw data.
+
+Libraries like `formik` gives the parsing and validation part away to the user, which could be quite a burden as the form gets complex. 
+
+```tsx
+<Formik
+  initialValues={{
+    name: '',
+    age: '',
+  }}
+  validate={(values) => {
+    const errors = {};
+    if (Number.isNaN(Number.parseInt(values.age))) {
+      errors.age = 'Please input a valid age';
+    }
+    return errors;
+  }}
+  onSubmit={(values) => {
+    const ageParsed = Number.parseInt(values.age);
+    // ...
+  }}
+>
+  // ...
+</Formik>
+```
+
+Because the fact that `<input />` doesn't really give us a `number`, but gives us a `number` **encoded** in a decimal format string, we are passed with `values.age` as a `string` everywhere. We need to handle it both in `validate` and `onSubmit`, which brings trouble.
+
+In Mobx Zod Form, we first **decode** the form, casting any number-like `string` to `number` against our schema, then you have the digested value from `field.decodeResult.data`, as illustrated below:
+
+```tsx
+const FormDecode = () => {
+  const fields = useForm(
+    z.object({
+      name: z.string().min(1),
+      age: z.number(),
+    }),
+  ).root.fields;
+
+  if (fields.age.decodeResult.success) {
+    console.info("Age is:", fields.age.decodeResult.data); // <-- number, not string
+  }
+
+  return (
+    <form style={{ border: `1px solid black` }}>
+      <TextInput field={fields.name} />
+      <TextInput field={fields.age} />
+    </form>
+  );
+};
+```
+
+<Callout emoji="⚠️">Notice that in a cruel world, the decoding might fail. So `decodeResult` is actually a discriminated union with `success: true` only when the input is valid.</Callout>
+
+### Compose, out of the box.
+
+Consider you have a credit card info input, which you might use it a couple of times in the UI:
+
+```tsx
+const CreditCardSchema = z.object({
+  cardNumber: z.string().min(1),
+  secureCode: z.string().min(1),
+  expirationMonth: z.number().min(1).max(12),
+  expirationYear: z.number().min(new Date().getFullYear()).max(9999),
+});
+
+type CreditCardSchema = z.infer<typeof CreditCardSchema>;
+
+const CreditCardInput = (props: {
+  field: MobxZodObjectField<typeof CreditCardSchema>;
+}) => {
+  const {
+    field: { fields },
+  } = props;
+
+  return (
+    <div style={{ border: "1px solid red" }}>
+      <div>Input your card info:</div>
+      <TextInput field={fields.cardNumber} />
+      <TextInput field={fields.secureCode} />
+      <TextInput field={fields.expirationMonth} />
+      <TextInput field={fields.expirationYear} />
+    </div>
+  );
+};
+```
+
+Now you can plug `CreditCardSchema` else where, and then bind the corresponding field to `CreditCardInput`:
+
+```tsx
+const ComposableForm = () => {
+  const fields = useForm(
+    z.object({
+      bookName: z.string().min(1),
+      creditCard: CreditCardSchema,
+    }),
+  ).root.fields;
+
+  return (
+    <div style={{ border: `1px solid black` }}>
+      <TextInput field={fields.bookName} />
+      <CreditCardInput field={fields.creditCard} />
+    </div>
+  );
+};
+```
+
+The entire process is, of course, as type-checked as guaranteed.
+
+Consider that you are using `formik`, you might need to write the following component:
+
+```tsx
+const CreditCardInput = ({ name }: { name: string }) => {
+  return (
+    <>
+      <Field id={`${name}.cardNumber`} id={`${name}.cardNumber`} placeholder="0000123456781234" />
+      <Field id={`${name}.secureCode`} id={`${name}.secureCode`} placeholder="123" />
+      <Field id={`${name}.expirationMonth`} id={`${name}.expirationMonth`} placeholder="123" />
+      <Field id={`${name}.expirationYear`} id={`${name}.expirationYear`} placeholder="2024" />
+    </>
+  );
+};
+```
+
+Not only does this needs a lot of template strings, but also it just doesn't handle the repeated validation logic! I will leave how to do that in `formik` or `react-final-form` as your homework :)
