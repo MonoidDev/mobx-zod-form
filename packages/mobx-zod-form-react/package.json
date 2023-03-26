@@ -1,6 +1,6 @@
 {
   "name": "@monoid-dev/mobx-zod-form-react",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "type": "commonjs",
   "main": "./lib/index.js",
   "module": "./lib/index.mjs",
@@ -9,11 +9,6 @@
       "import": "./lib/index.mjs",
       "require": "./lib/index.js",
       "default": "./lib/index.js"
-    },
-    "./lib/react": {
-      "import": "./lib/react.mjs",
-      "require": "./lib/react.js",
-      "default": "./lib/react.js"
     }
   },
   "files": [
@@ -33,7 +28,7 @@
     "dev": "tsx src/index.ts",
     "build": "tsup src/index.tsx --external react --format esm,cjs -d lib/ && tsc -p tsconfig.build.json",
     "lint": "tsc && eslint ./src --ext .ts,.tsx",
-    "test": "echo 'no tests'"
+    "test": "vitest run"
   },
   "dependencies": {
     "@monoid-dev/mobx-zod-form": "~0.0.1"
@@ -47,6 +42,8 @@
     "zod": "~3.21.2"
   },
   "devDependencies": {
-    "@types/react": "~18.0.28"
+    "@types/react": "~18.0.28",
+    "jsdom": "^21.1.1",
+    "mobx-react": "^7.6.0"
   }
 }

@@ -47,6 +47,7 @@ export interface MobxZodField<T extends ZodTypeAny> {
    */
   readonly uniqueId: number;
   readonly formMeta: FormMeta;
+  readonly form: MobxZodForm<ZodTypeAny>;
   path: ParsePath;
   /**
    * The original input, e.g. from DOM string.

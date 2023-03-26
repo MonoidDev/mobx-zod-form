@@ -263,3 +263,13 @@ const CreditCardInput = ({ name }: { name: string }) => {
 ```
 
 Not only does this needs a lot of template strings, but also it just doesn't handle the repeated validation logic! I will leave how to do that in `formik` or `react-final-form` as your homework :)
+
+## Takeaways
+
+Our library powers the user in 3 ways:
+
+1. No magic-strings. Declare your schema first, then bind your fields to your components in a type-safe fashion.
+2. Handles decoding for you, not throwing DOM stirngs into your face.
+3. Highly composable UI and validation logic.
+
+However, as you can see from our example code, it might require you to write extra code and extra types to achieve that level of type-safety. Or Mobx/Zod might just not fit your ecosystem. Use it at your own risk!

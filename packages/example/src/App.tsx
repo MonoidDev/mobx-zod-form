@@ -6,6 +6,7 @@ import {
 } from "@monoid-dev/mobx-zod-form";
 import {
   FormContextProvider,
+  getForm,
   useForm,
   useFormContext,
 } from "@monoid-dev/mobx-zod-form-react";
@@ -18,12 +19,13 @@ import "./App.css";
 
 const TextInput = observer(
   ({ field }: { field: MobxZodField<ZodString | ZodNumber> }) => {
+    const form = getForm(field);
+
     return (
       <div>
         <input
+          {...form.bindField(field)}
           placeholder={field.path.at(-1)?.toString()}
-          value={field.rawInput as string}
-          onChange={(e) => field.setRawInput(e.target.value)}
         />
         {field.errorMessages.map((e, i) => (
           <div style={{ color: "red" }} key={i}>
@@ -35,7 +37,7 @@ const TextInput = observer(
   },
 );
 
-const Form = () => {
+const SimpleForm = () => {
   const form = useForm(
     z.object({
       username: z.string().min(1),
@@ -44,16 +46,13 @@ const Form = () => {
   );
 
   return (
-    <form style={{ border: `1px solid black` }}>
+    <form
+      {...form.bindForm({ onSubmit: console.info })}
+      style={{ border: `1px solid black` }}
+    >
       <TextInput field={form.root.fields.username} />
       <TextInput field={form.root.fields.password} />
-      <button
-        onClick={() => {
-          form.handleSubmit(() => console.info(form.parsed));
-        }}
-      >
-        Submit
-      </button>
+      <button type="submit">Submit</button>
     </form>
   );
 };
@@ -208,15 +207,78 @@ const ComposableForm = () => {
   );
 };
 
+const ExoticFields = observer(() => {
+  const form = useForm(
+    z.object({
+      checkboxBoolean: z.boolean(),
+      checkboxArray: z.string().array(),
+      ratioBoolean: z.boolean(),
+    }),
+  );
+
+  return (
+    <div style={{ border: `1px solid black` }}>
+      <form>
+        <div>
+          <label>
+            Checkbox Boolean
+            <input
+              {...form.bindField(form.root.fields.checkboxBoolean, {
+                type: "checkbox",
+              })}
+            />
+          </label>
+        </div>
+
+        <div>
+          {["A", "B", "C"].map((v) => (
+            <label key={v}>
+              Checkbox Array {v}
+              <input
+                {...form.bindField(form.root.fields.checkboxArray, {
+                  type: "checkbox",
+                  value: v,
+                })}
+              />
+            </label>
+          ))}
+        </div>
+
+        <div>
+          <label>
+            Ratio True
+            <input
+              {...form.bindField(form.root.fields.ratioBoolean, {
+                type: "radio",
+                value: true,
+              })}
+            />
+          </label>
+          <label>
+            Ratio False
+            <input
+              {...form.bindField(form.root.fields.ratioBoolean, {
+                type: "radio",
+                value: false,
+              })}
+            />
+          </label>
+        </div>
+      </form>
+    </div>
+  );
+});
+
 function App() {
   return (
     <div className="App">
-      <Form />
+      <SimpleForm />
       <FormDecode />
       <Form2 />
       <FormArray1 />
       <FormContext1 />
       <ComposableForm />
+      <ExoticFields />
     </div>
   );
 }

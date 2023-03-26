@@ -1,4 +1,13 @@
-import { z, ZodIssueCode, ZodType, ZodTypeDef } from "zod";
+import {
+  z,
+  ZodEffects,
+  ZodIssueCode,
+  ZodNullable,
+  ZodOptional,
+  ZodType,
+  ZodTypeAny,
+  ZodTypeDef,
+} from "zod";
 
 import { MobxZodDiscriminatedUnionFieldTypes } from "./MobxZodField";
 import { MobxZodDiscriminatedUnion } from "./types";
@@ -27,4 +36,13 @@ export const discriminatorType = <T extends MobxZodDiscriminatedUnion>(
     });
 
   return result;
+};
+
+export const unwrapZodType = (t: ZodTypeAny): ZodTypeAny => {
+  if (t instanceof ZodEffects) {
+    return unwrapZodType(t.innerType());
+  } else if (t instanceof ZodNullable || t instanceof ZodOptional) {
+    return unwrapZodType(t.unwrap());
+  }
+  return t;
 };

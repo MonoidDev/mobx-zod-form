@@ -163,7 +163,7 @@ export const resolveDOMFormMeta = (type: ZodTypeAny): FormMeta => {
           };
         }
       } else if (type instanceof ZodBoolean) {
-        if (typeof type === "boolean") {
+        if (typeof input === "boolean") {
           return {
             success: true,
             data: input,

@@ -6,19 +6,22 @@
     "prepare": "husky install"
   },
   "private": true,
-  "dependencies": {},
   "devDependencies": {
+    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/react": "^14.0.0",
+    "@types/testing-library__jest-dom": "^5.14.5",
     "@typescript-eslint/eslint-plugin": "^5.55.0",
     "@typescript-eslint/parser": "^5.55.0",
     "eslint": "^8.36.0",
     "eslint-plugin-import": "^2.27.5",
     "eslint-plugin-prettier": "^4.2.1",
     "husky": "^8.0.3",
+    "jsdom": "^21.1.1",
+    "nx": "15.8.6",
+    "prettier": "^2.8.4",
     "tsup": "^6.6.3",
     "tsx": "^3.12.5",
     "typescript": "^4.9.5",
-    "vitest": "^0.29.2",
-    "nx": "15.8.6",
-    "prettier": "^2.8.4"
+    "vitest": "^0.29.2"
   }
 }
