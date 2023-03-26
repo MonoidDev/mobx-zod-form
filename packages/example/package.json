@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "mobx": "^6.8.0",
-    "mobx-react": "^7.6.0",
+    "mobx-react": "^8.0.0",
     "@monoid-dev/mobx-zod-form": "*",
     "@monoid-dev/mobx-zod-form-react": "*",
     "react": "^18.2.0",

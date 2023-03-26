@@ -46,7 +46,7 @@ importers:
       '@types/react-dom': ^18.0.10
       '@vitejs/plugin-react': ^3.1.0
       mobx: ^6.8.0
-      mobx-react: ^7.6.0
+      mobx-react: ^8.0.0
       react: ^18.2.0
       react-dom: ^18.2.0
       vite: ^4.1.0
@@ -55,7 +55,7 @@ importers:
       '@monoid-dev/mobx-zod-form': link:../mobx-zod-form
       '@monoid-dev/mobx-zod-form-react': link:../mobx-zod-form-react
       mobx: 6.8.0
-      mobx-react: 7.6.0_woojb62cqeyk443mbl7msrwu2e
+      mobx-react: 8.0.0_woojb62cqeyk443mbl7msrwu2e
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
       zod: 3.21.4
@@ -79,7 +79,7 @@ importers:
       '@types/react': ~18.0.28
       jsdom: ^21.1.1
       mobx: ~6.8.0
-      mobx-react: ^7.6.0
+      mobx-react: ^8.0.0
       react: ~18.2.0
       zod: ~3.21.2
     dependencies:
@@ -90,7 +90,7 @@ importers:
     devDependencies:
       '@types/react': 18.0.28
       jsdom: 21.1.1
-      mobx-react: 7.6.0_mobx@6.8.0+react@18.2.0
+      mobx-react: 8.0.0_mobx@6.8.0+react@18.2.0
 
   packages/website:
     specifiers:
@@ -4613,10 +4613,10 @@ packages:
       ufo: 1.1.1
     dev: true
 
-  /mobx-react-lite/3.4.3_mobx@6.8.0+react@18.2.0:
-    resolution: {integrity: sha512-NkJREyFTSUXR772Qaai51BnE1voWx56LOL80xG7qkZr6vo8vEaLF3sz1JNUVh+rxmUzxYaqOhfuxTfqUh0FXUg==}
+  /mobx-react-lite/4.0.1_mobx@6.8.0+react@18.2.0:
+    resolution: {integrity: sha512-c/yU1JuFFO7qPonrr36bb1NEiWpl71Ig9yUF0VosRoJnt7YLxV2MVW+cNRr2WUQNDa7ghVgcLynzoNJwv9ijIw==}
     peerDependencies:
-      mobx: ^6.1.0
+      mobx: ^6.9.0
       react: ^16.8.0 || ^17 || ^18
       react-dom: '*'
       react-native: '*'
@@ -4630,10 +4630,10 @@ packages:
       react: 18.2.0
     dev: true
 
-  /mobx-react-lite/3.4.3_woojb62cqeyk443mbl7msrwu2e:
-    resolution: {integrity: sha512-NkJREyFTSUXR772Qaai51BnE1voWx56LOL80xG7qkZr6vo8vEaLF3sz1JNUVh+rxmUzxYaqOhfuxTfqUh0FXUg==}
+  /mobx-react-lite/4.0.1_woojb62cqeyk443mbl7msrwu2e:
+    resolution: {integrity: sha512-c/yU1JuFFO7qPonrr36bb1NEiWpl71Ig9yUF0VosRoJnt7YLxV2MVW+cNRr2WUQNDa7ghVgcLynzoNJwv9ijIw==}
     peerDependencies:
-      mobx: ^6.1.0
+      mobx: ^6.9.0
       react: ^16.8.0 || ^17 || ^18
       react-dom: '*'
       react-native: '*'
@@ -4648,10 +4648,10 @@ packages:
       react-dom: 18.2.0_react@18.2.0
     dev: false
 
-  /mobx-react/7.6.0_mobx@6.8.0+react@18.2.0:
-    resolution: {integrity: sha512-+HQUNuh7AoQ9ZnU6c4rvbiVVl+wEkb9WqYsVDzGLng+Dqj1XntHu79PvEWKtSMoMj67vFp/ZPXcElosuJO8ckA==}
+  /mobx-react/8.0.0_mobx@6.8.0+react@18.2.0:
+    resolution: {integrity: sha512-WKfYrxIDmI/ysmugybfWBFnKC0li4VvLHhfZqn1y5hXkOJ0selFFZ4rO8KHWZljWrzseNGRRqatYX9X4PaDD8A==}
     peerDependencies:
-      mobx: ^6.1.0
+      mobx: ^6.9.0
       react: ^16.8.0 || ^17 || ^18
       react-dom: '*'
       react-native: '*'
@@ -4662,14 +4662,14 @@ packages:
         optional: true
     dependencies:
       mobx: 6.8.0
-      mobx-react-lite: 3.4.3_mobx@6.8.0+react@18.2.0
+      mobx-react-lite: 4.0.1_mobx@6.8.0+react@18.2.0
       react: 18.2.0
     dev: true
 
-  /mobx-react/7.6.0_woojb62cqeyk443mbl7msrwu2e:
-    resolution: {integrity: sha512-+HQUNuh7AoQ9ZnU6c4rvbiVVl+wEkb9WqYsVDzGLng+Dqj1XntHu79PvEWKtSMoMj67vFp/ZPXcElosuJO8ckA==}
+  /mobx-react/8.0.0_woojb62cqeyk443mbl7msrwu2e:
+    resolution: {integrity: sha512-WKfYrxIDmI/ysmugybfWBFnKC0li4VvLHhfZqn1y5hXkOJ0selFFZ4rO8KHWZljWrzseNGRRqatYX9X4PaDD8A==}
     peerDependencies:
-      mobx: ^6.1.0
+      mobx: ^6.9.0
       react: ^16.8.0 || ^17 || ^18
       react-dom: '*'
       react-native: '*'
@@ -4680,7 +4680,7 @@ packages:
         optional: true
     dependencies:
       mobx: 6.8.0
-      mobx-react-lite: 3.4.3_woojb62cqeyk443mbl7msrwu2e
+      mobx-react-lite: 4.0.1_woojb62cqeyk443mbl7msrwu2e
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
     dev: false
