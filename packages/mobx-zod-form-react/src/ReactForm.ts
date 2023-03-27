@@ -71,11 +71,13 @@ export class ReactForm<T extends MobxZodTypes> extends MobxZodForm<T> {
         e.preventDefault();
         e.stopPropagation();
 
-        if (this.parsed.success) {
-          await options?.onSubmit?.(this.parsed.data, e);
-        } else {
-          await options?.onSubmitError?.(this.parsed.error, e);
-        }
+        await this.handleSubmit(async () => {
+          if (this.parsed.success) {
+            await options?.onSubmit?.(this.parsed.data, e);
+          } else {
+            await options?.onSubmitError?.(this.parsed.error, e);
+          }
+        });
       },
       action: "#",
     };
