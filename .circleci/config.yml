@@ -28,12 +28,11 @@ jobs:
       - run:
           name: Run Tests
           command: |
+            npx nx run-many --target=build
             npx nx run-many --target=test
       - run:
           name: Publish All
           command: |
-            npx nx run-many --target=build
-            
             npm config set '//registry.npmjs.org/:_authToken' "${NPM_TOKEN}"
             pnpm publish -r --no-git-checks
 
