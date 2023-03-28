@@ -32,6 +32,11 @@ export type SafeDecodeResult<RawInput, Decoded> =
   | SafeDecodeResultSuccess<Decoded>
   | SafeDecodeResultError<RawInput>;
 
+/**
+ *
+ * @param result
+ * @returns The data if success, throws if MobxZodDecodeError not.
+ */
 export const unwrapDecodeResult = <RawInput, Decoded>(
   result: SafeDecodeResult<RawInput, Decoded>,
 ): Decoded => {
@@ -39,6 +44,37 @@ export const unwrapDecodeResult = <RawInput, Decoded>(
     return result.data;
   } else {
     throw new MobxZodDecodeError(result);
+  }
+};
+
+/**
+ *
+ * @param result
+ * @param mapper
+ * @param defaultValue
+ * @returns The return value of mapper applied to data if success, defaultValue if not.
+ */
+export const mapDecodeResult = <RawInput, Decoded, O>(
+  result: SafeDecodeResult<RawInput, Decoded>,
+  mapper: (data: Decoded) => O,
+  defaultValue: O,
+) => {
+  if (result.success) {
+    return mapper(result.data);
+  } else {
+    return defaultValue;
+  }
+};
+
+export const decodeResultEqual = <RawInput, Decoded>(
+  result: SafeDecodeResult<RawInput, Decoded>,
+  value: Decoded,
+  defaultValue = false,
+) => {
+  if (result.success) {
+    return value === result.data;
+  } else {
+    return defaultValue;
   }
 };
 
