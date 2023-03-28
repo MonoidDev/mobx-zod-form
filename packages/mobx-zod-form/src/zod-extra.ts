@@ -1,5 +1,7 @@
 import {
   z,
+  output,
+  input,
   ZodEffects,
   ZodIssueCode,
   ZodNullable,
@@ -9,8 +11,84 @@ import {
   ZodTypeDef,
 } from "zod";
 
+import { FormMeta, resolveDOMFormMeta } from "./FormMeta";
 import { MobxZodDiscriminatedUnionFieldTypes } from "./MobxZodField";
 import { MobxZodDiscriminatedUnion } from "./types";
+
+declare module "zod" {
+  interface ZodType<
+    Output,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    Def extends ZodTypeDef = ZodTypeDef,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    Input = Output,
+  > {
+    _formMeta: FormMeta;
+
+    /**
+     * Extend the form meta of the type. You can retrieve it later with `getFormMeta`.
+     * Sorry we cannot better type the returning type,
+     * which means you'll get optional properties when you use them,
+     * because `zod` does not give us a chance to use generic here.
+     * @param this type
+     * @param meta custom partial form meta
+     */
+    formMeta<T extends Partial<FormMeta>, Z extends ZodTypeAny>(
+      this: Z,
+      meta: T,
+    ): Z;
+
+    getFormMeta(): FormMeta;
+
+    /**
+     * A wrapping type that parses as-is like its inner type,
+     * but forbids mobx-zod-form from creating fields or encoding/decoding for inner fields.
+     * In other words, the inner value will be treated as if it is an atomic value.
+     *
+     * This means you can deal with the object with your custom logics.
+     */
+    box(): MobxZodBox<this>;
+  }
+}
+
+/**
+ * Extend zod so that you can append `mobxZodMeta` onto it.
+ * @param zod the z object imported from zod
+ */
+export function extendZodWithMobxZodForm(zod: typeof z) {
+  if (zod.ZodType.prototype.formMeta !== undefined) {
+    console.warn(
+      "`extendZodWithMobxZodForm` is already called on the same z object. You probably should not call it twice.",
+    );
+    return;
+  }
+
+  Object.defineProperty(zod.ZodType.prototype, "_formMeta", {
+    get() {
+      return this._def._formMeta || {}; // To match type definition '_formMeta: Readonly<{}>'
+    },
+  });
+
+  zod.ZodType.prototype.formMeta = function (meta: any) {
+    const o = new (this as any).constructor({
+      ...this._def,
+      _formMeta: {
+        ...this._formMeta,
+        ...meta,
+      },
+    });
+
+    return o;
+  };
+
+  zod.ZodType.prototype.getFormMeta = function () {
+    return resolveDOMFormMeta(this);
+  };
+
+  zod.ZodType.prototype.box = function () {
+    return MobxZodBox.create(this);
+  };
+}
 
 export type DiscriminatorType<T extends MobxZodDiscriminatedUnion> = ZodType<
   T["options"][number]["shape"][T["discriminator"]]["_output"],
@@ -46,3 +124,27 @@ export const unwrapZodType = (t: ZodTypeAny): ZodTypeAny => {
   }
   return t;
 };
+
+export interface MobxZodBoxDef<T extends ZodTypeAny> extends ZodTypeDef {
+  schema: T;
+}
+
+export class MobxZodBox<
+  T extends ZodTypeAny,
+  Output = output<T>,
+  Input = input<T>,
+> extends ZodType<Output, MobxZodBoxDef<T>, Input> {
+  _parse(input: z.ParseInput): z.ParseReturnType<Output> {
+    return this._def.schema._parse(input);
+  }
+
+  innerType(): T {
+    return this._def.schema;
+  }
+
+  static create = <I extends ZodTypeAny>(schema: I) => {
+    return new MobxZodBox({
+      schema,
+    });
+  };
+}

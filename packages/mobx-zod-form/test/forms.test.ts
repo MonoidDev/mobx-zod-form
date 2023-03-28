@@ -382,4 +382,50 @@ describe("form tests", () => {
       reason: "xyz",
     });
   });
+
+  it("should handle effects in field", () => {
+    const form = new MobxZodForm(
+      z.object({
+        refined: z.string().refine((s) => s.length > 1),
+      }),
+    );
+
+    form.root.fields.refined.setOutput("xxxx");
+
+    expect(form.root.fields.refined.decodeResult).toMatchObject({
+      success: true,
+      data: "xxxx",
+    });
+  });
+
+  it("should handle box", () => {
+    const form = new MobxZodForm(
+      z.object({
+        boxed: z
+          .object({
+            a: z.instanceof(Function),
+          })
+          .box(),
+      }),
+    );
+
+    // Should initialized with empty
+    expect(
+      form.parsed.success === false &&
+        form.parsed.error.issues.map((i) => i.message),
+    ).toMatchObject(["Required"]);
+
+    form.root.fields.boxed.setOutput({ a: new Function() });
+
+    expect(form.parsed).toMatchInlineSnapshot(`
+      {
+        "data": {
+          "boxed": {
+            "a": [Function],
+          },
+        },
+        "success": true,
+      }
+    `);
+  });
 });

@@ -1,5 +1,4 @@
 import {
-  z,
   ZodAny,
   ZodArray,
   ZodBoolean,
@@ -13,10 +12,10 @@ import {
   ZodOptional,
   ZodString,
   ZodTypeAny,
-  ZodTypeDef,
 } from "zod";
 
 import { MobxFatalError, MobxZodDecodeError } from "./errors";
+import { MobxZodBox } from "./zod-extra";
 
 export type SafeDecodeResultSuccess<Decoded> = {
   success: true;
@@ -92,68 +91,6 @@ export interface FormMeta {
    * @returns Get the initial output.
    */
   getInitialOutput: () => any;
-}
-
-declare module "zod" {
-  interface ZodType<
-    Output,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    Def extends ZodTypeDef = ZodTypeDef,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    Input = Output,
-  > {
-    _formMeta: FormMeta;
-
-    /**
-     * Extend the form meta of the type. You can retrieve it later with `getFormMeta`.
-     * Sorry we cannot better type the returning type,
-     * which means you'll get optional properties when you use them,
-     * because `zod` does not give us a chance to use generic here.
-     * @param this type
-     * @param meta custom partial form meta
-     */
-    formMeta<T extends Partial<FormMeta>, Z extends ZodTypeAny>(
-      this: Z,
-      meta: T,
-    ): Z;
-
-    getFormMeta(): FormMeta;
-  }
-}
-
-/**
- * Extend zod so that you can append `mobxZodMeta` onto it.
- * @param zod the z object imported from zod
- */
-export function extendZodWithMobxZodForm(zod: typeof z) {
-  if (zod.ZodType.prototype.formMeta !== undefined) {
-    console.warn(
-      "`extendZodWithMobxZodForm` is already called on the same z object. You probably should not call it twice.",
-    );
-    return;
-  }
-
-  Object.defineProperty(zod.ZodType.prototype, "_formMeta", {
-    get() {
-      return this._def._formMeta || {}; // To match type definition '_formMeta: Readonly<{}>'
-    },
-  });
-
-  zod.ZodType.prototype.formMeta = function (meta: any) {
-    const o = new (this as any).constructor({
-      ...this._def,
-      _formMeta: {
-        ...this._formMeta,
-        ...meta,
-      },
-    });
-
-    return o;
-  };
-
-  zod.ZodType.prototype.getFormMeta = function () {
-    return resolveDOMFormMeta(this);
-  };
 }
 
 /**
@@ -324,6 +261,11 @@ export const resolveDOMFormMeta = (type: ZodTypeAny): FormMeta => {
           input,
           passthrough,
         );
+      } else if (type instanceof MobxZodBox) {
+        return {
+          success: true,
+          data: input,
+        };
       } else {
         throw new MobxFatalError(
           `${type.constructor.name} is not handled. Is that type supported?`,
@@ -413,6 +355,8 @@ export const resolveDOMFormMeta = (type: ZodTypeAny): FormMeta => {
         }
       } else if (type instanceof ZodEffects) {
         return resolveDOMFormMeta(type.innerType()).encode(output);
+      } else if (type instanceof MobxZodBox) {
+        return output;
       }
 
       throw new MobxFatalError(
@@ -450,6 +394,8 @@ export const resolveDOMFormMeta = (type: ZodTypeAny): FormMeta => {
         return resolveDOMFormMeta(defaultOption).encode(empty);
       } else if (type instanceof ZodEffects) {
         return resolveDOMFormMeta(type.innerType()).getInitialOutput();
+      } else if (type instanceof MobxZodBox) {
+        return undefined;
       }
 
       throw new MobxFatalError(

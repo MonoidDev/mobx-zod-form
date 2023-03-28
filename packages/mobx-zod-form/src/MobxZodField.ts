@@ -15,6 +15,7 @@ import {
   ZodOptional,
   ZodNullable,
   ZodDiscriminatedUnion,
+  ZodEffects,
 } from "zod";
 
 import { MobxFatalError } from "./errors";
@@ -28,16 +29,17 @@ import {
   MobxZodOmittableFieldImpl,
 } from "./MobxZodFieldImpl";
 import { MobxZodForm, InputSetActionOptions } from "./MobxZodForm";
-import { IdxOf } from "./type-utils";
+import { Expand, IdxOf } from "./type-utils";
 import type {
   MobxOmittableTypes,
   MobxZodArray,
   MobxZodDiscriminatedUnion,
+  MobxZodEffects,
   MobxZodLiteral,
   MobxZodObject,
   MobxZodTypes,
 } from "./types";
-import { DiscriminatorType } from "./zod-extra";
+import { DiscriminatorType, MobxZodBox } from "./zod-extra";
 
 export interface MobxZodField<T extends ZodTypeAny> {
   type: T;
@@ -83,6 +85,11 @@ export interface MobxZodField<T extends ZodTypeAny> {
   _walk: (handler: (f: MobxZodField<any>) => void) => void;
 }
 
+export type FieldWithEffects<
+  F extends MobxZodField<ZodTypeAny>,
+  E extends MobxZodEffects,
+> = Expand<Omit<F, "effects"> & { effects: E }>;
+
 export type MapZodTypeToField<T extends MobxZodTypes> = T extends
   | ZodString
   | ZodNumber
@@ -100,6 +107,10 @@ export type MapZodTypeToField<T extends MobxZodTypes> = T extends
   ? MobxZodArrayField<T>
   : T extends MobxZodDiscriminatedUnion
   ? MobxZodDiscriminatedUnionField<T>
+  : T extends MobxZodEffects
+  ? FieldWithEffects<MapZodTypeToField<T["_def"]["schema"]>, T>
+  : T extends MobxZodBox<ZodTypeAny>
+  ? MobxZodField<T["_def"]["schema"]>
   : never;
 
 export type MobxZodObjectFieldFields<T extends MobxZodObject> = {
@@ -222,6 +233,17 @@ export const createFieldForType = <T extends MobxZodTypes>(
     return new MobxZodArrayFieldImpl<typeof type>(type, form, path) as any;
   } else if (type instanceof ZodDiscriminatedUnion) {
     return new MobxZodDiscriminatedUnionFieldImpl(type, form, path) as any;
+  } else if (type instanceof ZodEffects) {
+    // Where TypeScript breaks down
+    const field = createFieldForType<ZodTypeAny>(
+      type.sourceType(),
+      form,
+      path,
+    ) as any;
+    field.effects = type;
+    return field;
+  } else if (type instanceof MobxZodBox) {
+    return new MobxZodBaseFieldImpl<typeof type>(type, form, path) as any;
   }
 
   throw new MobxFatalError(

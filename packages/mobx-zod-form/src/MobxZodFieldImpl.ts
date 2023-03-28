@@ -26,6 +26,7 @@ import {
   type MobxZodTypes,
   type MobxZodArray,
   type MobxZodObject,
+  type MobxZodEffects,
 } from "./types";
 import { DiscriminatorType, discriminatorType } from "./zod-extra";
 
@@ -40,6 +41,8 @@ export class MobxZodBaseFieldImpl<T extends MobxZodTypes>
   static curUniqueId = 0;
 
   uniqueId = ++MobxZodArrayFieldImpl.curUniqueId;
+
+  public readonly effects?: MobxZodEffects;
 
   constructor(
     public readonly type: T,

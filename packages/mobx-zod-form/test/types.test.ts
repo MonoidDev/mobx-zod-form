@@ -23,6 +23,17 @@ TYPE_TESTS &&
         enum: z.enum(["A", "B", "C"]),
         nullable: z.string().nullable(),
         optional: z.string().optional(),
+        transformEffects: z.string().transform((s) => s.length),
+        transformEffects2: z
+          .string()
+          .transform((s) => s.length)
+          .transform((l) => l > 5),
+        boxed: z
+          .object({
+            field1: z.string(),
+            field2: z.string(),
+          })
+          .box(),
       });
 
       const o: MobxZodObjectField<typeof schema> = {} as any;
@@ -46,6 +57,17 @@ TYPE_TESTS &&
       const _shouldGetOptional: typeof o.fields.optional.type = z
         .string()
         .optional();
+
+      const _transformEffects: z.ZodEffects<z.ZodString, number, string> =
+        o.fields.transformEffects.effects;
+
+      const _transformEffects2: z.ZodEffects<z.ZodString, number, string> =
+        o.fields.transformEffects.effects;
+
+      const _box: typeof o.fields.boxed.type = z.object({
+        field1: z.string(),
+        field2: z.string(),
+      });
     });
 
     it("should extend zod", () => {
@@ -59,6 +81,9 @@ TYPE_TESTS &&
       const _shouldGetString2: string | undefined =
         schema2._formMeta.description;
       const _shouldGetString3: string | undefined = schema2._formMeta.label;
+
+      const boxed = z.object({}).box();
+      const _inner: typeof boxed._def.schema = z.object({});
     });
 
     it("should create discriminated union", () => {
@@ -131,27 +156,21 @@ describe("field tests", () => {
       number: z.number(),
     });
 
-    expect(resolveDOMFormMeta(schema.shape.string).decode("string")).toBe(
-      "string",
-    );
+    expect(schema.shape.string.getFormMeta().decode("string")).toBe("string");
 
-    expect(
-      resolveDOMFormMeta(schema.shape.string).safeDecode(12345),
-    ).toMatchObject({
+    expect(schema.shape.string.getFormMeta().safeDecode(12345)).toMatchObject({
       success: false,
       input: 12345,
     });
 
-    expect(resolveDOMFormMeta(schema.shape.number).decode("12345")).toBe(12345);
-    expect(
-      resolveDOMFormMeta(schema.shape.number).safeDecode("x"),
-    ).toMatchObject({
+    expect(schema.shape.number.getFormMeta().decode("12345")).toBe(12345);
+    expect(schema.shape.number.getFormMeta().safeDecode("x")).toMatchObject({
       success: false,
       input: "x",
     });
 
     expect(
-      resolveDOMFormMeta(schema).decode({
+      schema.getFormMeta().decode({
         string: "string",
         number: "12345",
       }),
@@ -163,75 +182,87 @@ describe("field tests", () => {
     const array = schema.array();
 
     expect(
-      resolveDOMFormMeta(array).decode([{ string: "string", number: "12345" }]),
+      array.getFormMeta().decode([{ string: "string", number: "12345" }]),
     ).toMatchObject([{ string: "string", number: 12345 }]);
 
-    expect(resolveDOMFormMeta(array).safeDecode("not-an-array")).toMatchObject({
+    expect(array.getFormMeta().safeDecode("not-an-array")).toMatchObject({
       success: false,
       input: "not-an-array",
     });
 
-    expect(resolveDOMFormMeta(z.string().nullable()).decode("")).toBe(null);
-    expect(resolveDOMFormMeta(z.string().nullable()).decode(null)).toBe(null);
-    expect(resolveDOMFormMeta(z.string().nullable()).decode(undefined)).toBe(
-      null,
-    );
+    expect(z.string().nullable().getFormMeta().decode("")).toBe(null);
+    expect(z.string().nullable().getFormMeta().decode(null)).toBe(null);
+    expect(z.string().nullable().getFormMeta().decode(undefined)).toBe(null);
     expect(
-      resolveDOMFormMeta(
-        z
-          .object({
-            name: z.string(),
-            url: z.string(),
-          })
-          .optional()
-          .nullable(),
-      ).encode({
-        name: "name",
-        url: "url",
-      }),
+      z
+        .object({
+          name: z.string(),
+          url: z.string(),
+        })
+        .optional()
+        .nullable()
+        .getFormMeta()
+        .encode({
+          name: "name",
+          url: "url",
+        }),
     ).toMatchObject({
       name: "name",
       url: "url",
     });
 
-    expect(
-      resolveDOMFormMeta(z.enum(["A", "B"])).safeDecode("A"),
-    ).toMatchObject({
+    expect(z.enum(["A", "B"]).getFormMeta().safeDecode("A")).toMatchObject({
       success: true,
       data: "A",
     });
 
-    expect(resolveDOMFormMeta(z.enum(["A", "B"])).encode("A")).toMatchObject(
-      "A",
-    );
-
-    expect(
-      resolveDOMFormMeta(z.enum(["A", "B"])).safeDecode("C"),
-    ).toMatchObject({
+    expect(z.enum(["A", "B"]).getFormMeta().safeDecode("C")).toMatchObject({
       success: false,
       input: "C",
     });
   });
 
   it("should encode values", () => {
-    expect(resolveDOMFormMeta(z.number()).encode(12345)).toBe("12345");
-    expect(resolveDOMFormMeta(z.number()).encode(undefined)).toBe("");
+    // ZodString
+    expect(z.string().getFormMeta().encode("12345")).toBe("12345");
 
-    expect(resolveDOMFormMeta(z.string()).encode("12345")).toBe("12345");
+    // ZodNumber
+    expect(z.number().getFormMeta().encode(12345)).toBe("12345");
+    expect(z.number().getFormMeta().encode(undefined)).toBe("");
 
-    expect(resolveDOMFormMeta(z.boolean()).encode(true)).toBe(true);
+    // ZodBoolean
+    expect(z.boolean().getFormMeta().encode(true)).toBe(true);
+    expect(z.boolean().getFormMeta().encode(false)).toBe(false);
+
+    // ZodEnum
+    expect(z.enum(["A", "B"]).getFormMeta().encode("A")).toMatchObject("A");
+
+    // ZodOptional
+    expect(z.string().optional().getFormMeta().encode(empty)).toBe(undefined);
+    expect(z.string().optional().getFormMeta().encode(null)).toBe(undefined);
+    expect(z.string().optional().getFormMeta().encode(undefined)).toBe(
+      undefined,
+    );
+
+    // ZodNullable
+    expect(z.string().nullable().getFormMeta().encode(empty)).toBe(null);
+    expect(z.string().nullable().getFormMeta().encode(null)).toBe(null);
+    expect(z.string().nullable().getFormMeta().encode(undefined)).toBe(null);
+
+    // ZodArray
+    expect(z.number().array().getFormMeta().encode([1, 2, 3])).toMatchObject([
+      "1",
+      "2",
+      "3",
+    ]);
 
     expect(
-      resolveDOMFormMeta(z.number().array()).encode([1, 2, 3]),
-    ).toMatchObject(["1", "2", "3"]);
-
-    expect(
-      resolveDOMFormMeta(z.string().array()).encode(["1", "2", "3", ""]),
+      z.string().array().getFormMeta().encode(["1", "2", "3", ""]),
     ).toMatchObject(["1", "2", "3", ""]);
 
     expect(z.number().array().getFormMeta().encode(empty)).toMatchObject([]);
 
-    expect(resolveDOMFormMeta(z.string().nullable()).encode(empty)).toBe(null);
+    expect(z.string().nullable().getFormMeta().encode(empty)).toBe(null);
 
     expect(
       z
@@ -289,6 +320,38 @@ describe("field tests", () => {
       answer: "NO",
       reason: "no comments",
     });
+
+    // ZodEffects
+    expect(
+      z
+        .number()
+        .transform((x) => String(x))
+        .getFormMeta()
+        .encode(123),
+    ).toMatchObject("123");
+
+    // Should recursively find the sourceType
+    expect(
+      z
+        .number()
+        .transform((x) => String(x))
+        .transform((x) => x.length)
+        .getFormMeta()
+        .encode(123),
+    ).toMatchObject("123");
+
+    // Should pass through nullable and optional
+    expect(
+      z
+        .object({
+          a: z.string(),
+          b: z.string(),
+        })
+        .nullable()
+        .optional()
+        .getFormMeta()
+        .encode({ a: "a", b: "b" }),
+    ).toMatchObject({ a: "a", b: "b" });
   });
 
   it("should get initial output", () => {
@@ -305,5 +368,16 @@ describe("field tests", () => {
       b: undefined,
       c: [],
     });
+  });
+
+  it("should parse input", () => {
+    // MobxZodBox
+    const boxedString = z.string().box();
+
+    expect(boxedString.parse("1234")).toBe("1234");
+
+    const boxedObject = z.object({ a: z.string() }).box();
+
+    expect(boxedObject.parse({ a: "1234" })).toMatchObject({ a: "1234" });
   });
 });

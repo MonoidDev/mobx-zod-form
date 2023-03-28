@@ -14,9 +14,10 @@ import type {
   ZodEnum,
   ZodNullable,
   ZodOptional,
+  ZodEffects,
 } from "zod";
 
-import { DiscriminatorType } from "./zod-extra";
+import { DiscriminatorType, MobxZodBox } from "./zod-extra";
 
 export type MobxZodLiteral = ZodLiteral<Primitive>;
 
@@ -35,6 +36,8 @@ export type MobxOmittableTypes =
   | ZodOptional<ZodTypeAny>
   | ZodNullable<ZodTypeAny>;
 
+export type MobxZodEffects = ZodEffects<ZodTypeAny>;
+
 export type MobxZodPrimitiveTypes =
   | ZodString
   | ZodNumber
@@ -48,5 +51,7 @@ export type MobxZodTypes =
   | MobxZodObject
   | MobxZodArray
   | DiscriminatorType<MobxZodDiscriminatedUnion>
-  | MobxZodDiscriminatedUnion;
+  | MobxZodDiscriminatedUnion
+  | MobxZodEffects
+  | MobxZodBox<ZodTypeAny>;
 // | MobxZodDefault;
