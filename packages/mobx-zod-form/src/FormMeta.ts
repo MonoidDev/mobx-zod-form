@@ -128,6 +128,11 @@ export const resolveDOMFormMeta = (type: ZodTypeAny): FormMeta => {
                 data: parsed,
               };
             }
+          } else if (passthrough) {
+            return {
+              success: true,
+              data: undefined,
+            };
           }
         } else if (typeof input === "number") {
           return {

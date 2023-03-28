@@ -164,6 +164,12 @@ describe("field tests", () => {
     });
 
     expect(schema.shape.number.getFormMeta().decode("12345")).toBe(12345);
+    expect(
+      schema.shape.number.getFormMeta().safeDecode("", true),
+    ).toMatchObject({
+      success: true,
+      data: undefined,
+    });
     expect(schema.shape.number.getFormMeta().safeDecode("x")).toMatchObject({
       success: false,
       input: "x",
