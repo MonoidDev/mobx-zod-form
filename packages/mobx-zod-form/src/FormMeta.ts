@@ -205,6 +205,13 @@ export const resolveDOMFormMeta = (type: ZodTypeAny): FormMeta => {
             data: input,
           };
         }
+      } else if (type instanceof ZodEnum) {
+        if (type.options.includes(input)) {
+          return {
+            success: true,
+            data: input,
+          };
+        }
       } else if (type instanceof ZodOptional || type instanceof ZodNullable) {
         if (input == null) {
           return {
@@ -361,6 +368,8 @@ export const resolveDOMFormMeta = (type: ZodTypeAny): FormMeta => {
 
         return output == undefined ? "" : String(output);
       } else if (type instanceof ZodBoolean) {
+        return output;
+      } else if (type instanceof ZodEnum) {
         return output;
       } else if (type instanceof ZodOptional || type instanceof ZodNullable) {
         if (output === empty || output == null) {

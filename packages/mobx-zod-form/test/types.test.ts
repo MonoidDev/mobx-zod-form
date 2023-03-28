@@ -193,6 +193,24 @@ describe("field tests", () => {
       name: "name",
       url: "url",
     });
+
+    expect(
+      resolveDOMFormMeta(z.enum(["A", "B"])).safeDecode("A"),
+    ).toMatchObject({
+      success: true,
+      data: "A",
+    });
+
+    expect(resolveDOMFormMeta(z.enum(["A", "B"])).encode("A")).toMatchObject(
+      "A",
+    );
+
+    expect(
+      resolveDOMFormMeta(z.enum(["A", "B"])).safeDecode("C"),
+    ).toMatchObject({
+      success: false,
+      input: "C",
+    });
   });
 
   it("should encode values", () => {
