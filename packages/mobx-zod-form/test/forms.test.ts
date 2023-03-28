@@ -4,7 +4,7 @@ import { z } from "zod";
 
 import { observeForm } from "./utils";
 import { setup } from "./utils";
-import { unwrapDecodeResult } from "../src";
+import { empty, unwrapDecodeResult } from "../src";
 import { MobxZodForm } from "../src/MobxZodForm";
 
 setup();
@@ -427,5 +427,12 @@ describe("form tests", () => {
         "success": true,
       }
     `);
+
+    // Should be undefined
+    form.root.fields.boxed.setOutput(empty);
+    expect(
+      form.parsed.success === false &&
+        form.parsed.error.issues.map((i) => i.message),
+    ).toMatchObject(["Required"]);
   });
 });

@@ -356,6 +356,10 @@ export const resolveDOMFormMeta = (type: ZodTypeAny): FormMeta => {
       } else if (type instanceof ZodEffects) {
         return resolveDOMFormMeta(type.innerType()).encode(output);
       } else if (type instanceof MobxZodBox) {
+        if (output === empty) {
+          return this.getInitialOutput();
+        }
+
         return output;
       }
 
