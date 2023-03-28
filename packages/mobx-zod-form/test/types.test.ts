@@ -64,7 +64,7 @@ TYPE_TESTS &&
       const _transformEffects2: z.ZodEffects<z.ZodString, number, string> =
         o.fields.transformEffects.effects;
 
-      const _box: typeof o.fields.boxed.type = z.object({
+      const _box: ReturnType<typeof o.fields.boxed.type.innerType> = z.object({
         field1: z.string(),
         field2: z.string(),
       });

@@ -110,7 +110,7 @@ export type MapZodTypeToField<T extends MobxZodTypes> = T extends
   : T extends MobxZodEffects
   ? FieldWithEffects<MapZodTypeToField<T["_def"]["schema"]>, T>
   : T extends MobxZodBox<ZodTypeAny>
-  ? MobxZodField<T["_def"]["schema"]>
+  ? MobxZodField<T>
   : never;
 
 export type MobxZodObjectFieldFields<T extends MobxZodObject> = {
