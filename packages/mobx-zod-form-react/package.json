@@ -34,7 +34,7 @@
     "access": "public"
   },
   "peerDependencies": {
-    "mobx": "~6.8.0",
+    "mobx": "~6.8.0 || ~6.9.0",
     "react": "~18.2.0",
     "zod": "~3.21.2"
   },
