@@ -1,4 +1,6 @@
 # mobx-zod-form
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FMonoidDev%2Fmobx-zod-form.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2FMonoidDev%2Fmobx-zod-form?ref=badge_shield)
+
 
 Data-first form builder based on [MobX](https://mobx.js.org/) & [Zod](https://zod.dev/).
 
@@ -21,3 +23,7 @@ Data-first form builder based on [MobX](https://mobx.js.org/) & [Zod](https://zo
 
 ## Features
 
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FMonoidDev%2Fmobx-zod-form.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2FMonoidDev%2Fmobx-zod-form?ref=badge_large)
