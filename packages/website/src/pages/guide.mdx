@@ -1,0 +1,71 @@
+import { Callout, Tab, Tabs, Steps } from 'nextra-theme-docs'
+
+# Guide
+
+## Basic Concepts
+
+### Schemas and Fields
+
+What is a schema? According to Zod's [documentation](https://zod.dev), schema refers to any data type.
+
+> Zod is a TypeScript-first schema declaration and validation library. I'm using the term "schema" to broadly refer to any data type, from a simple string to a complex nested object.
+
+We have defined a schema before:
+
+@include "../components/examples/guide.tsx#schema"
+
+A schema can parse data from the outside world, and throws meaning error if the input does not satisfy it.
+
+Our form is built based on the schema. Here, we have two properties, `username` and `password` to fill out. According to those properties, we should have two `<input>` elements, wrapped in a form:
+
+@include "../components/examples/guide.tsx#basic-form"
+
+Here, we have
+
+@include "../components/examples/guide.tsx#basic-form-fields"
+
+as our **fields** for property `username` and `password` respectively.
+
+<Callout>
+  A schema is any data type.   
+  A field is a piece of UI to control a part of that schema. Plus, a form is the collection of fields to fill out a schema.
+</Callout>
+
+### Form and Field Controllers
+
+To make our application better reacts with the user, we need to do better than plain HTML native forms.
+
+`mobx-zod-form-react` provides a `useForm` hook which returns a `ReactForm` instance to manage the form and the fields.
+
+@include "../components/examples/guide.tsx#use-form"
+
+The `ReactForm` returned by `useForm` is a referential-stable [observable object](https://mobx.js.org/react-integration.html). Your components will re-render on its changes it you read its observable properties. We also see that `observer` is required to wrap our component, if we want the `Form` to react on `form`'s changes. Your form will not react if `observer` is not applied. Let's first bind the form to our HTML form and see the key properties and methods.
+
+<Callout>
+  Always remember to wrap your form with `observer` from `mobx-react` or it simply doesn't react!
+</Callout>
+
+@include "../components/examples/guide.tsx#bind-form"
+
+First of all, we visit `form.root`. It is a `MobxZodObjectField` object that lies at the root of your schema, corresponding to the root schema you passed to `useForm`. `form.root.fields` is the record of fields, each value being a `MobxZodField` to manage a text field.
+
+@include "../components/examples/guide.tsx#schema"
+
+Although other libraries might enforce an object, but the root schema could be `Array`, `string`, `number` or anything else. We use TypeScript generic types to map them to corresponding `MobxZodField`.
+
+Then, we call `form.bindField` for input objects against each property from `form.root.fields`.
+
+@include "../components/examples/guide.tsx#bind-field-1"
+
+@include "../components/examples/guide.tsx#bind-field-2"
+
+This effectively applies a list of props to that `<input />` element: `value`, `onChange`, `onBlur`, `ref`, `type`, `checked`. By doing that, we have everything we need to bind the input to our `ReactForm` and perform validation, state management and UI utilities.
+
+While `bindField` does a lot of stuff under the hood, `bindForm` is easier to master. It provides a idiomatic `onSubmit` handler for the form, which stops the event from propagating, sets `action` to `#` so that the page won't refresh after you click the submit button, and calls the user `onSubmit` when the validation is passed and `onSubmitError` when the validation is failed.
+
+@include "../components/examples/guide.tsx#bind-form-1"
+
+### Touched and Error Messages
+
+### Scroll to Error
+

@@ -21,9 +21,6 @@
     "type": "git",
     "url": "https://github.com/MonoidDev/mobx-zod-form"
   },
-  "engines": {
-    "node": ">=16.0.0"
-  },
   "scripts": {
     "dev": "tsx src/index.ts",
     "build": "tsup src/index.tsx --external react --format esm,cjs -d lib/ && tsc -p tsconfig.build.json",
