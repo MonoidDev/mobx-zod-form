@@ -34,6 +34,7 @@ export class MobxZodBaseFieldImpl<T extends MobxZodTypes>
   implements MobxZodField<T>
 {
   formMeta: FormMeta;
+  element = null;
   _issues: ZodIssue[] = [];
   _errorMessages: string[] = [];
   _touched: boolean = false;

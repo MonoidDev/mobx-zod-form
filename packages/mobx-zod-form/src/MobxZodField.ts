@@ -43,6 +43,7 @@ import { DiscriminatorType, MobxZodBox } from "./zod-extra";
 
 export interface MobxZodField<T extends ZodTypeAny> {
   type: T;
+  element: HTMLElement | null;
   /**
    * An id uniquely identifies the field across the form.
    * Useful for SSR and tracking array field elements.

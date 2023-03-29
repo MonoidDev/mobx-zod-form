@@ -35,6 +35,7 @@ export interface MobxZodFormOptions<T extends MobxZodTypes> {
   initialOutput?: z.infer<T>;
   validateOnMount?: boolean;
   setActionOptions?: InputSetActionOptions;
+  shouldFocusError?: boolean;
 }
 
 interface ValidationTask {
@@ -152,6 +153,7 @@ export class MobxZodForm<T extends MobxZodTypes> {
       setActionOptions: {
         validateSync: this._options.setActionOptions?.validateSync ?? false,
       },
+      shouldFocusError: this._options.shouldFocusError ?? true,
     };
   }
 
@@ -285,6 +287,28 @@ export class MobxZodForm<T extends MobxZodTypes> {
       runInAction(() => {
         this._isSubmitting = false;
       });
+
+      if (this.options.shouldFocusError) {
+        this.focusError();
+      }
+    }
+  }
+
+  focusError() {
+    class StopToken extends Error {}
+
+    try {
+      this.root._walk((f) => {
+        if (f._errorMessages.length > 0 && f.element && f.element.isConnected) {
+          f.element.focus();
+          throw new StopToken();
+        }
+      });
+    } catch (e) {
+      if (e instanceof StopToken) {
+        return;
+      }
+      throw e;
     }
   }
 }

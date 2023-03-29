@@ -165,6 +165,9 @@ export class ReactForm<T extends MobxZodTypes> extends MobxZodForm<T> {
       name: field.path.join("."),
       type: options.type,
       onBlur: () => field.setTouched(true),
+      ref(element) {
+        field.element = element;
+      },
       ...getPropsForType(),
     };
   }
