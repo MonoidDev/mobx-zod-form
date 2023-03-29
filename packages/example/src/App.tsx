@@ -269,6 +269,63 @@ const ExoticFields = observer(() => {
   );
 });
 
+const FocusErrorY = () => {
+  const form = useForm(
+    z.object({
+      password: z.string().min(6),
+      username: z.string().min(1),
+    }),
+  );
+
+  return (
+    <form
+      {...form.bindForm({ onSubmit: console.info })}
+      style={{ border: `1px solid black`, height: 120, overflow: "auto" }}
+    >
+      The form will scroll. It will focus on the first error based on the
+      distance to top.
+      <TextInput field={form.root.fields.username} />
+      <div style={{ height: 100 }} />
+      <TextInput field={form.root.fields.password} />
+      <button type="submit">Submit</button>
+    </form>
+  );
+};
+
+const FocusErrorX = () => {
+  const form = useForm(
+    z.object({
+      password: z.string().min(6),
+      username: z.string().min(1),
+      blah: z.string().min(6),
+      blahblah: z.string().min(1),
+    }),
+    {
+      shouldFocusError: "first-x",
+    },
+  );
+
+  return (
+    <form
+      {...form.bindForm({ onSubmit: console.info })}
+      style={{
+        border: `1px solid black`,
+        display: "grid",
+        gridTemplateColumns: "1fr 1fr",
+      }}
+    >
+      <div style={{ gridColumn: "1 / -1" }}>
+        It will focus on the first error based on the distance to left.
+      </div>
+      <TextInput field={form.root.fields.username} />
+      <TextInput field={form.root.fields.password} />
+      <TextInput field={form.root.fields.blah} />
+      <TextInput field={form.root.fields.blahblah} />
+      <button type="submit">Submit</button>
+    </form>
+  );
+};
+
 function App() {
   return (
     <div className="App">
@@ -279,6 +336,8 @@ function App() {
       <FormContext1 />
       <ComposableForm />
       <ExoticFields />
+      <FocusErrorY />
+      <FocusErrorX />
     </div>
   );
 }

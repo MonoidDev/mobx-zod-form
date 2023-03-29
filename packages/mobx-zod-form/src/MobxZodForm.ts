@@ -35,7 +35,18 @@ export interface MobxZodFormOptions<T extends MobxZodTypes> {
   initialOutput?: z.infer<T>;
   validateOnMount?: boolean;
   setActionOptions?: InputSetActionOptions;
-  shouldFocusError?: boolean;
+  /**
+   * Should we focus the element with error after submitting?
+   * 1. false:
+   *    do not focus at all.
+   * 2. "first-y":
+   *    focus on the element having the smallest `y`, then `x`.
+   *    Useful when your layout is a single column.
+   * 3. "first-x":
+   *    focus on the element having the smallest `x`, then `y`.
+   *    Useful when you expect your user complete the form column by column.
+   */
+  shouldFocusError?: false | "first-y" | "first-x";
 }
 
 interface ValidationTask {
@@ -153,7 +164,7 @@ export class MobxZodForm<T extends MobxZodTypes> {
       setActionOptions: {
         validateSync: this._options.setActionOptions?.validateSync ?? false,
       },
-      shouldFocusError: this._options.shouldFocusError ?? true,
+      shouldFocusError: this._options.shouldFocusError ?? "first-y",
     };
   }
 
@@ -295,20 +306,27 @@ export class MobxZodForm<T extends MobxZodTypes> {
   }
 
   focusError() {
-    class StopToken extends Error {}
-
+    const candidates: HTMLElement[] = [];
     try {
       this.root._walk((f) => {
         if (f._errorMessages.length > 0 && f.element && f.element.isConnected) {
-          f.element.focus();
-          throw new StopToken();
+          candidates.push(f.element);
         }
       });
     } catch (e) {
-      if (e instanceof StopToken) {
-        return;
-      }
       throw e;
+    }
+
+    if (candidates.length > 0) {
+      const getPriority: (e: HTMLElement) => number =
+        this.options.shouldFocusError === "first-y"
+          ? (e) =>
+              10000 * e.getBoundingClientRect().y + e.getBoundingClientRect().x
+          : (e) =>
+              10000 * e.getBoundingClientRect().x + e.getBoundingClientRect().y;
+
+      candidates.sort((a, b) => getPriority(a) - getPriority(b));
+      candidates[0].focus();
     }
   }
 }
