@@ -280,7 +280,11 @@ export class MobxZodArrayFieldImpl<T extends MobxZodArray>
     for (let i = 0; i < this._elements.length - start; i++) {
       this._elements[start + i]._updatePath([...this.path, start + i]);
     }
-    this.rawInput.splice(start, deleteCount, ...values);
+    this.rawInput.splice(
+      start,
+      deleteCount,
+      ...values.map((v) => this.type.element.getFormMeta().encode(v)),
+    );
     this.form._notifyChange();
   }
 

@@ -321,6 +321,26 @@ describe("form tests", () => {
     expect(obElements.observed).toMatchObject([3, 0, 4]);
   });
 
+  it("should encode new element for arrays", () => {
+    const form = new MobxZodForm(
+      z.object({
+        array: z.number().array(),
+      }),
+    );
+
+    form.root.fields.array.push(0);
+
+    expect(toJS(form.rawInput)).toMatchObject({
+      array: ["0"],
+    });
+
+    form.root.fields.array.push(empty);
+
+    expect(toJS(form.rawInput)).toMatchObject({
+      array: ["0", ""],
+    });
+  });
+
   it("should react on discriminated union", () => {
     const form = new MobxZodForm(
       z.discriminatedUnion("answer", [
