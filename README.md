@@ -21,7 +21,10 @@ Data-first form builder based on [MobX](https://mobx.js.org/) & [Zod](https://zo
 13. `ZodEffects`
 14. `MobxZodBox`
 
-## Features
+## Learn More
+
+Documentation (WIP):
+https://mobx-zod-form.pages.dev/
 
 
 
