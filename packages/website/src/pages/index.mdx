@@ -8,16 +8,21 @@ Mobx Zod Form is a data-first form builder based on two amazing libraries: `mobx
 
 You first define your form in `zod`:
 
+```
 @include "../components/examples/index.tsx#define-form"
+```
 
 Define your field controller component:
 
+```
 @include "../components/examples/index.tsx#define-controller"
+```
 
 Connect your `form` to your field controllers:
 
+```
 @include "../components/examples/index.tsx#connect-form"
-
+```
 
 Then you just created an end-to-end safe form widget!
 
@@ -108,7 +113,9 @@ Because the fact that `<input />` doesn't really give us a `number`, but gives u
 
 In Mobx Zod Form, we first **decode** the form, casting any number-like `string` to `number` against our schema, then you have the digested value from `field.decodeResult.data`, as illustrated below:
 
+```
 @include "../components/examples/index.tsx#form-decode"
+```
 
 <Callout emoji="⚠️">Notice that in a cruel world, the decoding might fail. So `decodeResult` is actually a discriminated union with `success: true` only when the input is valid.</Callout>
 
@@ -116,11 +123,15 @@ In Mobx Zod Form, we first **decode** the form, casting any number-like `string`
 
 Consider you have a credit card info input, which you might use it a couple of times in the UI:
 
+```
 @include "../components/examples/index.tsx#form-compose-schema"
+```
 
 Now you can plug `CreditCardSchema` else where, and then bind the corresponding field to `CreditCardInput`:
 
+```
 @include "../components/examples/index.tsx#form-compose-form"
+```
 
 The entire process is, of course, as type-checked as guaranteed.
 

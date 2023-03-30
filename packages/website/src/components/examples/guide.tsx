@@ -109,3 +109,45 @@ z.object({
 
   /* #bind-form */
 };
+
+() => {
+  /* #decode-result */
+  const Form = observer(() => {
+    const form = useForm(
+      z.object({
+        age: z.number().min(20),
+      }),
+    );
+
+    const { fields } = form.root;
+
+    return (
+      <form
+        {...form.bindForm({
+          onSubmit(data /* { age: number; } */) {
+            alert(`You are ${data.age}-year-old. `);
+          },
+        })}
+      >
+        <input {...form.bindField(fields.age)} />
+        <div>
+          {fields.age.decodeResult.success
+            ? fields.age.type.minValue! > fields.age.decodeResult.data
+              ? `You are ${
+                  fields.age.type.minValue! - fields.age.decodeResult.data
+                } years younger than 20`
+              : "Old enough"
+            : null}
+        </div>
+        {fields.age.touched &&
+          fields.age.errorMessages.map((e, i) => (
+            <div style={{ color: "red" }} key={i}>
+              {e}
+            </div>
+          ))}
+      </form>
+    );
+  });
+
+  /* #decode-result */
+};

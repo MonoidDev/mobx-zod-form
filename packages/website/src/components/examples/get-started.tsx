@@ -18,7 +18,6 @@ const Form = observer(() => {
 
   const { fields } = form.root;
 
-  /* #bindForm */
   return (
     <form
       {...form.bindForm({
@@ -27,7 +26,6 @@ const Form = observer(() => {
         },
       })}
     >
-      {/* #bindForm */}
       <input {...form.bindField(fields.username)} placeholder="Username" />
       <br />
       {fields.username.touched &&

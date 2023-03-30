@@ -32,7 +32,9 @@ To get started, you should have setup a TypeScript React project (more framework
 
 In your React project's root, copy-paste the following code to your entrypoint:
 
+```
 @include "../components/examples/get-started.tsx"
+```
 
 Then open your browser, you might see the form UI like this, if everything goes well.
 
@@ -48,7 +50,9 @@ This acts like most users expect, and also makes the dev feel at home if they ar
 
 Then, enter complete information, and click submit, you'll see a popup on the screen, as we state in `bindForm`:
 
-@include "../components/examples/get-started.tsx#bindForm"
+```tsx {24-26}
+@include "../components/examples/get-started.tsx"
+```
 
 Then, refresh the page, and click `Create Account` directly, you'll see the following:
 
