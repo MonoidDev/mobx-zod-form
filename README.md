@@ -1,4 +1,6 @@
 # mobx-zod-form
+[![CircleCI](https://dl.circleci.com/status-badge/img/gh/MonoidDev/mobx-zod-form/tree/master.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/MonoidDev/mobx-zod-form/tree/master)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FMonoidDev%2Fmobx-zod-form.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2FMonoidDev%2Fmobx-zod-form?ref=badge_shield)
 
 Data-first form builder based on [MobX](https://mobx.js.org/) & [Zod](https://zod.dev/).
 
@@ -19,5 +21,12 @@ Data-first form builder based on [MobX](https://mobx.js.org/) & [Zod](https://zo
 13. `ZodEffects`
 14. `MobxZodBox`
 
-## Features
+## Learn More
 
+Documentation (WIP):
+https://mobx-zod-form.pages.dev/
+
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FMonoidDev%2Fmobx-zod-form.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2FMonoidDev%2Fmobx-zod-form?ref=badge_large)
