@@ -120,7 +120,7 @@ export const resolveDOMFormMeta = (type: ZodTypeAny): FormMeta => {
 
           const trimmed = input.trim();
           if (trimmed.length > 0) {
-            const parsed = Number.parseFloat(trimmed);
+            const parsed = Number(trimmed);
 
             if (!Number.isNaN(parsed) && Number.isFinite(parsed)) {
               return {
