@@ -77,7 +77,7 @@ Then, we call `form.bindField` for input objects against each property from `for
 
 This effectively applies a list of props to that `<input />` element: `value`, `onChange`, `onBlur`, `ref`, `type`, `checked`. By doing that, we have everything we need to bind the input to our `ReactForm` and perform validation, state management and UI utilities.
 
-While `bindField` does a lot of stuff under the hood, `bindForm` is easier to master. It provides a idiomatic `onSubmit` handler for the form, which stops the event from propagating, sets `action` to `#` so that the page won't refresh after you click the submit button, and calls the user `onSubmit` when the validation is passed and `onSubmitError` when the validation is failed.
+While `bindField` does a lot of stuff under the hood, `bindForm` is easier to master. It provides a idiomatic `onSubmit` handler for the form, which stops the event from propagating, sets `action` to `#` so that the page won't refresh after you click the submit button, attaches a `ref` so that `form.element` is set to the form element, and calls the user `onSubmit` when the validation is passed and `onSubmitError` when the validation is failed.
 
 ```
 @include "../components/examples/guide.tsx#bind-form-1"

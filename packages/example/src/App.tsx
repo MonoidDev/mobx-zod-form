@@ -1,8 +1,11 @@
+import { useEffect } from "react";
+
 import {
   empty,
   MobxZodField,
   extendZodWithMobxZodForm,
   MobxZodObjectField,
+  mapDecodeResult,
 } from "@monoid-dev/mobx-zod-form";
 import {
   FormContextProvider,
@@ -326,6 +329,23 @@ const FocusErrorX = () => {
   );
 };
 
+const AutoSubmit = observer(() => {
+  const form = useForm(z.object({ autoSubmit: z.string() }));
+
+  useEffect(() => {
+    form.element?.dispatchEvent(
+      new Event("submit", { cancelable: true, bubbles: true }),
+    );
+  }, [mapDecodeResult(form.root.fields.autoSubmit.decodeResult, (d) => d, "")]);
+
+  return (
+    <form {...form.bindForm()}>
+      <div>Submit Count: {form.submitCount}</div>
+      <TextInput field={form.root.fields.autoSubmit} />
+    </form>
+  );
+});
+
 function App() {
   return (
     <div className="App">
@@ -338,6 +358,7 @@ function App() {
       <ExoticFields />
       <FocusErrorY />
       <FocusErrorX />
+      <AutoSubmit />
     </div>
   );
 }

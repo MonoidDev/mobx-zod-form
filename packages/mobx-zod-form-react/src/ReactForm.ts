@@ -67,6 +67,9 @@ export type BindInputOptions =
 export class ReactForm<T extends MobxZodTypes> extends MobxZodForm<T> {
   bindForm(options: BindFormOptions<T> = {}): React.ComponentProps<"form"> {
     return {
+      ref: (element) => {
+        this.element = element;
+      },
       onSubmit: async (e) => {
         e.preventDefault();
         e.stopPropagation();

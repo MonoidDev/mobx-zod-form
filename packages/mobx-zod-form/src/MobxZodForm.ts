@@ -66,6 +66,8 @@ export class MobxZodForm<T extends MobxZodTypes> {
 
   schemaFormMeta: FormMeta;
 
+  element: HTMLFormElement | null = null;
+
   root: MapZodTypeToField<T>;
 
   _currentSetActionOptions?: SetActionOptions;
