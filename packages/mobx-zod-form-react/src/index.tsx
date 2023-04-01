@@ -6,6 +6,8 @@ import { ZodTypeAny } from "zod";
 import { NotReactFormField } from "./errors";
 import { ReactForm, ReactFormOptions } from "./ReactForm";
 
+export { ReactForm, type ReactFormOptions };
+
 export const useForm = <T extends MobxZodTypes>(
   schema: T,
   options: ReactFormOptions<T> = {},

@@ -93,12 +93,30 @@ export interface FormMeta {
   getInitialOutput: () => any;
 }
 
+export const resolveFormMeta = (type: ZodTypeAny) => {
+  let formMeta = type._formMeta as Partial<FormMeta>;
+
+  if (type instanceof ZodOptional || type instanceof ZodNullable) {
+    formMeta = {
+      ...resolveFormMeta(type.unwrap()),
+      ...formMeta,
+    };
+  } else if (type instanceof ZodEffects) {
+    formMeta = {
+      ...resolveFormMeta(type.innerType()),
+      ...formMeta,
+    };
+  }
+
+  return formMeta;
+};
+
 /**
  * Resolved MobxZodMeta for en/decoding on DOM inputs.
  * Encodes number as decimal strings, and other as-is.
  */
 export const resolveDOMFormMeta = (type: ZodTypeAny): FormMeta => {
-  const inputFormMeta = type._formMeta as Partial<FormMeta>;
+  let inputFormMeta = resolveFormMeta(type);
 
   return {
     ...inputFormMeta,
