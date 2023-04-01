@@ -102,8 +102,8 @@ importers:
   packages/mobx-zod-form-react:
     dependencies:
       '@monoid-dev/mobx-zod-form':
-        specifier: ^0.1.0
-        version: link:../mobx-zod-form
+        specifier: ^0.0.22
+        version: 0.0.22(mobx@6.8.0)(zod@3.21.4)
       mobx:
         specifier: ~6.8.0
         version: 6.8.0
@@ -1068,6 +1068,17 @@ packages:
   /@mdx-js/util@1.6.22:
     resolution: {integrity: sha512-H1rQc1ZOHANWBvPcW+JpGwr+juXSxM8Q8YCkm3GhZd8REu1fHR3z99CErO1p9pkcfcxZnMdIZdIsXkOHY0NilA==}
     dev: true
+
+  /@monoid-dev/mobx-zod-form@0.0.22(mobx@6.8.0)(zod@3.21.4):
+    resolution: {integrity: sha512-04IMF2pnFj3twNwGbxsANlX6KcqtHGXC9TUF+kKh97MRMJEif3z5WmSLbgojLfQPumEID2ldCxQGE6oMHxdQHw==}
+    engines: {node: '>=16.0.0'}
+    peerDependencies:
+      mobx: ~6.8.0
+      zod: ~3.21.2
+    dependencies:
+      mobx: 6.8.0
+      zod: 3.21.4
+    dev: false
 
   /@napi-rs/simple-git-android-arm-eabi@0.1.8:
     resolution: {integrity: sha512-JJCejHBB1G6O8nxjQLT4quWCcvLpC3oRdJJ9G3MFYSCoYS8i1bWCWeU+K7Br+xT+D6s1t9q8kNJAwJv9Ygpi0g==}

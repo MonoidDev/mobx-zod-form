@@ -28,7 +28,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@monoid-dev/mobx-zod-form": "^0.1.0"
+    "@monoid-dev/mobx-zod-form": "^0.0.22"
   },
   "publishConfig": {
     "access": "public"
