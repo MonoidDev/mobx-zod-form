@@ -285,10 +285,10 @@ export const resolveDOMFormMeta = (type: ZodTypeAny): FormMeta => {
           passthrough,
         );
       } else if (type instanceof MobxZodBox) {
-        return {
-          success: true,
-          data: input,
-        };
+        return resolveDOMFormMeta(type.innerType()).safeDecode(
+          input,
+          passthrough,
+        );
       } else {
         throw new MobxFatalError(
           `${type.constructor.name} is not handled. Is that type supported?`,

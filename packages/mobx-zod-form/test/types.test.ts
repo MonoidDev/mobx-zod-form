@@ -232,6 +232,22 @@ describe("field tests", () => {
       success: false,
       input: "C",
     });
+
+    // Should decode boxed
+    expect(
+      z.object({ a: z.number() }).box().getFormMeta().safeDecode({ a: 1 }),
+    ).toMatchObject({
+      success: true,
+      data: { a: 1 },
+    });
+
+    // Should decode bad boxed
+    expect(
+      z.object({ a: z.number() }).box().getFormMeta().safeDecode(undefined),
+    ).toMatchObject({
+      input: undefined,
+      success: false,
+    });
   });
 
   it("should encode values", () => {
