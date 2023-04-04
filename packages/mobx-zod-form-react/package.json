@@ -34,9 +34,9 @@
     "access": "public"
   },
   "peerDependencies": {
-    "mobx": "~6.8.0",
-    "react": "~18.2.0",
-    "zod": "~3.21.2"
+    "mobx": "^6.8.0",
+    "react": "^18.2.0",
+    "zod": "^3.21.2"
   },
   "devDependencies": {
     "@types/react": "~18.0.28",

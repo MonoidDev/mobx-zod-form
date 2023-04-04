@@ -131,6 +131,18 @@ describe("form tests", () => {
     ]);
   });
 
+  it("should get referential equal rawInput", () => {
+    const form = new MobxZodForm(
+      z.object({
+        ids: z.array(z.number().min(0)),
+      }),
+    );
+
+    expect(
+      (form.rawInput as any).ids === form.root.fields.ids.rawInput,
+    ).toBeTruthy();
+  });
+
   it("should react on array issues", () => {
     const form = new MobxZodForm(
       z.object({

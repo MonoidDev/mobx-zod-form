@@ -81,8 +81,7 @@ export class MobxZodForm<T extends MobxZodTypes> {
     this.schemaFormMeta = schema.getFormMeta();
 
     this._rawInput = this.schemaFormMeta.encode(this.options.initialOutput);
-
-    this.root = createFieldForType(this.schema, this, []);
+    this.root = runInAction(() => createFieldForType(this.schema, this, []));
 
     if (this.options.validateOnMount) {
       this.validate();

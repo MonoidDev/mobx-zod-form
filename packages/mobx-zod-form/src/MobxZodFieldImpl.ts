@@ -208,6 +208,7 @@ export class MobxZodArrayFieldImpl<T extends MobxZodArray>
     public path: ParsePath,
   ) {
     super(type, form, path);
+
     makeObservable(this, {
       _elements: observable,
       elements: computed,

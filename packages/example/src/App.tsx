@@ -99,37 +99,41 @@ const Form2 = () => {
   );
 };
 
-const FormArray1 = observer(() => {
-  const form = useForm(
-    z.object({
-      users: z.array(
-        z.object({
-          name: z.string().min(1),
-          age: z.number().min(5),
-        }),
-      ),
-    }),
+const FormArray1Schema = z.object({
+  users: z
+    .array(
+      z.object({
+        name: z.string().min(1),
+        age: z.number().min(5),
+      }),
+    )
+    .min(1),
+});
+
+const FormArray1Inner = observer(({ field }: { field: any }) => {
+  return (
+    <>
+      {field.elements.length > 0 &&
+        field.elements.map((userField: any) => (
+          <div key={userField.uniqueId}>
+            <div style={{ border: `1px solid black` }}>
+              <TextInput field={userField.fields.name} />
+              <TextInput field={userField.fields.age} />
+            </div>
+          </div>
+        ))}
+    </>
   );
+});
+
+const FormArray1 = observer(() => {
+  const form = useForm(FormArray1Schema);
 
   return (
     <div style={{ border: `1px solid black` }}>
-      {form.root.fields.users.elements.map((userField) => (
-        <div key={userField.uniqueId}>
-          <div style={{ border: `1px solid black` }}>
-            <TextInput field={userField.fields.name} />
-            <TextInput field={userField.fields.age} />
-          </div>
-        </div>
-      ))}
+      <FormArray1Inner field={form.root.fields.users} />
 
-      <button
-        onClick={() =>
-          form.root.fields.users.push({
-            name: "",
-            age: empty,
-          })
-        }
-      />
+      <button onClick={() => form.root.fields.users.push(empty)} />
     </div>
   );
 });

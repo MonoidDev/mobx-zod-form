@@ -62,11 +62,11 @@ importers:
         specifier: '*'
         version: link:../mobx-zod-form-react
       mobx:
-        specifier: ^6.8.0
-        version: 6.8.0
+        specifier: ^6.9.0
+        version: 6.9.0
       mobx-react:
         specifier: ^7.6.0
-        version: 7.6.0(mobx@6.8.0)(react-dom@18.2.0)(react@18.2.0)
+        version: 7.6.0(mobx@6.9.0)(react-dom@18.2.0)(react@18.2.0)
       react:
         specifier: ^18.2.0
         version: 18.2.0
@@ -93,10 +93,10 @@ importers:
   packages/mobx-zod-form:
     dependencies:
       mobx:
-        specifier: ~6.8.0
+        specifier: ^6.8.0
         version: 6.8.0
       zod:
-        specifier: ~3.21.2
+        specifier: ^3.21.2
         version: 3.21.4
 
   packages/mobx-zod-form-react:
@@ -105,13 +105,13 @@ importers:
         specifier: ^0.1.0
         version: link:../mobx-zod-form
       mobx:
-        specifier: ~6.8.0
+        specifier: ^6.8.0
         version: 6.8.0
       react:
-        specifier: ~18.2.0
+        specifier: ^18.2.0
         version: 18.2.0
       zod:
-        specifier: ~3.21.2
+        specifier: ^3.21.2
         version: 3.21.4
     devDependencies:
       '@types/react':
@@ -174,7 +174,7 @@ importers:
         version: 6.1.0
       typedoc:
         specifier: ^0.23.28
-        version: 0.23.28(typescript@4.9.5)
+        version: 0.23.28(typescript@5.0.3)
       unist-util-flatmap:
         specifier: ^1.0.0
         version: 1.0.0
@@ -4105,6 +4105,7 @@ packages:
 
   /loose-envify@1.4.0:
     resolution: {integrity: sha512-lyuxPGr/Wfhrlem2CL/UcnUc1zcqKAImBDzukY7Y5F/yQiNdko6+fRLevlw1HgMySw7f611UIY408EtxRSoK3Q==}
+    hasBin: true
     dependencies:
       js-tokens: 4.0.0
 
@@ -4811,6 +4812,25 @@ packages:
       mobx: 6.8.0
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
+    dev: true
+
+  /mobx-react-lite@3.4.3(mobx@6.9.0)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-NkJREyFTSUXR772Qaai51BnE1voWx56LOL80xG7qkZr6vo8vEaLF3sz1JNUVh+rxmUzxYaqOhfuxTfqUh0FXUg==}
+    peerDependencies:
+      mobx: ^6.1.0
+      react: ^16.8.0 || ^17 || ^18
+      react-dom: '*'
+      react-native: '*'
+    peerDependenciesMeta:
+      react-dom:
+        optional: true
+      react-native:
+        optional: true
+    dependencies:
+      mobx: 6.9.0
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
+    dev: false
 
   /mobx-react@7.6.0(mobx@6.8.0)(react-dom@18.2.0)(react@18.2.0):
     resolution: {integrity: sha512-+HQUNuh7AoQ9ZnU6c4rvbiVVl+wEkb9WqYsVDzGLng+Dqj1XntHu79PvEWKtSMoMj67vFp/ZPXcElosuJO8ckA==}
@@ -4829,9 +4849,33 @@ packages:
       mobx-react-lite: 3.4.3(mobx@6.8.0)(react-dom@18.2.0)(react@18.2.0)
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
+    dev: true
+
+  /mobx-react@7.6.0(mobx@6.9.0)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-+HQUNuh7AoQ9ZnU6c4rvbiVVl+wEkb9WqYsVDzGLng+Dqj1XntHu79PvEWKtSMoMj67vFp/ZPXcElosuJO8ckA==}
+    peerDependencies:
+      mobx: ^6.1.0
+      react: ^16.8.0 || ^17 || ^18
+      react-dom: '*'
+      react-native: '*'
+    peerDependenciesMeta:
+      react-dom:
+        optional: true
+      react-native:
+        optional: true
+    dependencies:
+      mobx: 6.9.0
+      mobx-react-lite: 3.4.3(mobx@6.9.0)(react-dom@18.2.0)(react@18.2.0)
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
+    dev: false
 
   /mobx@6.8.0:
     resolution: {integrity: sha512-+o/DrHa4zykFMSKfS8Z+CPSEg5LW9tSNGTuN8o6MF1GKxlfkSHSeJn5UtgxvPkGgaouplnrLXCF+duAsmm6FHQ==}
+
+  /mobx@6.9.0:
+    resolution: {integrity: sha512-HdKewQEREEJgsWnErClfbFoVebze6rGazxFLU/XUyrII8dORfVszN1V0BMRnQSzcgsNNtkX8DHj3nC6cdWE9YQ==}
+    dev: false
 
   /mri@1.2.0:
     resolution: {integrity: sha512-tzzskb3bG8LvYGFF/mDTpq3jpI6Q9wc3LEmBaghu+DdCssd1FakN7Bc0hVNmEyGq1bq3RgfkCb3cmQLpNPOroA==}
@@ -6387,7 +6431,7 @@ packages:
       is-typed-array: 1.1.10
     dev: true
 
-  /typedoc@0.23.28(typescript@4.9.5):
+  /typedoc@0.23.28(typescript@5.0.3):
     resolution: {integrity: sha512-9x1+hZWTHEQcGoP7qFmlo4unUoVJLB0H/8vfO/7wqTnZxg4kPuji9y3uRzEu0ZKez63OJAUmiGhUrtukC6Uj3w==}
     engines: {node: '>= 14.14'}
     hasBin: true
@@ -6398,12 +6442,18 @@ packages:
       marked: 4.2.12
       minimatch: 7.4.2
       shiki: 0.14.1
-      typescript: 4.9.5
+      typescript: 5.0.3
     dev: true
 
   /typescript@4.9.5:
     resolution: {integrity: sha512-1FXk9E2Hm+QzZQ7z+McJiHL4NW1F2EzMu9Nq9i3zAaGqibafqYwCVU6WyWAuyQRRzOlxou8xZSyXLEN8oKj24g==}
     engines: {node: '>=4.2.0'}
+    dev: true
+
+  /typescript@5.0.3:
+    resolution: {integrity: sha512-xv8mOEDnigb/tN9PSMTwSEqAnUvkoXMQlicOb0IUVDBSQCgBSaAAROUZYy2IcUy5qU6XajK5jjjO7TMWqBTKZA==}
+    engines: {node: '>=12.20'}
+    hasBin: true
     dev: true
 
   /ufo@1.1.1:
