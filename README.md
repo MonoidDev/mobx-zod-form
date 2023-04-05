@@ -1,32 +1,20 @@
 # mobx-zod-form
 [![CircleCI](https://dl.circleci.com/status-badge/img/gh/MonoidDev/mobx-zod-form/tree/master.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/MonoidDev/mobx-zod-form/tree/master)
-[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FMonoidDev%2Fmobx-zod-form.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2FMonoidDev%2Fmobx-zod-form?ref=badge_shield)
+![npm](https://img.shields.io/npm/v/@monoid-dev/mobx-zod-form?label=mobx-zod-form)
+![npm](https://img.shields.io/npm/v/@monoid-dev/mobx-zod-form-react?label=mobx-zod-form-react)
+
+
+<img src="https://raw.githubusercontent.com/MonoidDev/mobx-zod-form/master/packages/website/public/favicon.svg" width="256" height="256" alt="Logo" />
+
+<br />
 
 Data-first form builder based on [MobX](https://mobx.js.org/) & [Zod](https://zod.dev/).
 
-## Supported types
+<br />
 
-1. `ZodString`
-2. `ZodNumber`
-3. `ZodBoolean`
-4. `ZodEnum`
-5. `ZodOptional`
-6. `ZodNullable`
-7. `ZodLiteral`
-8. `ZodAny`
-9. `ZodObject`
-10. `ZodArray`
-11. `ZodDefault`
-12. `ZodDiscriminatedUnion`
-13. `ZodEffects`
-14. `MobxZodBox`
+## Checkout our Documentation
 
-## Learn More
-
-Documentation (WIP):
+Documentation:
 https://mobx-zod-form.pages.dev/
 
 
-
-## License
-[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FMonoidDev%2Fmobx-zod-form.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2FMonoidDev%2Fmobx-zod-form?ref=badge_large)
