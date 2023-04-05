@@ -176,8 +176,8 @@ importers:
         specifier: ^1.6.22
         version: 1.6.22
       to-vfile:
-        specifier: ^6.1.0
-        version: 6.1.0
+        specifier: ^7.0.0
+        version: 7.0.0
       unist-util-flatmap:
         specifier: ^1.0.0
         version: 1.0.0
@@ -6267,6 +6267,13 @@ packages:
       vfile: 4.2.1
     dev: true
 
+  /to-vfile@7.0.0:
+    resolution: {integrity: sha512-l2/CqmSVwXZhzyWsxsllCi/JQr9oFO4hKNG7Y1dk9nhHQnO/2hU94wxxmTehMvQKA4z+EcjSyfWJFR+Ybhy4cA==}
+    dependencies:
+      is-buffer: 2.0.5
+      vfile: 5.3.7
+    dev: true
+
   /tough-cookie@4.1.2:
     resolution: {integrity: sha512-G9fqXWoYFZgTc2z8Q5zaHy/vJMjm+WV0AkAeHxVCQiEB1b+dGvWzFW6QV07cY5jQ5gRkeid2qIkzkxUnmoQZUQ==}
     engines: {node: '>=6'}
@@ -6573,7 +6580,6 @@ packages:
     resolution: {integrity: sha512-k5GzIBZ/QatR8N5X2y+drfpWG8IDBzdnVj6OInRNWm1oXrzydiaAT2OQiA8DPRRZyAKb9b6I2a6PxYklZD0gKg==}
     dependencies:
       '@types/unist': 2.0.6
-    dev: false
 
   /unist-util-visit-parents@3.1.1:
     resolution: {integrity: sha512-1KROIZWo6bcMrZEwiH2UrXDyalAa0uqzWCxCJj6lPOvTve2WkfgCytoDTPaMnodXh1WrXOq0haVYHj99ynJlsg==}
@@ -6703,7 +6709,6 @@ packages:
     dependencies:
       '@types/unist': 2.0.6
       unist-util-stringify-position: 3.0.3
-    dev: false
 
   /vfile@4.2.1:
     resolution: {integrity: sha512-O6AE4OskCG5S1emQ/4gl8zK586RqA3srz3nfK/Viy0UPToBc5Trp9BVFb1u0CjsKrAWwnpr4ifM/KBXPWwJbCA==}
@@ -6721,7 +6726,6 @@ packages:
       is-buffer: 2.0.5
       unist-util-stringify-position: 3.0.3
       vfile-message: 3.1.4
-    dev: false
 
   /vite-node@0.29.2(@types/node@18.15.3):
     resolution: {integrity: sha512-5oe1z6wzI3gkvc4yOBbDBbgpiWiApvuN4P55E8OI131JGrSuo4X3SOZrNmZYo4R8Zkze/dhi572blX0zc+6SdA==}
