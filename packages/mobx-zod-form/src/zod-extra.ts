@@ -52,7 +52,7 @@ declare module "zod" {
 }
 
 /**
- * Extend zod so that you can append `mobxZodMeta` onto it.
+ * Extend zod so that you can append `formMeta` onto it.
  * @param zod the z object imported from zod
  */
 export function extendZodWithMobxZodForm(zod: typeof z) {

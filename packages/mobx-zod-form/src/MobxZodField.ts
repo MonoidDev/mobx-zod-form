@@ -42,15 +42,32 @@ import type {
 import { DiscriminatorType, MobxZodBox } from "./zod-extra";
 
 export interface MobxZodField<T extends ZodTypeAny> {
+  /**
+   * The Zod type associated with the field
+   */
   type: T;
+  /**
+   * The optional HTMLElement associated with the field.
+   * Typically set in frontend framework.
+   */
   element: HTMLElement | null;
   /**
    * An id uniquely identifies the field across the form.
    * Useful for SSR and tracking array field elements.
    */
   readonly uniqueId: number;
+  /**
+   * See `FormMeta`.
+   */
   readonly formMeta: FormMeta;
+  /**
+   * The form containing the field.
+   */
   readonly form: MobxZodForm<ZodTypeAny>;
+  /**
+   * The path of the field. Only contains numbers for array indices and strings for object keys.
+   * For example, the first field `a` in `items` in `{ items: [{ a: 'text' }] }` would be `['items', 0, 'a']`
+   */
   path: ParsePath;
   /**
    * The original input, e.g. from DOM string.
@@ -69,20 +86,47 @@ export interface MobxZodField<T extends ZodTypeAny> {
    */
   setOutput(output: T["_output"]): void;
   /**
-   * Issues associated with this field
-   */
-  /**
+   * @internal
    * When this field's value has changed involuntarily, e.g. the parent field has called 'setRawInput'
    */
   _onInputChange(): void;
+  /**
+   * Issues associated with this field.
+   */
   issues: readonly ZodIssue[];
+  /**
+   * @internal
+   */
   _issues: ZodIssue[];
+  /**
+   * Whether user has interacted with the field.
+   */
   touched: boolean;
+  /**
+   * @internal
+   */
   _touched: boolean;
+  /**
+   * Manually set whether the user has interacted with the field.
+   * @param touched
+   * @returns
+   */
   setTouched: (touched: boolean) => void;
+  /**
+   * Error messages associated with the field.
+   */
   errorMessages: readonly string[];
+  /**
+   * @internal
+   */
   _errorMessages: string[];
+  /**
+   * @internal
+   */
   _updatePath: (newPath: ParsePath) => void;
+  /**
+   * @internal
+   */
   _walk: (handler: (f: MobxZodField<any>) => void) => void;
 }
 
@@ -120,19 +164,44 @@ export type MobxZodObjectFieldFields<T extends MobxZodObject> = {
 
 export interface MobxZodObjectField<T extends MobxZodObject>
   extends MobxZodField<T> {
+  /**
+   * The child fields of this field, matching the object's shape.
+   */
   fields: MobxZodObjectFieldFields<T>;
 }
 
 export interface MobxZodArrayField<T extends MobxZodArray>
   extends MobxZodField<T> {
   _elementOutput: T["element"]["_output"];
-
+  /**
+   * The child fields of this field.
+   */
   elements: readonly MapZodTypeToField<T["element"]>[];
+  /**
+   * The field array's length.
+   */
   length: number;
+  /**
+   * Array.pop for the field array.
+   */
   pop(): unknown;
+  /**
+   * Array.push for the field array.
+   */
   push(...items: this["_elementOutput"][]): number;
+  /**
+   * Array.shift for the field array
+   */
   shift(): unknown;
   // TODO: sort the fields in place
+  /**
+   * Array.splice for the field array. See MDN for more.
+   * @param start
+   * @param deleteCount
+   * @param values
+   * @param options
+   * @returns
+   */
   splice: (
     start: number,
     deleteCount: number,
@@ -204,6 +273,10 @@ export type MobxZodOmittableFieldTypes<T extends MobxOmittableTypes> = {
 export interface MobxZodOmittableField<T extends MobxOmittableTypes>
   extends MobxZodField<T> {
   _types: MobxZodOmittableFieldTypes<T>;
+  /**
+   * If the input is null or undefined, innerField will be undefined;
+   * else, it will be the field that its inner type is mapped to.
+   */
   innerField: this["_types"]["_innerField"] | undefined;
 }
 

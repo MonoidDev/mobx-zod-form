@@ -1,10 +1,10 @@
-const includeMarkdownPlugin = require("./scripts/include-markdown");
+const includeCodePlugin = require("./scripts/include-code");
 
 module.exports = require("nextra")({
   theme: "nextra-theme-docs",
   themeConfig: "./theme.config.tsx",
   mdxOptions: {
-    remarkPlugins: [includeMarkdownPlugin],
+    remarkPlugins: [includeCodePlugin],
   },
 })({
   images: {

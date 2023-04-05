@@ -5,6 +5,9 @@
   "scripts": {
     "prepare": "husky install"
   },
+  "workspaces": [
+    "packages/*"
+  ],
   "private": true,
   "devDependencies": {
     "@testing-library/jest-dom": "^5.16.5",

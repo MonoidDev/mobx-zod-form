@@ -7,11 +7,14 @@
   "scripts": {
     "test": "echo 'no tests'",
     "dev": "next dev",
-    "build": "next build && next export"
+    "build:api": "bash scripts/build-api.sh",
+    "build:next": "next build && next export",
+    "build": "pnpm build:next && pnpm build:api",
+    "serve": "npx sirv-cli --dev out"
   },
   "keywords": [],
   "author": "hanayashiki",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "@hashicorp/remark-plugins": "^4.1.1",
     "@monoid-dev/mobx-zod-form": "workspace:*",
@@ -23,7 +26,6 @@
     "remark": "^12.0.1",
     "remark-mdx": "^1.6.22",
     "to-vfile": "^6.1.0",
-    "typedoc": "^0.23.28",
     "unist-util-flatmap": "^1.0.0",
     "zod": "^3.21.4"
   },
@@ -32,6 +34,7 @@
     "nextra": "^2.2.19",
     "nextra-theme-docs": "^2.2.19",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "typedoc": "^0.23.28"
   }
 }

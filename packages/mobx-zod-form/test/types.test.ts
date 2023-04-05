@@ -259,10 +259,12 @@ describe("field tests", () => {
     expect(z.number().getFormMeta().encode(undefined)).toBe("");
 
     // ZodBoolean
+    expect(z.boolean().getFormMeta().encode(empty)).toBe(undefined);
     expect(z.boolean().getFormMeta().encode(true)).toBe(true);
     expect(z.boolean().getFormMeta().encode(false)).toBe(false);
 
     // ZodEnum
+    expect(z.enum(["A", "B"]).getFormMeta().encode(empty)).toBe(undefined);
     expect(z.enum(["A", "B"]).getFormMeta().encode("A")).toMatchObject("A");
 
     // ZodOptional

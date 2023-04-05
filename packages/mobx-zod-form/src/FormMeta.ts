@@ -27,12 +27,15 @@ export type SafeDecodeResultError<RawInput> = {
   input: RawInput;
 };
 
+/**
+ * A discriminated union for decode reuslt, matched against `success: boolean`.
+ */
 export type SafeDecodeResult<RawInput, Decoded> =
   | SafeDecodeResultSuccess<Decoded>
   | SafeDecodeResultError<RawInput>;
 
 /**
- *
+ * An easy way to get your decoded data if you believe it is `success: true`
  * @param result
  * @returns The data if success, throws if MobxZodDecodeError not.
  */
@@ -47,7 +50,6 @@ export const unwrapDecodeResult = <RawInput, Decoded>(
 };
 
 /**
- *
  * @param result
  * @param mapper
  * @param defaultValue
@@ -77,22 +79,59 @@ export const decodeResultEqual = <RawInput, Decoded>(
   }
 };
 
+/**
+ * Metadata associated with the Zod type definition.
+ * You can extend the interface to add whatever information you need.
+ * Notice for `label`, `description`, `mobx-zod-form` itself doesn't use them,
+ * but you may build your UI based on them.
+ */
 export interface FormMeta {
+  /**
+   * The label associated with the field.
+   */
   label?: string;
+  /**
+   * The description associated with the field
+   */
   description?: string;
+
+  /**
+   * @internal
+   * @param output
+   * @returns
+   */
   encode: (output: unknown) => any;
 
+  /**
+   * @internal
+   * @param input
+   * @param passthrough
+   * @returns
+   */
   safeDecode: (
     input: unknown,
     passthrough?: boolean, // Whether to pass failed input as data. Useful to be handled by zod.
   ) => SafeDecodeResult<unknown, any>;
+
+  /**
+   * @internal
+   * @param input
+   * @returns
+   */
   decode: (input: any) => any;
   /**
+   * The initial output for this field. By default, a reasonable default value is given.
+   * @see TODO: explain initialOutput
    * @returns Get the initial output.
    */
   getInitialOutput: () => any;
 }
 
+/**
+ * @internal
+ * @param type
+ * @returns
+ */
 export const resolveFormMeta = (type: ZodTypeAny) => {
   let formMeta = type._formMeta as Partial<FormMeta>;
 
@@ -112,6 +151,7 @@ export const resolveFormMeta = (type: ZodTypeAny) => {
 };
 
 /**
+ * @internal
  * Resolved MobxZodMeta for en/decoding on DOM inputs.
  * Encodes number as decimal strings, and other as-is.
  */
@@ -333,8 +373,16 @@ export const resolveDOMFormMeta = (type: ZodTypeAny): FormMeta => {
 
         return output == undefined ? "" : String(output);
       } else if (type instanceof ZodBoolean) {
+        if (output === empty) {
+          return undefined;
+        }
+
         return output;
       } else if (type instanceof ZodEnum) {
+        if (output === empty) {
+          return undefined;
+        }
+
         return output;
       } else if (type instanceof ZodOptional || type instanceof ZodNullable) {
         if (output === empty || output == null) {
@@ -343,8 +391,16 @@ export const resolveDOMFormMeta = (type: ZodTypeAny): FormMeta => {
           return resolveDOMFormMeta(type.unwrap()).encode(output);
         }
       } else if (type instanceof ZodLiteral) {
+        if (output === empty) {
+          return undefined;
+        }
+
         return output;
       } else if (type instanceof ZodAny) {
+        if (output === empty) {
+          return undefined;
+        }
+
         return output;
       } else if (type instanceof ZodObject) {
         if (output === empty) {

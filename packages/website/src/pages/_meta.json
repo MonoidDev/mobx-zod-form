@@ -2,5 +2,9 @@
   "index": "Introduction",
   "get-started": "Get Started",
   "guide": "Guide",
-  "api-reference": "API Reference"
+  "api-reference": {
+    "title": "API Reference ↗",
+    "href": "/api-reference/modules.html",
+    "newWindow": true
+  }
 }

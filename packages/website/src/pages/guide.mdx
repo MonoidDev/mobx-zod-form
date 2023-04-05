@@ -130,7 +130,71 @@ You can observe the decode result using `field.decodeResult`, and read `output` 
 
 #### Output Encoding
 
-TODO:
+Output is the value that makes sense to your program. For example,
+
+```ts
+{
+  "name": "Mono",
+  "age": 10
+}
+```
+
+It makes sense to our program. However, the following value doesn't make sense to us:
+
+```ts
+{
+  "name": "Mono",
+  "age": "10"
+}
+```
+
+The object might represent a HTML form, where `age` is stored as `"10"` in an `HTMLInputElement`.
+
+or `name=Mono&age=10` in the query string. In either case, we make "compromises" to the storage so that our object can be represented their, be it an `HTMLInputElement` or query string. In Mobx Zod Form, we implement some simple rules to do that for you, namely **Output Encoding**.
+
+The encoding is mostly transparent to the user. You declare a Zod type, and we handle the mapping from the output type represented by the type to the values in the form automatically. That means, you write:
+
+```ts
+z.object({
+  name: z.string(),
+  age: z.number(),
+})
+```
+
+and we encode it into
+
+```ts
+{
+  "name": "Mono",
+  "age": "10"
+}
+```
+
+because we are using DOM to store our values.
+
+#### Empty Token
+
+Use the empty token to represent an "emptyish" value, which will be encoded as "empty" according to the type at its position. Not necessarily a valid raw input. 
+
+```tsx
+@include "../components/examples/guide-empty.tsx"
+```
+
+| Type | Encoded | Decoded |
+|----|----|----|
+| ZodString | `""` | `""` |
+| ZodNumber | `""` | `undefined` |
+| ZodBoolean | `undefined` | `undefined` |
+| ZodOptional | `undefined` | `undefined` |
+| ZodNullable | `null` | `null` |
+| ZodLiteral | `undefined` | `undefined` |
+| ZodAny | `undefined` | `undefined` |
+| ZodObject | An object each value being its initial output | - |
+| ZodArray | `[]`| `[]` |
+| ZodDiscriminatedUnion | The first option's emptyish value | - |
+| ZodEffects | Inner type's emtyish value | - |
+| MobxZodBox | `undefined` | `undefined`
+
 
 ### Touched and Error Messages
 
@@ -171,13 +235,68 @@ The process should match Formik's [Form Submission](https://formik.org/docs/guid
 
 ### Conventional Fields
 
-TODO:
+Types are mapped to fields with default rules. For atomic types, i.e. `ZodString`, `ZodNumber`, and `ZodBoolean`, etc, are mapped to atomic fields with no child fields. For complex types, `ZodObject` and `ZodArray`, etc, are mapped to complex fields containing child fields. You can also construct your own fields using [Boxed Fields](#boxed-fields).
 
-### Customized Fields
+#### MobxZodField
 
-TODO:
+The following types are mapped to an atomic `MobxZodField`.
+
+1. `ZodString`
+2. `ZodNumber`
+3. `ZodBoolean`
+4. `ZodEnum`
+5. `ZodOptional`
+6. `ZodNullable`
+7. `ZodLiteral`
+
+See [interface MobxZodField](packages/website/out/api-reference/interfaces/_monoid_dev_mobx_zod_form.MobxZodField.html)
+
+#### MobxZodOptionalField & MobxZodNullableField
+
+The following types are mapped to an `MobxZodOptionalField<T>` or `MobxZodNullableField<T>`.
+
+1. `ZodOptional<T>`
+2. `ZodDefault<T>`
+
+See [interface MobxZodOmittableField](packages/website/out/api-reference/interfaces/_monoid_dev_mobx_zod_form.MobxZodOmittableField.html)
+
+#### MobxZodObjectField
+
+`ZodObject` will be mapped to this field.
+
+See [interface MobxZodObjectField](packages/website/out/api-reference/interfaces/_monoid_dev_mobx_zod_form.MobxZodObjectField.html)
+
+#### MobxZodArrayField
+
+`ZodArray` will be mapped to this field.
+
+See [interface MobxZodArrayField](packages/website/out/api-reference/interfaces/_monoid_dev_mobx_zod_form.MobxZodArrayField.html)
+
+#### Discriminated Union
+
+`ZodDiscriminatedUnion` will be mapped to `MobxZodDiscriminatedUnionField`.
+
+See [interface MobxZodDiscriminatedUnionField](packages/website/out/api-reference/interfaces/_monoid_dev_mobx_zod_form.MobxZodDiscriminatedUnionField.html)
+
+
+### Boxed Fields
+
+A boxed field is treated as an atomic value, as if it is a `string` or `boolean`. That means, even the type represents an `object` or `array`, we don't create subfields for it. This is useful for you to implement your own logic free of the defaults.
+
+Use the `box` extended ZodType method for creating a boxed field.
+
+```ts
+const form = useForm({
+  file: z.object({
+    url: z.string(),
+    name: z.string(),
+  }).box()
+});
+```
+
+Then `form.root.fields.file` should of type `MobxZodField`.
 
 ### Advanced Usages
 
-Didn't find what you need in the Guide? Take a look at API reference to see if you can hack.
+Didn't find what you need in the Guide? Take a look at [API Reference](/api-reference/index.html) to see if you can hack.
 

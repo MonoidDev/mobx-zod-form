@@ -1,6 +1,6 @@
 {
   "name": "@monoid-dev/mobx-zod-form-react",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "type": "commonjs",
   "main": "./lib/index.js",
   "module": "./lib/index.mjs",
@@ -42,5 +42,8 @@
     "@types/react": "~18.0.28",
     "jsdom": "^21.1.1",
     "mobx-react": "^7.6.0"
+  },
+  "typedoc": {
+    "entryPoint": "./src/index.tsx"
   }
 }

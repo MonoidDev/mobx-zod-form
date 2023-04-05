@@ -8,6 +8,13 @@ import { ReactForm, ReactFormOptions } from "./ReactForm";
 
 export { ReactForm, type ReactFormOptions };
 
+/**
+ * The most usual way to initialize a form in a React functional component.
+ *
+ * @param schema
+ * @param options
+ * @returns the form instance to build your observable React component.
+ */
 export const useForm = <T extends MobxZodTypes>(
   schema: T,
   options: ReactFormOptions<T> = {},
