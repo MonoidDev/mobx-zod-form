@@ -488,4 +488,4 @@ export const resolveDOMFormMeta = (type: ZodTypeAny): FormMeta => {
   };
 };
 
-export const empty = Object.create(null) as any;
+export const empty = Symbol("empty") as any;

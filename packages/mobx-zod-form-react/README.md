@@ -6,8 +6,6 @@
 
 <img src="https://raw.githubusercontent.com/MonoidDev/mobx-zod-form/master/packages/website/public/favicon.svg" width="256" height="256" alt="Logo" />
 
-<br />
-
 Data-first form builder based on [MobX](https://mobx.js.org/) & [Zod](https://zod.dev/).
 
 <br />
