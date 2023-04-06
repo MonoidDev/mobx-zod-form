@@ -29,6 +29,7 @@ export default {
           content={title ? title + " - " + siteName : siteName}
         />
         <meta name="apple-mobile-web-app-title" content={siteName} />
+        <script defer data-domain="mobx-zod-form.pages.dev" src="https://plausible.monoid.co.jp/js/script.js"></script>
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
       </>
     );
