@@ -7,7 +7,7 @@
     "mobx",
     "typescript",
     "react"
-  ]
+  ],
   "type": "commonjs",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
