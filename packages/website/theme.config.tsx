@@ -29,7 +29,11 @@ export default {
           content={title ? title + " - " + siteName : siteName}
         />
         <meta name="apple-mobile-web-app-title" content={siteName} />
-        <script defer data-domain="mobx-zod-form.pages.dev" src="https://plausible.monoid.co.jp/js/script.js"></script>
+        <script
+          defer
+          data-domain="mobx-zod-form.pages.dev"
+          src="https://plausible.monoid.co.jp/js/script.js"
+        ></script>
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
       </>
     );
@@ -45,5 +49,19 @@ export default {
   },
   docsRepositoryBase:
     packageJson.repository.url + "/blob/master/packages/website",
-  // ...
+  footer: {
+    text: (
+      <span className="nx-text-xs">
+        MIT {new Date().getFullYear()} ©{" "}
+        <a className="nx-underline" href="https://monoid.co.jp" target="_blank">
+          Monoid
+        </a>
+        . Powered by{" "}
+        <a href="https://nextra.site/" className="nx-underline" target="_blank">
+          Nextra
+        </a>
+        .
+      </span>
+    ),
+  },
 };
