@@ -52,5 +52,15 @@ describe("formMeta tests", () => {
     expect(labeledAndEffectsAndLabeled.getFormMeta().label).toBe(
       "transformed2",
     );
+
+    const refinedAndLabeled = z
+      .string()
+      .refine((x) => x.length > 1, "length > 1")
+      .formMeta({ label: "transformed2" });
+
+    expect(refinedAndLabeled.getFormMeta().label).toBe("transformed2");
+    expect(refinedAndLabeled.innerType().getFormMeta().label).toBe(
+      "transformed2",
+    );
   });
 });

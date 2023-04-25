@@ -70,15 +70,22 @@ export function extendZodWithMobxZodForm(zod: typeof z) {
   });
 
   zod.ZodType.prototype.formMeta = function (meta: any) {
-    const o = new (this as any).constructor({
-      ...this._def,
-      _formMeta: {
-        ...this._formMeta,
-        ...meta,
-      },
-    });
+    if (this instanceof ZodEffects) {
+      return new ZodEffects({
+        ...this._def,
+        schema: this.innerType().formMeta(meta),
+      });
+    } else {
+      const o = new (this as any).constructor({
+        ...this._def,
+        _formMeta: {
+          ...this._formMeta,
+          ...meta,
+        },
+      });
 
-    return o;
+      return o;
+    }
   };
 
   zod.ZodType.prototype.getFormMeta = function () {
