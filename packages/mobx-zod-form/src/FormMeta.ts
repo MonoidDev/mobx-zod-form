@@ -67,6 +67,20 @@ export const mapDecodeResult = <RawInput, Decoded, O>(
   }
 };
 
+export const getDecodeResult = <RawInput, Decoded>(
+  result: SafeDecodeResult<RawInput, Decoded>,
+) => getDecodeResultOr(result, undefined);
+
+export const getDecodeResultOr = <RawInput, Decoded, O>(
+  result: SafeDecodeResult<RawInput, Decoded>,
+  defaultValue: O,
+) =>
+  mapDecodeResult<RawInput, Decoded, Decoded | O>(
+    result,
+    (v) => v,
+    defaultValue,
+  );
+
 export const decodeResultEqual = <RawInput, Decoded>(
   result: SafeDecodeResult<RawInput, Decoded>,
   value: Decoded,
