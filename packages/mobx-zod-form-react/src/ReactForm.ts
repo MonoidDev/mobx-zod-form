@@ -19,7 +19,13 @@ import {
 import { UnsupportedInputType } from "./errors";
 
 export interface ReactFormOptions<T extends MobxZodTypes>
-  extends MobxZodFormOptions<T> {}
+  extends MobxZodFormOptions<T> {
+  /**
+   * When input `initialOutput` changes (per useEffect), set the output as the new one.
+   * @default: false
+   */
+  enableReinitialize?: boolean;
+}
 
 export interface BindFormOptions<T extends MobxZodTypes> {
   onSubmit?: (
