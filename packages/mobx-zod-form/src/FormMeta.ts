@@ -235,7 +235,7 @@ export const resolveDOMFormMeta = (type: ZodTypeAny): FormMeta => {
           };
         }
 
-        const innerType = type.unwrap();
+        const innerType = unwrapZodType(type);
 
         // For innerType is empty string, cast it to null
         if (innerType instanceof ZodString && !input) {

@@ -362,6 +362,17 @@ const OptionalField = observer(() => {
     z.object({
       string: z.string(),
       optionalString: z.string().optional(),
+      optionalStringNumberOnlyRegex: z
+        .string()
+        .regex(/[0-9]+/)
+        .optional(),
+      optionalStringNumberOnlyRefine: z
+        .string()
+        .refine(
+          (x) => String(x).trim().length > 0 && !Number.isNaN(Number(x)),
+          `半角数字で入力してください。`,
+        )
+        .optional(),
       optionalNumber: z.number().optional(),
       nullishString: z.string().nullish(),
       nullishNumber: z.number().nullish(),
@@ -369,14 +380,26 @@ const OptionalField = observer(() => {
   );
 
   return (
-    <form {...form.bindForm()}>
+    <form
+      {...form.bindForm({
+        onSubmit() {
+          console.info("submit optional field!");
+        },
+        onSubmitError(e) {
+          console.error(e);
+        },
+      })}
+    >
       <div>Should reset successfully</div>
 
       <TextInput field={form.root.fields.string} />
       <TextInput field={form.root.fields.optionalString} />
+      <TextInput field={form.root.fields.optionalStringNumberOnlyRegex} />
+      <TextInput field={form.root.fields.optionalStringNumberOnlyRefine} />
       <TextInput field={form.root.fields.optionalNumber} />
       <TextInput field={form.root.fields.nullishString} />
       <TextInput field={form.root.fields.nullishNumber} />
+      <button type="submit">Submit</button>
       <button onClick={() => form.root.setOutput(empty)}>Reset</button>
     </form>
   );
