@@ -43,11 +43,11 @@ export type MobxZodPrimitiveTypes =
   | ZodNumber
   | ZodBoolean
   | ZodEnum<[string, ...string[]]>
-  | MobxOmittableTypes
   | MobxZodLiteral;
 
 export type MobxZodTypes =
   | MobxZodPrimitiveTypes
+  | MobxOmittableTypes
   | MobxZodObject
   | MobxZodArray
   | DiscriminatorType<MobxZodDiscriminatedUnion>

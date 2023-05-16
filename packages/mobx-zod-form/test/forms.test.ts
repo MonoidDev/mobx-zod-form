@@ -291,6 +291,41 @@ describe("form tests", () => {
   it("should react on field changes for omittable types", () => {
     const form = new MobxZodForm(
       z.object({
+        optional: z
+          .object({
+            a: z.number(),
+          })
+          .optional(),
+        nullable: z
+          .object({
+            a: z.number(),
+          })
+          .optional()
+          .nullable(),
+      }),
+    );
+
+    const obOptional = observeForm((ob) =>
+      ob(!!form.root.fields.optional.innerField),
+    );
+    const obNullable = observeForm((ob) =>
+      ob(!!form.root.fields.nullable.innerField),
+    );
+
+    form.root.fields.optional.setOutput({
+      a: 1,
+    });
+    form.root.fields.nullable.setOutput({
+      a: 2,
+    });
+
+    expect(obOptional.observed).toMatchObject([false, true]);
+    expect(obNullable.observed).toMatchObject([false, true]);
+  });
+
+  it("should not react on field changes for omittable types if the inner type is String or Number", () => {
+    const form = new MobxZodForm(
+      z.object({
         optional: z.string().optional(),
         nullable: z.string().nullable(),
       }),
@@ -306,8 +341,8 @@ describe("form tests", () => {
     form.root.fields.optional.setOutput("filled");
     form.root.fields.nullable.setOutput("filled");
 
-    expect(obOptional.observed).toMatchObject([false, true]);
-    expect(obNullable.observed).toMatchObject([false, true]);
+    expect(obOptional.observed).toMatchObject([true]);
+    expect(obNullable.observed).toMatchObject([true]);
   });
 
   it("should react on parent input change for arrays", () => {

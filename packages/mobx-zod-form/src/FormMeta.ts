@@ -15,7 +15,7 @@ import {
 } from "zod";
 
 import { MobxFatalError, MobxZodDecodeError } from "./errors";
-import { MobxZodBox } from "./zod-extra";
+import { MobxZodBox, unwrapZodType } from "./zod-extra";
 
 export type SafeDecodeResultSuccess<Decoded> = {
   success: true;
@@ -201,6 +201,7 @@ export const resolveDOMFormMeta = (type: ZodTypeAny): FormMeta => {
               };
             }
           } else if (passthrough) {
+            // "" -> undefined
             return {
               success: true,
               data: undefined,
@@ -235,28 +236,30 @@ export const resolveDOMFormMeta = (type: ZodTypeAny): FormMeta => {
         }
 
         const innerType = type.unwrap();
-        const innerDecoded = resolveDOMFormMeta(innerType).safeDecode(input);
 
         // For innerType is empty string, cast it to null
-        if (
-          innerType instanceof ZodString &&
-          innerDecoded.success &&
-          !innerDecoded.data
-        ) {
+        if (innerType instanceof ZodString && !input) {
           return {
             success: true,
             data: this.getInitialOutput(),
           };
         }
 
-        if (innerDecoded == null) {
-          return {
-            success: true,
-            data: this.getInitialOutput(),
-          };
+        // For innerType is empty number, cast it to null too.
+        if (innerType instanceof ZodNumber) {
+          const innerDecoded = resolveDOMFormMeta(innerType).safeDecode(
+            input,
+            true,
+          );
+          if (innerDecoded.success && innerDecoded.data === undefined) {
+            return {
+              success: true,
+              data: this.getInitialOutput(),
+            };
+          }
         }
 
-        return innerDecoded;
+        return resolveDOMFormMeta(innerType).safeDecode(input, passthrough);
       } else if (type instanceof ZodLiteral) {
         if (input === type.value) {
           return {
@@ -375,17 +378,17 @@ export const resolveDOMFormMeta = (type: ZodTypeAny): FormMeta => {
       }
 
       if (type instanceof ZodString) {
-        if (output === empty) {
+        if (output === empty || output == null) {
           return "";
         }
 
         return output;
       } else if (type instanceof ZodNumber) {
-        if (output === empty) {
+        if (output === empty || output == null) {
           return "";
         }
 
-        return output == undefined ? "" : String(output);
+        return String(output);
       } else if (type instanceof ZodBoolean) {
         if (output === empty) {
           return undefined;
@@ -399,10 +402,19 @@ export const resolveDOMFormMeta = (type: ZodTypeAny): FormMeta => {
 
         return output;
       } else if (type instanceof ZodOptional || type instanceof ZodNullable) {
+        const innerType = unwrapZodType(type);
+
         if (output === empty || output == null) {
+          if (
+            innerType instanceof ZodString ||
+            innerType instanceof ZodNumber
+          ) {
+            return resolveDOMFormMeta(innerType).encode(output);
+          }
+
           return this.getInitialOutput();
         } else {
-          return resolveDOMFormMeta(type.unwrap()).encode(output);
+          return resolveDOMFormMeta(innerType).encode(output);
         }
       } else if (type instanceof ZodLiteral) {
         if (output === empty) {
@@ -418,7 +430,14 @@ export const resolveDOMFormMeta = (type: ZodTypeAny): FormMeta => {
         return output;
       } else if (type instanceof ZodObject) {
         if (output === empty) {
-          return this.getInitialOutput();
+          const initialOutput = this.getInitialOutput();
+
+          return Object.fromEntries(
+            Object.entries(type.shape).map(([key, value]) => [
+              key,
+              resolveDOMFormMeta(value as any).encode(initialOutput[key]),
+            ]),
+          );
         }
 
         return Object.fromEntries(

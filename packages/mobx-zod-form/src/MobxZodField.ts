@@ -276,6 +276,9 @@ export interface MobxZodOmittableField<T extends MobxOmittableTypes>
   /**
    * If the input is null or undefined, innerField will be undefined;
    * else, it will be the field that its inner type is mapped to.
+   * For ZodString and ZodNumber inner type,
+   * it is always not undefined,
+   * because null or undefined will be encoded to empty string.
    */
   innerField: this["_types"]["_innerField"] | undefined;
 }

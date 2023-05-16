@@ -9,11 +9,16 @@ import {
   ZodType,
   ZodTypeAny,
   ZodTypeDef,
+  ZodString,
+  ZodNumber,
+  ZodBoolean,
+  ZodEnum,
+  ZodLiteral,
 } from "zod";
 
 import { FormMeta, resolveDOMFormMeta } from "./FormMeta";
 import { MobxZodDiscriminatedUnionFieldTypes } from "./MobxZodField";
-import { MobxZodDiscriminatedUnion } from "./types";
+import { MobxZodDiscriminatedUnion, MobxZodPrimitiveTypes } from "./types";
 
 declare module "zod" {
   interface ZodType<
@@ -130,6 +135,18 @@ export const unwrapZodType = (t: ZodTypeAny): ZodTypeAny => {
     return unwrapZodType(t.unwrap());
   }
   return t;
+};
+
+export const isPrimitiveZodType = (
+  t: ZodTypeAny,
+): t is MobxZodPrimitiveTypes => {
+  return (
+    t instanceof ZodString ||
+    t instanceof ZodNumber ||
+    t instanceof ZodBoolean ||
+    t instanceof ZodEnum ||
+    t instanceof ZodLiteral
+  );
 };
 
 export interface MobxZodBoxDef<T extends ZodTypeAny> extends ZodTypeDef {

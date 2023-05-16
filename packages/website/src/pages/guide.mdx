@@ -186,8 +186,8 @@ Use the empty token to represent an "emptyish" value, which will be encoded as "
 | ZodNumber | `""` | `undefined` |
 | ZodBoolean | `undefined` | `undefined` |
 | ZodOptional | `undefined` | `undefined` |
-| ZodNullable | `null` | `null` |
-| ZodLiteral | `undefined` | `undefined` |
+| ZodNullable | `""` for inner type `ZodString` and `ZodNumber`, `null` for other  | `null` |
+| ZodLiteral | `""` for inner type `ZodString` and `ZodNumber`, `undefined` for other | `undefined` |
 | ZodAny | `undefined` | `undefined` |
 | ZodObject | An object each value being its initial output | - |
 | ZodArray | `[]`| `[]` |

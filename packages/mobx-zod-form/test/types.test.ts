@@ -268,16 +268,14 @@ describe("field tests", () => {
     expect(z.enum(["A", "B"]).getFormMeta().encode("A")).toMatchObject("A");
 
     // ZodOptional
-    expect(z.string().optional().getFormMeta().encode(empty)).toBe(undefined);
-    expect(z.string().optional().getFormMeta().encode(null)).toBe(undefined);
-    expect(z.string().optional().getFormMeta().encode(undefined)).toBe(
-      undefined,
-    );
+    expect(z.string().optional().getFormMeta().encode(empty)).toBe("");
+    expect(z.string().optional().getFormMeta().encode(null)).toBe("");
+    expect(z.string().optional().getFormMeta().encode(undefined)).toBe("");
 
     // ZodNullable
-    expect(z.string().nullable().getFormMeta().encode(empty)).toBe(null);
-    expect(z.string().nullable().getFormMeta().encode(null)).toBe(null);
-    expect(z.string().nullable().getFormMeta().encode(undefined)).toBe(null);
+    expect(z.string().nullable().getFormMeta().encode(empty)).toBe("");
+    expect(z.string().nullable().getFormMeta().encode(null)).toBe("");
+    expect(z.string().nullable().getFormMeta().encode(undefined)).toBe("");
 
     // ZodArray
     expect(z.number().array().getFormMeta().encode([1, 2, 3])).toMatchObject([
@@ -291,8 +289,6 @@ describe("field tests", () => {
     ).toMatchObject(["1", "2", "3", ""]);
 
     expect(z.number().array().getFormMeta().encode(empty)).toMatchObject([]);
-
-    expect(z.string().nullable().getFormMeta().encode(empty)).toBe(null);
 
     expect(
       z

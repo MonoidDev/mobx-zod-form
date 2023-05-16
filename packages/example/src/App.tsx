@@ -14,31 +14,29 @@ import {
   useFormContext,
 } from "@monoid-dev/mobx-zod-form-react";
 import { observer } from "mobx-react";
-import { z, ZodNumber, ZodString } from "zod";
+import { z, ZodTypeAny } from "zod";
 
 extendZodWithMobxZodForm(z);
 
 import "./App.css";
 
-const TextInput = observer(
-  ({ field }: { field: MobxZodField<ZodString | ZodNumber> }) => {
-    const form = getForm(field);
+const TextInput = observer(({ field }: { field: MobxZodField<ZodTypeAny> }) => {
+  const form = getForm(field);
 
-    return (
-      <div>
-        <input
-          {...form.bindField(field)}
-          placeholder={field.path.at(-1)?.toString()}
-        />
-        {field.errorMessages.map((e, i) => (
-          <div style={{ color: "red" }} key={i}>
-            {e}
-          </div>
-        ))}
-      </div>
-    );
-  },
-);
+  return (
+    <div>
+      <input
+        {...form.bindField(field)}
+        placeholder={field.path.at(-1)?.toString()}
+      />
+      {field.errorMessages.map((e, i) => (
+        <div style={{ color: "red" }} key={i}>
+          {e}
+        </div>
+      ))}
+    </div>
+  );
+});
 
 const SimpleForm = () => {
   const form = useForm(
@@ -350,6 +348,29 @@ const AutoSubmit = observer(() => {
   );
 });
 
+const OptionalField = observer(() => {
+  const form = useForm(
+    z.object({
+      string: z.string().optional(),
+      number: z.number().optional(),
+      nullishString: z.string().nullish(),
+      nullishNumber: z.number().nullish(),
+    }),
+  );
+
+  return (
+    <form {...form.bindForm()}>
+      <div>Should reset successfully</div>
+
+      <TextInput field={form.root.fields.string} />
+      <TextInput field={form.root.fields.number} />
+      <TextInput field={form.root.fields.nullishString} />
+      <TextInput field={form.root.fields.nullishNumber} />
+      <button onClick={() => form.root.setOutput(empty)}>Reset</button>
+    </form>
+  );
+});
+
 function App() {
   return (
     <div className="App">
@@ -363,6 +384,7 @@ function App() {
       <FocusErrorY />
       <FocusErrorX />
       <AutoSubmit />
+      <OptionalField />
     </div>
   );
 }
