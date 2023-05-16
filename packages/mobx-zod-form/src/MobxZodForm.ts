@@ -4,6 +4,7 @@ import {
   makeObservable,
   observable,
   runInAction,
+  untracked,
   when,
 } from "mobx";
 import {
@@ -81,11 +82,6 @@ export class MobxZodForm<T extends MobxZodTypes> {
     this.schemaFormMeta = schema.getFormMeta();
 
     this._rawInput = this.schemaFormMeta.encode(this.options.initialOutput);
-    this.root = runInAction(() => createFieldForType(this.schema, this, []));
-
-    if (this.options.validateOnMount) {
-      this.validate();
-    }
 
     makeObservable(this, {
       _rawInput: observable,
@@ -104,6 +100,12 @@ export class MobxZodForm<T extends MobxZodTypes> {
       _setRawInputAt: action,
       _notifyChange: action,
     });
+
+    this.root = untracked(() => createFieldForType(this.schema, this, []));
+
+    if (this.options.validateOnMount) {
+      this.validate();
+    }
   }
 
   flushValidationTasks() {

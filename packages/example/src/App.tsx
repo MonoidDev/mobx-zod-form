@@ -29,11 +29,12 @@ const TextInput = observer(({ field }: { field: MobxZodField<ZodTypeAny> }) => {
         {...form.bindField(field)}
         placeholder={field.path.at(-1)?.toString()}
       />
-      {field.errorMessages.map((e, i) => (
-        <div style={{ color: "red" }} key={i}>
-          {e}
-        </div>
-      ))}
+      {field.touched &&
+        field.errorMessages.map((e, i) => (
+          <div style={{ color: "red" }} key={i}>
+            {e}
+          </div>
+        ))}
     </div>
   );
 });
@@ -125,13 +126,21 @@ const FormArray1Inner = observer(({ field }: { field: any }) => {
 });
 
 const FormArray1 = observer(() => {
-  const form = useForm(FormArray1Schema);
+  const form = useForm(FormArray1Schema, {
+    initialOutput: {
+      users: [empty],
+    },
+  });
 
   return (
     <div style={{ border: `1px solid black` }}>
+      <div>Form Array</div>
       <FormArray1Inner field={form.root.fields.users} />
 
-      <button onClick={() => form.root.fields.users.push(empty)} />
+      <button
+        type="button"
+        onClick={() => form.root.fields.users.push(empty)}
+      />
     </div>
   );
 });
@@ -351,8 +360,9 @@ const AutoSubmit = observer(() => {
 const OptionalField = observer(() => {
   const form = useForm(
     z.object({
-      string: z.string().optional(),
-      number: z.number().optional(),
+      string: z.string(),
+      optionalString: z.string().optional(),
+      optionalNumber: z.number().optional(),
       nullishString: z.string().nullish(),
       nullishNumber: z.number().nullish(),
     }),
@@ -363,7 +373,8 @@ const OptionalField = observer(() => {
       <div>Should reset successfully</div>
 
       <TextInput field={form.root.fields.string} />
-      <TextInput field={form.root.fields.number} />
+      <TextInput field={form.root.fields.optionalString} />
+      <TextInput field={form.root.fields.optionalNumber} />
       <TextInput field={form.root.fields.nullishString} />
       <TextInput field={form.root.fields.nullishNumber} />
       <button onClick={() => form.root.setOutput(empty)}>Reset</button>

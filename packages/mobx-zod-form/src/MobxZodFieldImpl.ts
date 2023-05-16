@@ -119,8 +119,7 @@ export class MobxZodOmittableFieldImpl<
   implements MobxZodOmittableField<T>
 {
   _types!: MobxZodOmittableFieldTypes<T>;
-  _innerField: this["_types"]["_innerField"] | undefined =
-    this.createMaybeField() as any;
+  _innerField: this["_types"]["_innerField"] | undefined;
 
   constructor(
     public readonly type: T,
@@ -129,13 +128,15 @@ export class MobxZodOmittableFieldImpl<
   ) {
     super(type, form, path);
 
+    this._innerField = this.createMaybeInnerField() as any;
+
     makeObservable(this, {
       _innerField: observable,
       innerField: computed,
     });
   }
 
-  createMaybeField() {
+  createMaybeInnerField() {
     if (this.rawInput == null) {
       return undefined;
     } else {
@@ -154,8 +155,10 @@ export class MobxZodOmittableFieldImpl<
     if (newOmitted) {
       this._innerField = undefined;
     } else if (oldOmitted) {
-      this._innerField = this.createMaybeField() as any;
+      this._innerField = this.createMaybeInnerField() as any;
     }
+
+    this._innerField?._onInputChange();
   }
 }
 
