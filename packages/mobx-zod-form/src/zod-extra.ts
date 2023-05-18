@@ -53,6 +53,11 @@ declare module "zod" {
      * This means you can deal with the object with your custom logics.
      */
     box(): MobxZodBox<this>;
+
+    /**
+     * Shorthand for `.formMeta({ label })`
+     */
+    label<Z extends ZodTypeAny>(this: Z, label: string): Z;
   }
 }
 
@@ -91,6 +96,10 @@ export function extendZodWithMobxZodForm(zod: typeof z) {
 
       return o;
     }
+  };
+
+  zod.ZodType.prototype.label = function (this, label) {
+    return this.formMeta({ label });
   };
 
   zod.ZodType.prototype.getFormMeta = function () {

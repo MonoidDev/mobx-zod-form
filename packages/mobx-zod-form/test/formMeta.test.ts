@@ -62,5 +62,9 @@ describe("formMeta tests", () => {
     expect(refinedAndLabeled.innerType().getFormMeta().label).toBe(
       "transformed2",
     );
+
+    const labelShorthand = z.string().label("label");
+
+    expect(labelShorthand.getFormMeta().label).toBe("label");
   });
 });
