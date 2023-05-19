@@ -200,6 +200,26 @@ describe("form tests", () => {
     ]);
   });
 
+  it("should push array", () => {
+    const form = new MobxZodForm(
+      z.object({
+        objects: z.array(
+          z.object({
+            a: z.string().optional(),
+            b: z.string(),
+          }),
+        ),
+      }),
+      {
+        setActionOptions: {
+          validateSync: true,
+        },
+      },
+    );
+
+    form.root.fields.objects.push(empty);
+  });
+
   it("should delete arrays in the middle", () => {
     const form = new MobxZodForm(
       z.object({

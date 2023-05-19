@@ -269,6 +269,12 @@ export class MobxZodArrayFieldImpl<T extends MobxZodArray>
     values: this["_elementOutput"][],
     _options?: InputSetActionOptions,
   ) {
+    this.rawInput.splice(
+      start,
+      deleteCount,
+      ...values.map((v) => this.type.element.getFormMeta().encode(v)),
+    );
+
     this._elements.splice(
       start,
       deleteCount,
@@ -284,11 +290,7 @@ export class MobxZodArrayFieldImpl<T extends MobxZodArray>
     for (let i = 0; i < this._elements.length - start; i++) {
       this._elements[start + i]._updatePath([...this.path, start + i]);
     }
-    this.rawInput.splice(
-      start,
-      deleteCount,
-      ...values.map((v) => this.type.element.getFormMeta().encode(v)),
-    );
+
     this.form._notifyChange();
   }
 
