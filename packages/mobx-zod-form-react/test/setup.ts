@@ -13,3 +13,6 @@ expect.extend(matchers);
 afterEach(() => {
   cleanup();
 });
+
+globalThis.requestIdleCallback = (callback: IdleRequestCallback) =>
+  setTimeout(callback);

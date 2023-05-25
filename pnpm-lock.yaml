@@ -105,7 +105,7 @@ importers:
   packages/mobx-zod-form-react:
     dependencies:
       '@monoid-dev/mobx-zod-form':
-        specifier: ^0.3.2
+        specifier: ^0.3.5
         version: link:../mobx-zod-form
       mobx:
         specifier: ^6.8.0
@@ -117,6 +117,9 @@ importers:
         specifier: ^3.21.2
         version: 3.21.4
     devDependencies:
+      '@testing-library/user-event':
+        specifier: ^14.4.3
+        version: 14.4.3(@testing-library/dom@9.0.1)
       '@types/react':
         specifier: ~18.0.28
         version: 18.0.28
@@ -1495,6 +1498,15 @@ packages:
       '@types/react-dom': 18.0.11
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
+    dev: true
+
+  /@testing-library/user-event@14.4.3(@testing-library/dom@9.0.1):
+    resolution: {integrity: sha512-kCUc5MEwaEMakkO5x7aoD+DLi02ehmEM2QCGWvNqAS1dV/fAvORWEjnjsEIvml59M7Y5kCkWN6fCCyPOe8OL6Q==}
+    engines: {node: '>=12', npm: '>=6'}
+    peerDependencies:
+      '@testing-library/dom': '>=7.21.4'
+    dependencies:
+      '@testing-library/dom': 9.0.1
     dev: true
 
   /@tootallnate/once@2.0.0:

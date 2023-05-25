@@ -92,6 +92,23 @@ export class ReactForm<T extends MobxZodTypes> extends MobxZodForm<T> {
     };
   }
 
+  static getDomName<T extends ZodTypeAny>(field: MobxZodField<T>) {
+    return field.path.join(".");
+  }
+
+  static getDomId<T extends ZodTypeAny>(field: MobxZodField<T>) {
+    return this.getDomName(field) + "__" + field.uniqueId;
+  }
+
+  bindLabel<T extends ZodTypeAny>(
+    field: MobxZodField<T>,
+  ): React.ComponentProps<"label"> {
+    return {
+      htmlFor: ReactForm.getDomId(field),
+      children: field.type.getFormMeta().label,
+    };
+  }
+
   bindField<T extends ZodTypeAny>(
     field: MobxZodField<T>,
     options: BindInputOptions = { type: "text" },
@@ -171,7 +188,8 @@ export class ReactForm<T extends MobxZodTypes> extends MobxZodForm<T> {
     };
 
     return {
-      name: field.path.join("."),
+      name: ReactForm.getDomName(field),
+      id: ReactForm.getDomId(field),
       type: options.type,
       onBlur: () => field.setTouched(true),
       ref(element) {

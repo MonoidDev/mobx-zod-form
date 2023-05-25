@@ -400,7 +400,10 @@ export class MobxZodDiscriminatedUnionFieldImpl<
           .filter((key) => key !== this.type.discriminator)
           .map((key) => [
             key,
-            createFieldForType(this.type, this.form, [...this.path, key]),
+            createFieldForType(currentOption.shape[key], this.form, [
+              ...this.path,
+              key,
+            ]),
           ]),
       );
     } else {
@@ -459,5 +462,12 @@ export class MobxZodDiscriminatedUnionFieldImpl<
     Object.values(this._fields).forEach((f) => {
       f._onInputChange();
     });
+  }
+
+  _walk(f: (field: MobxZodField<any>) => void): void {
+    super._walk(f);
+    Object.values(this._fields).forEach((field: MobxZodField<any>) =>
+      field._walk(f),
+    );
   }
 }

@@ -29,7 +29,7 @@ import {
   MobxZodOmittableFieldImpl,
 } from "./MobxZodFieldImpl";
 import { MobxZodForm, InputSetActionOptions } from "./MobxZodForm";
-import { Expand, IdxOf } from "./type-utils";
+import { Expand, IdxOf, IsAny } from "./type-utils";
 import type {
   MobxOmittableTypes,
   MobxZodArray,
@@ -135,12 +135,14 @@ export type FieldWithEffects<
   E extends MobxZodEffects,
 > = Expand<Omit<F, "effects"> & { effects: E }>;
 
-export type MapZodTypeToField<T extends MobxZodTypes> = T extends
-  | ZodString
-  | ZodNumber
-  | ZodBoolean
-  | ZodEnum<[string, ...string[]]>
-  | MobxZodLiteral
+export type MapZodTypeToField<T extends MobxZodTypes> = true extends IsAny<T>
+  ? MobxZodField<T>
+  : T extends
+      | ZodString
+      | ZodNumber
+      | ZodBoolean
+      | ZodEnum<[string, ...string[]]>
+      | MobxZodLiteral
   ? MobxZodField<T>
   : T extends ZodOptional<ZodTypeAny>
   ? MobxZodOptionalField<T>

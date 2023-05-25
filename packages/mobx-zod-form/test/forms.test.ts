@@ -416,7 +416,7 @@ describe("form tests", () => {
         }),
         z.object({
           answer: z.literal("NO"),
-          reason: z.string().min(1),
+          reason: z.string().min(1).label("Reason"),
         }),
       ]),
       {
@@ -437,6 +437,12 @@ describe("form tests", () => {
       reason: "",
     });
 
+    expect(
+      form.root.fieldsResult.success &&
+        form.root.fieldsResult.fields.discriminator === "NO" &&
+        form.root.fieldsResult.fields.reason.errorMessages,
+    ).toMatchObject(["String must contain at least 1 character(s)"]);
+
     form.root.setOutput({
       answer: "NO",
       reason: "xyz",
@@ -452,6 +458,10 @@ describe("form tests", () => {
       form.root.fieldsResult.fields.discriminator === "NO"
     ) {
       expect(form.root.fieldsResult.fields.reason.rawInput).toBe("xyz");
+
+      expect(
+        form.root.fieldsResult.fields.reason.type.getFormMeta().label,
+      ).toBe("Reason");
     } else {
       throw new Error("unexpected field value");
     }

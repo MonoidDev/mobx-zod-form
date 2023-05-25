@@ -1,36 +1,17 @@
-import { MobxZodField } from "@monoid-dev/mobx-zod-form";
-import { render } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { observer } from "mobx-react";
 import { describe, it } from "vitest";
-import { z, ZodString, ZodNumber } from "zod";
+import { z } from "zod";
 
-import { getForm, useForm } from "../src";
+import { TextInput } from "./TextInput";
+import { useForm } from "../src";
 
-const TextInput = observer(
-  ({ field }: { field: MobxZodField<ZodString | ZodNumber> }) => {
-    const form = getForm(field);
-
-    return (
-      <div>
-        <input
-          {...form.bindField(field)}
-          placeholder={field.path.at(-1)?.toString()}
-        />
-        {field.errorMessages.map((e, i) => (
-          <div style={{ color: "red" }} key={i}>
-            {e}
-          </div>
-        ))}
-      </div>
-    );
-  },
-);
-
-const SimpleForm = () => {
+const SimpleForm = observer(() => {
   const form = useForm(
     z.object({
-      username: z.string().min(1),
-      password: z.string().min(6),
+      username: z.string().min(1).label("Username"),
+      password: z.string().min(6).label("Password"),
     }),
   );
 
@@ -44,10 +25,28 @@ const SimpleForm = () => {
       <button type="submit">Submit</button>
     </form>
   );
-};
+});
 
 describe("simple", () => {
   it("renders SimpleForm", () => {
     render(<SimpleForm />);
+  });
+
+  it("displays error", async () => {
+    const user = userEvent.setup();
+
+    render(<SimpleForm />);
+    await user.type(screen.getByLabelText("Password"), "abc");
+
+    // Click away
+    await userEvent.click(document.body);
+
+    await screen.findByText("String must contain at least 6 character(s)");
+
+    // Submit the form
+    await userEvent.click(screen.getByText("Submit"));
+
+    await screen.findByText("String must contain at least 1 character(s)");
+    await screen.findByText("String must contain at least 6 character(s)");
   });
 });
