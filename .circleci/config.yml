@@ -41,4 +41,8 @@ workflows:
   version: 2
   build_and_deploy:
     jobs:
-      - publish
+      - publish:
+          filters:
+            branches:
+              only:
+                - master
