@@ -1,5 +1,8 @@
+import { useMemo } from "react";
+
 import { empty } from "@monoid-dev/mobx-zod-form";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { observer } from "mobx-react";
 import { describe, expect, it } from "vitest";
 import { z } from "zod";
@@ -75,11 +78,146 @@ describe("formOptions", () => {
     ).toHaveProperty("value", "");
   });
 
-  it("validateOnMount", () => {});
+  it("validateOnMount", async () => {
+    const Form = observer(() => {
+      const form = useForm(
+        z.object({
+          username: z.string().min(1).label("Username"),
+        }),
+        {
+          validateOnMount: true,
+        },
+      );
 
-  it("setActionOptions", () => {});
+      // Set touched so error messages are visible.
+      useMemo(() => {
+        form.root.fields.username.setTouched(true);
+      }, []);
 
-  it("shouldFocusError", () => {});
+      return (
+        <form
+          {...form.bindForm({ onSubmit: console.info })}
+          style={{ border: `1px solid black` }}
+        >
+          <TextInput field={form.root.fields.username} />
+          <button type="submit">Submit</button>
+        </form>
+      );
+    });
 
-  it("enableReinitialize", () => {});
+    render(<Form />);
+
+    await screen.findByText("String must contain at least 1 character(s)");
+  });
+
+  it("setActionOptions.validateSync", () => {
+    const Form = observer(() => {
+      const form = useForm(
+        z.object({
+          password: z.string().min(6).label("Password"),
+        }),
+        {
+          setActionOptions: {
+            validateSync: true,
+          },
+        },
+      );
+
+      // Set touched so error messages are visible.
+      useMemo(() => {
+        form.root.fields.password.setTouched(true);
+      }, []);
+
+      return (
+        <form
+          {...form.bindForm({ onSubmit: console.info })}
+          style={{ border: `1px solid black` }}
+        >
+          <TextInput field={form.root.fields.password} />
+          <button type="submit">Submit</button>
+        </form>
+      );
+    });
+
+    render(<Form />);
+
+    fireEvent.change(screen.getByLabelText("Password"), {
+      target: { value: "short" },
+    });
+
+    screen.getByText("String must contain at least 6 character(s)");
+  });
+
+  it("shouldFocusError", async () => {
+    // By default
+    const Form = observer(() => {
+      const form = useForm(
+        z.object({
+          age: z.number().label("Age").min(18),
+        }),
+      );
+
+      return (
+        <form
+          {...form.bindForm({ onSubmit: console.info })}
+          style={{ border: `1px solid black` }}
+        >
+          <TextInput field={form.root.fields.age} />
+          <button type="submit">Submit</button>
+        </form>
+      );
+    });
+
+    render(<Form />);
+
+    const user = userEvent.setup();
+
+    await user.click(screen.getByRole("button", { name: "Submit" }));
+
+    await waitFor(() => expect(screen.getByLabelText("Age")).toHaveFocus());
+  });
+
+  it("enableReinitialize", async () => {
+    const Form = observer(({ initialAge }: { initialAge: number }) => {
+      const form = useForm(
+        z.object({
+          age: z.number().label("Age"),
+        }),
+        {
+          initialOutput: {
+            age: initialAge,
+          },
+          enableReinitialize: true,
+        },
+      );
+
+      return (
+        <form
+          {...form.bindForm({ onSubmit: console.info })}
+          style={{ border: `1px solid black` }}
+        >
+          <TextInput field={form.root.fields.age} />
+          <button type="submit">Submit</button>
+        </form>
+      );
+    });
+
+    const { rerender } = render(<Form initialAge={3} />);
+
+    expect(screen.getByDisplayValue("3")).toBeInTheDocument();
+
+    rerender(<Form initialAge={empty} />);
+
+    await waitFor(() => {
+      expect(screen.getByLabelText("Age")).toHaveValue("");
+    });
+
+    rerender(<Form initialAge={22} />);
+
+    await waitFor(() => {
+      expect(screen.getByLabelText("Age")).toHaveValue("22");
+    });
+
+    screen.getByLabelText("Age").getBoundingClientRect();
+  });
 });
