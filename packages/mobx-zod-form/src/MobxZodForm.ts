@@ -65,6 +65,8 @@ export class MobxZodForm<T extends MobxZodTypes> {
 
   _isSubmitting: boolean = false;
 
+  _parsed?: SafeParseReturnType<T["_input"], T["_output"]>;
+
   schemaFormMeta: FormMeta;
 
   element: HTMLFormElement | null = null;
@@ -95,7 +97,6 @@ export class MobxZodForm<T extends MobxZodTypes> {
       isSubmitting: computed,
       input: computed,
       looseInput: computed,
-      parsed: computed,
       validate: action,
       _setRawInputAt: action,
       _notifyChange: action,
@@ -196,10 +197,14 @@ export class MobxZodForm<T extends MobxZodTypes> {
   }
 
   get parsed(): SafeParseReturnType<T["_input"], T["_output"]> {
+    if (this._parsed) return this._parsed;
+
     if (this.input.success) {
-      return this.schema.safeParse(this.input.data);
+      return (this._parsed = this.schema.safeParse(this.input.data));
     } else {
-      return this.schema.safeParse(unwrapDecodeResult(this.looseInput));
+      return (this._parsed = this.schema.safeParse(
+        unwrapDecodeResult(this.looseInput),
+      ));
     }
   }
 
@@ -220,6 +225,8 @@ export class MobxZodForm<T extends MobxZodTypes> {
   }
 
   _notifyChange() {
+    this._parsed = undefined;
+
     if (this.resolveCurrentSetActionOptions().validateSync) {
       this.validate();
     } else {
@@ -278,7 +285,6 @@ export class MobxZodForm<T extends MobxZodTypes> {
   async handleSubmit(onSubmit: () => Promise<void> | void) {
     try {
       let validationPromise!: Promise<void>;
-
       runInAction(() => {
         this._isSubmitting = true;
         this._submitCount++;
@@ -295,7 +301,6 @@ export class MobxZodForm<T extends MobxZodTypes> {
       await validationPromise;
 
       this.root._walk((f) => f.setTouched(true));
-
       await onSubmit();
     } finally {
       runInAction(() => {
