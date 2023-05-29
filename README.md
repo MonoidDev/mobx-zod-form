@@ -17,4 +17,6 @@ Data-first form builder based on [MobX](https://mobx.js.org/) & [Zod](https://zo
 Documentation:
 https://mobx-zod-form.pages.dev/
 
+Blog on this library (in Chinese):
 
+https://blog.cwang.io/blogs/creating-a-fully-type-safe-form
