@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import { z } from "zod";
 
 import { setup } from "./utils";
-import { MobxZodForm } from "../src/MobxZodForm";
+import { MobxZodPlugin, MobxZodForm } from "../src";
 
 setup();
 
@@ -99,6 +99,13 @@ describe("plugin tests", () => {
   });
 
   it("should modify field for onBeforeSubmit", async () => {
+    const fillUsernameWithAaaa: MobxZodPlugin = {
+      name: "fill-username-with-aaaa",
+      onBeforeSubmit() {
+        form.root.fields.username.setOutput("aaaa");
+      },
+    };
+
     const form = new MobxZodForm(
       z.object({
         username: z.string(),
@@ -107,14 +114,7 @@ describe("plugin tests", () => {
         setActionOptions: {
           validateSync: true,
         },
-        plugins: [
-          {
-            name: "fill-username-with-aaaa",
-            onBeforeSubmit() {
-              form.root.fields.username.setOutput("aaaa");
-            },
-          },
-        ],
+        plugins: [fillUsernameWithAaaa],
       },
     );
 

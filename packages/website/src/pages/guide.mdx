@@ -296,6 +296,23 @@ const form = useForm({
 
 Then `form.root.fields.file` should of type `MobxZodField`.
 
+### Plugins
+
+<Callout type="warning" emoji="⚠️">
+  Plugins are objects with methods that are run on different timings, along with native tasks, so use them with care. Throwing an error might break other plugins or native tasks, so errors should be handled inside. Plugins are mainly used to synchronous tasks, so you may want to move asynchronous tasks to `onSubmit`.
+</Callout>
+
+You can use plugins to run various effects on various timings. For example, the following plugin `fill-username-with-aaaa` sets the `username` field to `"aaaa"` (no matter what the user inputs).
+
+```tsx
+@include "../components/examples/guide.tsx#plugin"
+```
+
+For more, please check the `MobxZodPlugin` type and the API reference.
+
+Please notice that plugins are not meant to intercept the validation results provided by Zod. To achieve that, use the original `superRefine` method.
+
+
 ## Advanced Usages
 
 Didn't find what you need in the Guide? Take a look at [API Reference](/api-reference/index.html) to see if you can hack.

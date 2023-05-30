@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import { MobxZodPlugin, getDecodeResult } from "@monoid-dev/mobx-zod-form";
 import { useForm } from "@monoid-dev/mobx-zod-form-react";
 import { observer } from "mobx-react";
 import { z } from "zod";
@@ -150,4 +151,28 @@ z.object({
   });
 
   /* #decode-result */
+};
+
+() => {
+  /* #plugin */
+  const Form = observer(() => {
+    const fillUsernameWithAaaa: MobxZodPlugin = {
+      name: "fill-username-with-aaaa",
+      onBeforeSubmit() {
+        form.root.fields.username.setOutput("aaaa");
+      },
+    };
+
+    const form = useForm(
+      z.object({
+        username: z.string(),
+      }),
+      {
+        plugins: [fillUsernameWithAaaa],
+      },
+    );
+
+    return <form />;
+  });
+  /* #plugin */
 };
