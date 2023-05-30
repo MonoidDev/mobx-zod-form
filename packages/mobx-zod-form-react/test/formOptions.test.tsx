@@ -8,7 +8,7 @@ import { describe, expect, it } from "vitest";
 import { z } from "zod";
 
 import { TextInput } from "./TextInput";
-import { useForm } from "../src";
+import { FormOptionsProvider, useForm } from "../src";
 
 describe("formOptions", () => {
   it("initialOutput", () => {
@@ -219,5 +219,50 @@ describe("formOptions", () => {
     });
 
     screen.getByLabelText("Age").getBoundingClientRect();
+  });
+
+  it("inherits FormOptionsContext", () => {
+    const Form = observer(({ initialAge }: { initialAge: number }) => {
+      const form = useForm(
+        z.object({
+          age: z.number().label("Age"),
+        }),
+        {
+          initialOutput: {
+            age: initialAge,
+          },
+        },
+      );
+
+      expect(form.options.plugins).toMatchObject([
+        {
+          name: "plugin",
+        },
+      ]);
+
+      return (
+        <form
+          {...form.bindForm({ onSubmit: console.info })}
+          style={{ border: `1px solid black` }}
+        >
+          <TextInput field={form.root.fields.age} />
+          <button type="submit">Submit</button>
+        </form>
+      );
+    });
+
+    render(
+      <FormOptionsProvider
+        options={{
+          plugins: [
+            {
+              name: "plugin",
+            },
+          ],
+        }}
+      >
+        <Form initialAge={3} />
+      </FormOptionsProvider>,
+    );
   });
 });

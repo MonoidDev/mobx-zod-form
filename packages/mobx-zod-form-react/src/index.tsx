@@ -19,10 +19,26 @@ export const useForm = <T extends MobxZodTypes>(
   schema: T,
   options: ReactFormOptions<T> = {},
 ) => {
-  const form = useMemo(() => new ReactForm(schema, options), []);
-  useEffect(() => {
-    return form.start();
-  }, []);
+  const defaultOptions = useFormOptionsContext();
+
+  const form = useMemo(
+    () =>
+      new ReactForm(schema, {
+        ...defaultOptions,
+        ...options,
+        setActionOptions: {
+          ...defaultOptions.setActionOptions,
+          ...options.setActionOptions,
+        },
+        plugins: [
+          ...(defaultOptions.plugins ?? []),
+          ...(options?.plugins ?? []),
+        ],
+      }),
+    [],
+  );
+
+  useEffect(() => form.start(), []);
 
   useEffect(() => {
     if (options.enableReinitialize && "initialOutput" in options) {
@@ -70,4 +86,21 @@ export const getForm = (f: MobxZodField<ZodTypeAny>) => {
   } else {
     throw new NotReactFormField(f);
   }
+};
+
+export const FormOptionsContext = React.createContext<
+  ReactFormOptions<MobxZodTypes>
+>({});
+
+export const useFormOptionsContext = () => useContext(FormOptionsContext);
+
+export const FormOptionsProvider = <T extends MobxZodTypes>({
+  options,
+  children,
+}: React.PropsWithChildren<{ options: ReactFormOptions<T> }>) => {
+  return (
+    <FormOptionsContext.Provider value={options}>
+      {children}
+    </FormOptionsContext.Provider>
+  );
 };
