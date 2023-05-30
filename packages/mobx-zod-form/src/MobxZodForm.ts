@@ -21,6 +21,7 @@ import {
 } from "./FormMeta";
 import { getPathId, setPath, shallowEqual, visitPath } from "./js-utils";
 import { createFieldForType, type MapZodTypeToField } from "./MobxZodField";
+import { type MobxZodPlugin } from "./MobxZodPlugin";
 import { type MobxZodTypes } from "./types";
 
 export interface InputSetActionOptions {
@@ -48,6 +49,7 @@ export interface MobxZodFormOptions<T extends MobxZodTypes> {
    *    Useful when you expect your user complete the form column by column.
    */
   shouldFocusError?: false | "first-y" | "first-x";
+  plugins?: MobxZodPlugin[];
 }
 
 interface ValidationTask {
@@ -158,6 +160,23 @@ export class MobxZodForm<T extends MobxZodTypes> {
     };
   }
 
+  start() {
+    const disposeValidationWorker = this.options.setActionOptions.validateSync
+      ? undefined
+      : this.startValidationWorker();
+    for (const plugin of this.options.plugins) {
+      plugin.onStart?.();
+    }
+
+    return () => {
+      disposeValidationWorker?.();
+
+      for (const plugin of [...this.options.plugins].reverse()) {
+        plugin.onEnd?.();
+      }
+    };
+  }
+
   get options() {
     return {
       initialOutput:
@@ -169,7 +188,8 @@ export class MobxZodForm<T extends MobxZodTypes> {
         validateSync: this._options.setActionOptions?.validateSync ?? false,
       },
       shouldFocusError: this._options.shouldFocusError ?? "first-y",
-    };
+      plugins: this._options.plugins ?? [],
+    } satisfies MobxZodFormOptions<T>;
   }
 
   get rawInput() {
@@ -242,6 +262,10 @@ export class MobxZodForm<T extends MobxZodTypes> {
    * Errors are compared against their error messages.
    */
   validate() {
+    this.options.plugins.forEach((plugin) => {
+      plugin?.onBeforeValidate?.();
+    });
+
     const newOutput = this.parsed;
 
     const issues = newOutput.success ? [] : newOutput.error.issues;
@@ -265,6 +289,10 @@ export class MobxZodForm<T extends MobxZodTypes> {
         field._errorMessages = newFieldIssues.map((e) => e.message);
       }
     });
+
+    [...this.options.plugins].reverse().forEach((plugin) => {
+      plugin?.onAfterValidate?.();
+    });
   }
 
   withSetActionOptions(options: InputSetActionOptions, action: () => void) {
@@ -284,6 +312,8 @@ export class MobxZodForm<T extends MobxZodTypes> {
 
   async handleSubmit(onSubmit: () => Promise<void> | void) {
     try {
+      this.options.plugins.forEach((p) => p.onBeforeSubmit?.());
+
       let validationPromise!: Promise<void>;
       runInAction(() => {
         this._isSubmitting = true;
@@ -310,6 +340,8 @@ export class MobxZodForm<T extends MobxZodTypes> {
       if (this.options.shouldFocusError) {
         this.focusError();
       }
+
+      [...this.options.plugins].reverse().forEach((p) => p.onAfterSubmit?.());
     }
   }
 

@@ -21,9 +21,7 @@ export const useForm = <T extends MobxZodTypes>(
 ) => {
   const form = useMemo(() => new ReactForm(schema, options), []);
   useEffect(() => {
-    if (!form.options.setActionOptions.validateSync) {
-      return form.startValidationWorker();
-    }
+    return form.start();
   }, []);
 
   useEffect(() => {
