@@ -165,14 +165,14 @@ export class MobxZodForm<T extends MobxZodTypes> {
       ? undefined
       : this.startValidationWorker();
     for (const plugin of this.options.plugins) {
-      plugin.onStart?.();
+      plugin.onStart?.(this);
     }
 
     return () => {
       disposeValidationWorker?.();
 
       for (const plugin of [...this.options.plugins].reverse()) {
-        plugin.onEnd?.();
+        plugin.onEnd?.(this);
       }
     };
   }
@@ -263,7 +263,7 @@ export class MobxZodForm<T extends MobxZodTypes> {
    */
   validate() {
     this.options.plugins.forEach((plugin) => {
-      plugin?.onBeforeValidate?.();
+      plugin?.onBeforeValidate?.(this);
     });
 
     const newOutput = this.parsed;
@@ -291,7 +291,7 @@ export class MobxZodForm<T extends MobxZodTypes> {
     });
 
     [...this.options.plugins].reverse().forEach((plugin) => {
-      plugin?.onAfterValidate?.();
+      plugin?.onAfterValidate?.(this);
     });
   }
 
@@ -312,7 +312,7 @@ export class MobxZodForm<T extends MobxZodTypes> {
 
   async handleSubmit(onSubmit: () => Promise<void> | void) {
     try {
-      this.options.plugins.forEach((p) => p.onBeforeSubmit?.());
+      this.options.plugins.forEach((p) => p.onBeforeSubmit?.(this));
 
       let validationPromise!: Promise<void>;
       runInAction(() => {
@@ -341,7 +341,9 @@ export class MobxZodForm<T extends MobxZodTypes> {
         this.focusError();
       }
 
-      [...this.options.plugins].reverse().forEach((p) => p.onAfterSubmit?.());
+      [...this.options.plugins]
+        .reverse()
+        .forEach((p) => p.onAfterSubmit?.(this));
     }
   }
 
