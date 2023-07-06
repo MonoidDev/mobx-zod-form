@@ -223,8 +223,11 @@ export class MobxZodArrayFieldImpl<T extends MobxZodArray>
     });
   }
 
-  get rawInput() {
-    return super.rawInput as unknown[];
+  get maybeArrayRawInput(): unknown[] | undefined {
+    if (Array.isArray(this.rawInput)) {
+      return this.rawInput;
+    }
+    return undefined;
   }
 
   _walk(f: (field: MobxZodField<any>) => void) {
@@ -233,7 +236,7 @@ export class MobxZodArrayFieldImpl<T extends MobxZodArray>
   }
 
   _createElements() {
-    return this.rawInput.map((_, i) =>
+    return (this.maybeArrayRawInput ?? []).map((_, i) =>
       createFieldForType(this.type.element, this.form, [...this.path, i]),
     );
   }
@@ -247,7 +250,7 @@ export class MobxZodArrayFieldImpl<T extends MobxZodArray>
   }
 
   pop() {
-    const last = this.rawInput[this._elements.length - 1];
+    const last = (this.maybeArrayRawInput ?? [])[this._elements.length - 1];
     this.splice(this._elements.length - 1, 1, []);
     return last;
   }
@@ -269,7 +272,9 @@ export class MobxZodArrayFieldImpl<T extends MobxZodArray>
     values: this["_elementOutput"][],
     _options?: InputSetActionOptions,
   ) {
-    this.rawInput.splice(
+    const target = this.maybeArrayRawInput ?? [];
+
+    target.splice(
       start,
       deleteCount,
       ...values.map((v) => this.type.element.getFormMeta().encode(v)),
@@ -291,7 +296,14 @@ export class MobxZodArrayFieldImpl<T extends MobxZodArray>
       this._elements[start + i]._updatePath([...this.path, start + i]);
     }
 
-    this.form._notifyChange();
+    if (!this.maybeArrayRawInput) {
+      // The target is not mounted to the form tree,
+      // so simply set the raw input, triggering a change
+      this.setRawInput(target);
+    } else {
+      // The form doesn't know there is a change unless we tell it.
+      this.form._notifyChange();
+    }
   }
 
   _onInputChange(): void {

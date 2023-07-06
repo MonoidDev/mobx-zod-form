@@ -408,6 +408,26 @@ describe("form tests", () => {
     });
   });
 
+  it("should handle rawInput other than array for arryas", () => {
+    const form = new MobxZodForm(
+      z.object({
+        array: z.number().array(),
+      }),
+      {
+        setActionOptions: {
+          validateSync: true,
+        },
+      },
+    );
+
+    form._setRawInputAt(["array"], undefined);
+    form.root.fields.array.push(0);
+
+    expect(toJS(form.rawInput)).toMatchObject({
+      array: ["0"],
+    });
+  });
+
   it("should react on discriminated union", () => {
     const form = new MobxZodForm(
       z.discriminatedUnion("answer", [
@@ -417,6 +437,7 @@ describe("form tests", () => {
         z.object({
           answer: z.literal("NO"),
           reason: z.string().min(1).label("Reason"),
+          array: z.string().array(),
         }),
       ]),
       {
@@ -435,6 +456,7 @@ describe("form tests", () => {
     expect(toJS(form.rawInput)).toMatchObject({
       answer: "NO",
       reason: "",
+      array: [],
     });
 
     expect(
@@ -446,6 +468,7 @@ describe("form tests", () => {
     form.root.setOutput({
       answer: "NO",
       reason: "xyz",
+      array: [],
     });
 
     expect(toJS(form.rawInput)).toMatchObject({
