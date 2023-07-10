@@ -70,6 +70,8 @@ export type BindInputOptions =
         | "select";
     };
 
+export type BindFieldResult = {};
+
 export class ReactForm<T extends MobxZodTypes> extends MobxZodForm<T> {
   bindForm(options: BindFormOptions<T> = {}): React.ComponentProps<"form"> {
     return {
@@ -197,5 +199,20 @@ export class ReactForm<T extends MobxZodTypes> extends MobxZodForm<T> {
       },
       ...getPropsForType(),
     };
+  }
+
+  bindTextArea<T extends ZodTypeAny>(field: MobxZodField<T>) {
+    return {
+      name: ReactForm.getDomName(field),
+      id: ReactForm.getDomId(field),
+      onBlur: () => field.setTouched(true),
+      ref(element) {
+        field.element = element;
+      },
+      value: field.rawInput as any,
+      onChange: (e) => {
+        field.setOutput(e.target.value);
+      },
+    } satisfies React.ComponentProps<"textarea">;
   }
 }
