@@ -405,6 +405,41 @@ const OptionalField = observer(() => {
   );
 });
 
+const TextAreaForm = observer(function TextAreaForm() {
+  const form = useForm(
+    z.object({
+      string: z.string().min(1),
+    }),
+  );
+
+  const { fields } = form.root;
+
+  return (
+    <form
+      {...form.bindForm({
+        onSubmit(value) {
+          alert(JSON.stringify(value));
+        },
+        onSubmitError(e) {
+          console.error(e);
+        },
+      })}
+    >
+      <textarea
+        style={{ display: "block" }}
+        {...form.bindTextArea(fields.string)}
+      />
+      {fields.string.touched &&
+        fields.string.errorMessages.map((e, i) => (
+          <div style={{ color: "red" }} key={i}>
+            {e}
+          </div>
+        ))}
+      <button type="submit">Submit</button>
+    </form>
+  );
+});
+
 function App() {
   return (
     <div className="App">
@@ -419,6 +454,7 @@ function App() {
       <FocusErrorX />
       <AutoSubmit />
       <OptionalField />
+      <TextAreaForm />
     </div>
   );
 }
