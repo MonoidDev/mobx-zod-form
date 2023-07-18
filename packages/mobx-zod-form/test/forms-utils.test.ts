@@ -54,4 +54,7 @@ describe("form utils tests", () => {
     expect(form.root.touched).toBe(true);
     expect(form.root.fields.username.touched).toBe(true);
   });
+
+  // TODO:
+  it("should handle extra errors", () => {});
 });

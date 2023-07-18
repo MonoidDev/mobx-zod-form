@@ -35,6 +35,12 @@ const TextInput = observer(({ field }: { field: MobxZodField<ZodTypeAny> }) => {
             {e}
           </div>
         ))}
+
+      {field.extraErrorMessages.map((e, i) => (
+        <div style={{ color: "pink" }} key={i}>
+          {e}
+        </div>
+      ))}
     </div>
   );
 });
@@ -440,6 +446,34 @@ const TextAreaForm = observer(function TextAreaForm() {
   );
 });
 
+const ExtraErrorMessages = observer(() => {
+  const form = useForm(
+    z.object({
+      string: z.string().min(1),
+    }),
+  );
+
+  const { fields } = form.root;
+
+  return (
+    <form
+      {...form.bindForm({
+        async onSubmit() {
+          await new Promise((r) => setTimeout(r, 500));
+
+          fields.string.setExtraErrorMessages(["extra errors"]);
+        },
+        onSubmitError(e) {
+          console.error(e);
+        },
+      })}
+    >
+      <TextInput field={form.root.fields.string} />
+      <button type="submit">Submit</button>
+    </form>
+  );
+});
+
 function App() {
   return (
     <div className="App">
@@ -455,6 +489,7 @@ function App() {
       <AutoSubmit />
       <OptionalField />
       <TextAreaForm />
+      <ExtraErrorMessages />
     </div>
   );
 }

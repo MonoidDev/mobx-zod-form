@@ -128,6 +128,19 @@ export interface MobxZodField<T extends ZodTypeAny> {
    * @internal
    */
   _walk: (handler: (f: MobxZodField<any>) => void) => void;
+  /**
+   * Extra error messages associated with the field,
+   * i.e. errors not from the schema.
+   * Extra error messages are merely for the user's infomration,
+   * and does not block submission by default.
+   * Extra errror messages are removed from the field once the input changes or the form is submitted.
+   */
+  extraErrorMessages: readonly string[];
+  /**
+   * @internal
+   */
+  _extraErrorMessages: string[];
+  setExtraErrorMessages: (e: string[]) => void;
 }
 
 export type FieldWithEffects<

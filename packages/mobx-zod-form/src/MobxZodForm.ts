@@ -330,7 +330,13 @@ export class MobxZodForm<T extends MobxZodTypes> {
 
       await validationPromise;
 
-      this.root._walk((f) => f.setTouched(true));
+      runInAction(() => {
+        this.root._walk((f) => {
+          f.setTouched(true);
+          f.setExtraErrorMessages([]);
+        });
+      });
+
       await onSubmit();
     } finally {
       runInAction(() => {

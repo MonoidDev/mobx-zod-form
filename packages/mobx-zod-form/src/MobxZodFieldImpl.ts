@@ -38,6 +38,7 @@ export class MobxZodBaseFieldImpl<T extends MobxZodTypes>
   _issues: ZodIssue[] = [];
   _errorMessages: string[] = [];
   _touched: boolean = false;
+  _extraErrorMessages: string[] = [];
 
   static curUniqueId = 0;
 
@@ -55,6 +56,7 @@ export class MobxZodBaseFieldImpl<T extends MobxZodTypes>
       _issues: observable,
       _errorMessages: observable,
       _touched: observable,
+      _extraErrorMessages: observable,
       rawInput: computed,
       issues: computed,
       touched: computed,
@@ -101,6 +103,7 @@ export class MobxZodBaseFieldImpl<T extends MobxZodTypes>
   }
 
   _onInputChange(): void {
+    this._extraErrorMessages = [];
     return;
   }
 
@@ -110,6 +113,14 @@ export class MobxZodBaseFieldImpl<T extends MobxZodTypes>
 
   _walk(f: (field: MobxZodField<any>) => void) {
     f(this);
+  }
+
+  get extraErrorMessages() {
+    return this._extraErrorMessages;
+  }
+
+  setExtraErrorMessages(e: string[]) {
+    this._extraErrorMessages = e;
   }
 }
 export class MobxZodOmittableFieldImpl<
