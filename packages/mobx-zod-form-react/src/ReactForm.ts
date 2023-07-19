@@ -99,15 +99,27 @@ export class ReactForm<T extends MobxZodTypes> extends MobxZodForm<T> {
     return field.path.join(".");
   }
 
-  static getDomId<T extends ZodTypeAny>(field: MobxZodField<T>) {
-    return this.getDomName(field) + "__" + field.uniqueId;
+  static getDomId<T extends ZodTypeAny>(
+    field: MobxZodField<T>,
+    options: BindInputOptions = { type: "text" },
+  ) {
+    const baseId = this.getDomName(field) + "__" + field.uniqueId;
+
+    switch (options.type) {
+      case "checkbox":
+      case "radio":
+        return `${baseId}__${options.value}`;
+      default:
+        return baseId;
+    }
   }
 
   bindLabel<T extends ZodTypeAny>(
     field: MobxZodField<T>,
+    options: BindInputOptions = { type: "text" },
   ): React.ComponentProps<"label"> {
     return {
-      htmlFor: ReactForm.getDomId(field),
+      htmlFor: ReactForm.getDomId(field, options),
       children: field.type.getFormMeta().label,
     };
   }
@@ -193,7 +205,7 @@ export class ReactForm<T extends MobxZodTypes> extends MobxZodForm<T> {
 
     return {
       name: ReactForm.getDomName(field),
-      id: ReactForm.getDomId(field),
+      id: ReactForm.getDomId(field, options),
       type: options.type,
       onBlur: () => field.setTouched(true),
       ref(element) {
