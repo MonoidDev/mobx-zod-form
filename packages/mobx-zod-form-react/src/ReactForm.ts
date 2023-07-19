@@ -10,6 +10,7 @@ import {
 import {
   ZodArray,
   ZodBoolean,
+  ZodEnum,
   ZodError,
   ZodNumber,
   ZodString,
@@ -150,7 +151,8 @@ export class ReactForm<T extends MobxZodTypes> extends MobxZodForm<T> {
           if (
             fieldType instanceof ZodString ||
             fieldType instanceof ZodBoolean ||
-            fieldType instanceof ZodNumber
+            fieldType instanceof ZodNumber ||
+            fieldType instanceof ZodEnum
           ) {
             return {
               checked:
