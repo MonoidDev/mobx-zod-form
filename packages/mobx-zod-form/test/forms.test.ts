@@ -318,6 +318,11 @@ describe("form tests", () => {
     expect(
       form.root.fields.nestedArray.elements[0].elements[0].path,
     ).toMatchObject(["nestedArray", 0, 0]);
+
+    expect(form.root.fields.nestedArray.elements[0].path).toMatchObject([
+      "nestedArray",
+      0,
+    ]);
   });
 
   it("should react on changes for array.length", () => {

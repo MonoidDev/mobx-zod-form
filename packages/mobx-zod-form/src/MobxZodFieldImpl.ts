@@ -123,6 +123,7 @@ export class MobxZodBaseFieldImpl<T extends MobxZodTypes>
     this._extraErrorMessages = e;
   }
 }
+
 export class MobxZodOmittableFieldImpl<
     T extends ZodOptional<ZodTypeAny> | ZodNullable<ZodTypeAny>,
   >
@@ -192,6 +193,8 @@ export class MobxZodObjectFieldImpl<T extends MobxZodObject>
     Object.values(this.fields).forEach((field) => {
       field._updatePath([...newPath, ...field.path.slice(newPath.length)]);
     });
+
+    super._updatePath(newPath);
   }
 
   _walk(f: (field: MobxZodField<any>) => void) {
@@ -349,6 +352,8 @@ export class MobxZodArrayFieldImpl<T extends MobxZodArray>
     Object.values(this._elements).forEach((element) => {
       element._updatePath([...newPath, ...element.path.slice(newPath.length)]);
     });
+
+    super._updatePath(newPath);
   }
 }
 
@@ -509,5 +514,7 @@ export class MobxZodDiscriminatedUnionFieldImpl<
       ...newPath,
       ...this.discriminatorField.path.slice(newPath.length),
     ]);
+
+    super._updatePath(newPath);
   }
 }
