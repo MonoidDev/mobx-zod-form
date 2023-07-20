@@ -207,9 +207,15 @@ For custom fields, we expect you to call `field.setTouched` when the user has in
 The validation happens as a whole on the root data, and needs to be triggered. By default, the validation is triggered after any changes to the raw input in a `requestIdleCallback`. After the validation fails, `zod` returns us a list of `ZodError`. Each `zod` error contains a `path: string[]`, a `messages: string[]`, and other properties. We find the field according to the `path` and attach the `messages` to its `errorMessages` field.
 
 
-### Scroll to Error
+### Focus Error
 
-Scrolling to the first error is automatically enabled. The order is by default determined by its y-position, then x-position. To be more specific, when there is a `onSubmit` event happens to the form, the validation will be triggered for the form. If there is an error, after calling the `onSubmitError` custom handler, it will find all the fields with a non-empty `errorMessages`. Then, it calls `.focus()` on the first HTML element bound to those fields, if there's any.
+Focusing to the first error is automatically enabled. The order is by default determined by its y-position, then x-position. To be more specific, when there is a `onSubmit` event happens to the form, the validation will be triggered for the form. If there is an error, after calling the `onSubmitError` custom handler, it will find all the fields with a non-empty `errorMessages`. Then, it calls `.focus()` on the first HTML element bound to those fields, if there's any.
+
+<Callout>
+  If you bind your field to a non-focusable element, `.focus()` will not work. Add `tabindex="0"` to make it focusable.
+
+  See: https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/tabindex
+</Callout>
 
 ### Form Submission
 
