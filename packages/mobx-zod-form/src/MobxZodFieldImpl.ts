@@ -319,8 +319,8 @@ export class MobxZodArrayFieldImpl<T extends MobxZodArray>
 
   _onInputChange(): void {
     const oldLength = this._elements.length;
-    if (this.decodeResult.success) {
-      const newLength = this.decodeResult.data.length;
+    if (this.maybeArrayRawInput) {
+      const newLength = this.maybeArrayRawInput.length;
 
       if (newLength > oldLength) {
         // Create new fields for new elements

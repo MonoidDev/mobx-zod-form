@@ -308,6 +308,28 @@ describe("form tests", () => {
     expect(obLength.observed).toMatchObject([0, 1, 2, 3]);
   });
 
+  it("should change length for array", () => {
+    const form = new MobxZodForm(
+      z.object({
+        ages: z.array(z.number()),
+      }),
+      {
+        setActionOptions: {
+          validateSync: true,
+        },
+      },
+    );
+
+    form.root.fields.ages.setOutput([1]);
+
+    expect(form.root.fields.ages.length).toBe(1);
+
+    form.root.fields.ages.setOutput([1, empty]);
+
+    // Even for invalid input, the array should grow on it.
+    expect(form.root.fields.ages.length).toBe(2);
+  });
+
   it("should react on field changes for omittable types", () => {
     const form = new MobxZodForm(
       z.object({

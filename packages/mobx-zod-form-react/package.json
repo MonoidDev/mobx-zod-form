@@ -1,6 +1,6 @@
 {
   "name": "@monoid-dev/mobx-zod-form-react",
-  "version": "0.9.3",
+  "version": "0.9.4",
   "type": "commonjs",
   "main": "./lib/index.js",
   "module": "./lib/index.mjs",
@@ -28,7 +28,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@monoid-dev/mobx-zod-form": "^0.9.3"
+    "@monoid-dev/mobx-zod-form": "^0.9.4"
   },
   "publishConfig": {
     "access": "public"
