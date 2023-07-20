@@ -230,6 +230,17 @@ describe("form tests", () => {
             b: z.number(),
           }),
         ),
+        discriminatedUnions: z
+          .discriminatedUnion("tag", [
+            z.object({
+              tag: z.literal("A"),
+            }),
+            z.object({
+              tag: z.literal("B"),
+            }),
+          ])
+          .array(),
+        nestedArray: z.number().array().array(),
       }),
       {
         setActionOptions: {
@@ -280,6 +291,33 @@ describe("form tests", () => {
       ["objects", 0, "a"],
       ["objects", 1, "a"],
     ]);
+
+    form.root.fields.discriminatedUnions.push({
+      tag: "A",
+    });
+
+    form.root.fields.discriminatedUnions.push({
+      tag: "B",
+    });
+
+    form.root.fields.discriminatedUnions.splice(0, 1, []);
+
+    expect(form.root.fields.discriminatedUnions.decodeResult).toMatchObject({
+      success: true,
+      data: [{ tag: "B" }],
+    });
+
+    expect(
+      form.root.fields.discriminatedUnions.elements[0].discriminatorField.path,
+    ).toMatchObject(["discriminatedUnions", 0, "tag"]);
+
+    form.root.fields.nestedArray.push([1], [2]);
+
+    form.root.fields.nestedArray.splice(0, 1, []);
+
+    expect(
+      form.root.fields.nestedArray.elements[0].elements[0].path,
+    ).toMatchObject(["nestedArray", 0, 0]);
   });
 
   it("should react on changes for array.length", () => {

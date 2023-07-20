@@ -344,6 +344,12 @@ export class MobxZodArrayFieldImpl<T extends MobxZodArray>
       this._elements.splice(0, oldLength);
     }
   }
+
+  _updatePath(newPath: ParsePath) {
+    Object.values(this._elements).forEach((element) => {
+      element._updatePath([...newPath, ...element.path.slice(newPath.length)]);
+    });
+  }
 }
 
 export class MobxZodDiscriminatorFieldImpl<
@@ -492,5 +498,16 @@ export class MobxZodDiscriminatedUnionFieldImpl<
     Object.values(this._fields).forEach((field: MobxZodField<any>) =>
       field._walk(f),
     );
+  }
+
+  _updatePath(newPath: ParsePath) {
+    Object.values(this._fields).forEach((field) => {
+      field._updatePath([...newPath, ...field.path.slice(newPath.length)]);
+    });
+
+    this.discriminatorField._updatePath([
+      ...newPath,
+      ...this.discriminatorField.path.slice(newPath.length),
+    ]);
   }
 }
