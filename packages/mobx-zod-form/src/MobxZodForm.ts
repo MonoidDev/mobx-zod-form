@@ -357,7 +357,11 @@ export class MobxZodForm<T extends MobxZodTypes> {
     const candidates: HTMLElement[] = [];
     try {
       this.root._walk((f) => {
-        if (f._errorMessages.length > 0 && f.element && f.element.isConnected) {
+        if (
+          (f._errorMessages.length > 0 || f._extraErrorMessages.length > 0) &&
+          f.element &&
+          f.element.isConnected
+        ) {
           candidates.push(f.element);
         }
       });
