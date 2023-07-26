@@ -67,4 +67,25 @@ describe("formMeta tests", () => {
 
     expect(labelShorthand.getFormMeta().label).toBe("label");
   });
+
+  it("get initial output correctly", () => {
+    expect(z.string().getFormMeta().getInitialOutput()).toBe("");
+    expect(z.number().getFormMeta().getInitialOutput()).toBe(undefined);
+    expect(z.boolean().getFormMeta().getInitialOutput()).toBe(false);
+    expect(z.enum(["cn", "jp"]).getFormMeta().getInitialOutput()).toBe("cn");
+    // TODO: more types...
+
+    // Should respect user getInitialOutput
+    expect(
+      z
+        .enum(["cn", "jp"])
+        .formMeta({
+          getInitialOutput() {
+            return "jp";
+          },
+        })
+        .getFormMeta()
+        .getInitialOutput(),
+    ).toBe("jp");
+  });
 });

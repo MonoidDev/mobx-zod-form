@@ -480,6 +480,10 @@ export const resolveDOMFormMeta = (type: ZodTypeAny): FormMeta => {
       );
     },
     getInitialOutput() {
+      if (inputFormMeta.getInitialOutput) {
+        return inputFormMeta.getInitialOutput();
+      }
+
       if (type instanceof ZodString) {
         return "";
       } else if (type instanceof ZodNumber) {

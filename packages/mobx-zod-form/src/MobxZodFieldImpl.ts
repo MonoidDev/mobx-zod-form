@@ -397,7 +397,7 @@ export class MobxZodDiscriminatedUnionFieldImpl<
       _currentDiscriminatorParsed: observable,
       _fields: observable,
       fieldsResult: computed,
-      _rawDisciminator: computed,
+      _rawDiscriminator: computed,
       _discriminatorParsed: computed,
       _updateFieldsForDiscriminator: action,
     });
@@ -406,12 +406,12 @@ export class MobxZodDiscriminatedUnionFieldImpl<
     this._updateFieldsForDiscriminator();
   }
 
-  get _rawDisciminator(): any {
+  get _rawDiscriminator(): any {
     return (this.rawInput as any)?.[this.type.discriminator];
   }
 
   get _discriminatorParsed(): this["_types"]["_discriminatorParsedResult"] {
-    return this.discriminatorField.type.safeParse(this._rawDisciminator);
+    return this.discriminatorField.type.safeParse(this._rawDiscriminator);
   }
 
   _createDiscriminatorField() {
