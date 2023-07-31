@@ -85,6 +85,16 @@ export function extendZodWithMobxZodForm(zod: typeof z) {
         ...this._def,
         schema: this.innerType().formMeta(meta),
       });
+    } else if (this instanceof ZodNullable) {
+      return new ZodNullable({
+        ...this._def,
+        innerType: this.unwrap().formMeta(meta),
+      });
+    } else if (this instanceof ZodOptional) {
+      return new ZodOptional({
+        ...this._def,
+        innerType: this.unwrap().formMeta(meta),
+      });
     } else {
       const o = new (this as any).constructor({
         ...this._def,

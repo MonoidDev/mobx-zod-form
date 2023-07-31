@@ -66,6 +66,9 @@ describe("formMeta tests", () => {
     const labelShorthand = z.string().label("label");
 
     expect(labelShorthand.getFormMeta().label).toBe("label");
+
+    const nullableAndUnwrap = z.string().nullable().label("label").unwrap();
+    expect(nullableAndUnwrap.getFormMeta().label).toBe("label");
   });
 
   it("get initial output correctly", () => {
