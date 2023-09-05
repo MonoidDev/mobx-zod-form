@@ -87,6 +87,9 @@ export class MobxZodForm<T extends MobxZodTypes> {
 
     this._rawInput = this.schemaFormMeta.encode(this.options.initialOutput);
 
+    // To work around 'Field not found' when compiled to cjs by tsup.
+    this.root = undefined as any;
+
     makeObservable(this, {
       _rawInput: observable,
       _isDirty: observable,
