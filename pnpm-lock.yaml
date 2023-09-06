@@ -109,7 +109,7 @@ importers:
   packages/mobx-zod-form-react:
     dependencies:
       '@monoid-dev/mobx-zod-form':
-        specifier: ^0.9.10
+        specifier: ^0.9.11
         version: link:../mobx-zod-form
       mobx:
         specifier: ^6.8.0

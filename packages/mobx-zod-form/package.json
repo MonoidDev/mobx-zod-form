@@ -1,6 +1,6 @@
 {
   "name": "@monoid-dev/mobx-zod-form",
-  "version": "0.9.10",
+  "version": "0.9.11",
   "keywords": [
     "form",
     "zod",
@@ -31,7 +31,7 @@
   },
   "scripts": {
     "dev": "tsx src/index.ts",
-    "build": "tsup src/index.ts --format esm,cjs --splitting -d lib/ && tsc -p tsconfig.build.json",
+    "build": "tsup src/index.ts --format esm,cjs -d lib/ && tsc -p tsconfig.build.json",
     "lint": "tsc && eslint ./src --ext .ts,.tsx",
     "test": "vitest run"
   },
