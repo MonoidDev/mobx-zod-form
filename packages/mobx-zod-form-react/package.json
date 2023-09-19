@@ -1,6 +1,6 @@
 {
   "name": "@monoid-dev/mobx-zod-form-react",
-  "version": "0.9.11",
+  "version": "0.9.12",
   "type": "commonjs",
   "main": "./lib/index.js",
   "module": "./lib/index.mjs",
@@ -28,7 +28,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@monoid-dev/mobx-zod-form": "^0.9.11"
+    "@monoid-dev/mobx-zod-form": "^0.9.12"
   },
   "publishConfig": {
     "access": "public"
@@ -36,13 +36,13 @@
   "peerDependencies": {
     "mobx": "^6.8.0",
     "react": "^18.2.0",
-    "zod": "^3.21.2"
+    "zod": "^3.22.2"
   },
   "devDependencies": {
-    "@testing-library/user-event": "^14.4.3",
-    "@types/node": "^20.2.4",
-    "@types/react": "~18.0.28",
-    "jsdom": "^21.1.1",
+    "@testing-library/user-event": "^14.5.1",
+    "@types/node": "^20.6.2",
+    "@types/react": "~18.0.38",
+    "jsdom": "^21.1.2",
     "mobx-react": "^7.6.0"
   },
   "typedoc": {

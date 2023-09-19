@@ -10,17 +10,17 @@
   "dependencies": {
     "@monoid-dev/mobx-zod-form": "*",
     "@monoid-dev/mobx-zod-form-react": "*",
-    "mobx": "^6.9.0",
+    "mobx": "^6.10.2",
     "mobx-react": "^7.6.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "typedoc": "^0.23.28",
-    "zod": "^3.21.4"
+    "zod": "^3.22.2"
   },
   "devDependencies": {
-    "@types/react": "^18.0.27",
-    "@types/react-dom": "^18.0.10",
+    "@types/react": "^18.2.22",
+    "@types/react-dom": "^18.2.7",
     "@vitejs/plugin-react": "^3.1.0",
-    "vite": "^4.1.0"
+    "vite": "^4.4.9"
   }
 }

@@ -19,20 +19,20 @@
     "@hashicorp/remark-plugins": "^4.1.1",
     "@monoid-dev/mobx-zod-form": "workspace:*",
     "@monoid-dev/mobx-zod-form-react": "workspace:*",
-    "@types/react": "^18.0.28",
-    "@types/react-dom": "^18.0.10",
-    "mobx": "^6.8.0",
+    "@types/react": "^18.2.22",
+    "@types/react-dom": "^18.2.7",
+    "mobx": "^6.10.2",
     "mobx-react": "^7.6.0",
     "remark": "^12.0.1",
     "remark-mdx": "^1.6.22",
     "to-vfile": "^6.1.0",
     "unist-util-flatmap": "^1.0.0",
-    "zod": "^3.21.4"
+    "zod": "^3.22.2"
   },
   "dependencies": {
-    "next": "^13.2.4",
-    "nextra": "^2.2.19",
-    "nextra-theme-docs": "^2.2.19",
+    "next": "^13.4.19",
+    "nextra": "^2.12.3",
+    "nextra-theme-docs": "^2.12.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "typedoc": "^0.23.28"
