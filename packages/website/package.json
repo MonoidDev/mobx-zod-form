@@ -23,7 +23,7 @@
     "@types/react-dom": "^18.2.7",
     "mobx": "^6.10.2",
     "mobx-react": "^7.6.0",
-    "remark": "^12.0.1",
+    "remark": "^15.0.0",
     "remark-mdx": "^1.6.22",
     "to-vfile": "^6.1.0",
     "unist-util-flatmap": "^1.0.0",
