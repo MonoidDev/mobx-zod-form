@@ -34,6 +34,7 @@ export interface SetActionOptions {
 }
 
 export interface MobxZodFormOptions<T extends MobxZodTypes> {
+  id?: string;
   initialOutput?: z.infer<T>;
   validateOnMount?: boolean;
   setActionOptions?: InputSetActionOptions;
@@ -79,6 +80,8 @@ export class MobxZodForm<T extends MobxZodTypes> {
 
   _validationTasks: ValidationTask[] = [];
 
+  id: string;
+
   constructor(
     public readonly schema: T,
     public readonly _options: MobxZodFormOptions<T> = {},
@@ -89,6 +92,7 @@ export class MobxZodForm<T extends MobxZodTypes> {
 
     // To work around 'Field not found' when compiled to cjs by tsup.
     this.root = undefined as any;
+    this.id = this._options.id ?? "";
 
     makeObservable(this, {
       _rawInput: observable,

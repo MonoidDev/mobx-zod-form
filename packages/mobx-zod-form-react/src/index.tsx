@@ -1,12 +1,18 @@
-import React, { useMemo, useEffect, useContext } from "react";
+import React, { useMemo, useEffect, useContext, useId } from "react";
 
 import { MobxZodField, type MobxZodTypes } from "@monoid-dev/mobx-zod-form";
 import { ZodTypeAny } from "zod";
 
 import { NotReactFormField } from "./errors";
+import { HydrateMobxZodForm, getHydrateScript } from "./HydrateMobxZodForm";
 import { ReactForm, ReactFormOptions } from "./ReactForm";
 
-export { ReactForm, type ReactFormOptions };
+export {
+  ReactForm,
+  type ReactFormOptions,
+  HydrateMobxZodForm,
+  getHydrateScript,
+};
 
 /**
  * The most usual way to initialize a form in a React functional component.
@@ -21,9 +27,12 @@ export const useForm = <T extends MobxZodTypes>(
 ) => {
   const defaultOptions = useFormOptionsContext();
 
+  const id = useId();
+
   const form = useMemo(
     () =>
       new ReactForm(schema, {
+        id,
         ...defaultOptions,
         ...options,
         setActionOptions: {

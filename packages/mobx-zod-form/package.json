@@ -1,6 +1,6 @@
 {
   "name": "@monoid-dev/mobx-zod-form",
-  "version": "0.9.12",
+  "version": "0.10.0",
   "keywords": [
     "form",
     "zod",
@@ -35,7 +35,6 @@
     "lint": "tsc && eslint ./src --ext .ts,.tsx",
     "test": "vitest run"
   },
-  "devDependencies": {},
   "publishConfig": {
     "access": "public"
   },

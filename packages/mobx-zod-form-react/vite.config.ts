@@ -1,6 +1,11 @@
 export default {
   test: {
-    environment: 'jsdom',
-    setupFiles: './test/setup.ts',
-  }
-}
+    environment: "jsdom",
+    environmentOptions: {
+      jsdom: {
+        runScripts: "dangerously",
+      },
+    },
+    setupFiles: "./test/setup.ts",
+  },
+};

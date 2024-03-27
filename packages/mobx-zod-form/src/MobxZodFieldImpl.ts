@@ -8,6 +8,7 @@ import type {
 } from "zod";
 
 import { FormMeta } from "./FormMeta";
+import { getUniqueId } from "./getUnqiueId";
 import { parseResultValueEqual } from "./js-utils";
 import {
   createFieldForType,
@@ -42,7 +43,7 @@ export class MobxZodBaseFieldImpl<T extends MobxZodTypes>
 
   static curUniqueId = 0;
 
-  uniqueId = ++MobxZodArrayFieldImpl.curUniqueId;
+  uniqueId: number;
 
   public readonly effects?: MobxZodEffects;
 
@@ -52,6 +53,7 @@ export class MobxZodBaseFieldImpl<T extends MobxZodTypes>
     public path: ParsePath,
   ) {
     this.formMeta = this.type.getFormMeta();
+    this.uniqueId = getUniqueId(form.id, path);
     makeObservable(this, {
       _issues: observable,
       _errorMessages: observable,
