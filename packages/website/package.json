@@ -35,6 +35,6 @@
     "nextra-theme-docs": "^2.12.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "typedoc": "^0.23.28"
+    "typedoc": "^0.25.0"
   }
 }
