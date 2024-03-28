@@ -55,7 +55,7 @@ export interface MobxZodField<T extends ZodTypeAny> {
    * An id uniquely identifies the field across the form.
    * Useful for SSR and tracking array field elements.
    */
-  readonly uniqueId: number;
+  readonly uniqueId: string;
   /**
    * See `FormMeta`.
    */

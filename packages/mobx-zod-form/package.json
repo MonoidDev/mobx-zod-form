@@ -1,6 +1,6 @@
 {
   "name": "@monoid-dev/mobx-zod-form",
-  "version": "0.10.0",
+  "version": "0.11.0",
   "keywords": [
     "form",
     "zod",

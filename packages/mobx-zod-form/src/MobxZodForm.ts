@@ -82,6 +82,8 @@ export class MobxZodForm<T extends MobxZodTypes> {
 
   id: string;
 
+  _curFieldUniqueId = 0;
+
   constructor(
     public readonly schema: T,
     public readonly _options: MobxZodFormOptions<T> = {},
@@ -116,6 +118,10 @@ export class MobxZodForm<T extends MobxZodTypes> {
     if (this.options.validateOnMount) {
       this.validate();
     }
+  }
+
+  getFieldUniqueId() {
+    return `${this.id}${++this._curFieldUniqueId}`;
   }
 
   flushValidationTasks() {

@@ -1,4 +1,3 @@
-import { HydrateMobxZodForm } from "@monoid-dev/mobx-zod-form-react";
 import {
   Links,
   Meta,
@@ -20,7 +19,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
         {children}
         <ScrollRestoration />
         <Scripts />
-        <HydrateMobxZodForm />
       </body>
     </html>
   );

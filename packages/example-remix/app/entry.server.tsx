@@ -6,14 +6,11 @@
 
 import { PassThrough } from "node:stream";
 
-import { createMobxZodFormLocalStorage } from "@monoid-dev/mobx-zod-form";
 import type { AppLoadContext, EntryContext } from "@remix-run/node";
 import { createReadableStreamFromReadable } from "@remix-run/node";
 import { RemixServer } from "@remix-run/react";
 import { isbot } from "isbot";
 import { renderToPipeableStream } from "react-dom/server";
-
-import { asyncLocalStorage } from "./mobx-zod-form";
 
 const ABORT_DELAY = 5_000;
 
@@ -27,21 +24,19 @@ export default function handleRequest(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   loadContext: AppLoadContext,
 ) {
-  return asyncLocalStorage.run(createMobxZodFormLocalStorage(), async () =>
-    isbot(request.headers.get("user-agent") || "")
-      ? handleBotRequest(
-          request,
-          responseStatusCode,
-          responseHeaders,
-          remixContext,
-        )
-      : handleBrowserRequest(
-          request,
-          responseStatusCode,
-          responseHeaders,
-          remixContext,
-        ),
-  );
+  return isbot(request.headers.get("user-agent") || "")
+    ? handleBotRequest(
+        request,
+        responseStatusCode,
+        responseHeaders,
+        remixContext,
+      )
+    : handleBrowserRequest(
+        request,
+        responseStatusCode,
+        responseHeaders,
+        remixContext,
+      );
 }
 
 function handleBotRequest(
