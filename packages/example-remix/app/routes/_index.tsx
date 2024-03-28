@@ -1,11 +1,16 @@
 import { Suspense, useEffect, useState } from "react";
 
-import { MobxZodField } from "@monoid-dev/mobx-zod-form";
+import {
+  MobxZodField,
+  extendZodWithMobxZodForm,
+} from "@monoid-dev/mobx-zod-form";
 import { getForm, useForm } from "@monoid-dev/mobx-zod-form-react";
 import { defer, type MetaFunction } from "@remix-run/node";
 import { Await, useLoaderData } from "@remix-run/react";
 import { observer } from "mobx-react";
 import { z, type ZodString } from "zod";
+
+extendZodWithMobxZodForm(z);
 
 export const loader = () => {
   return defer({
@@ -69,9 +74,7 @@ function DeferredForm() {
     <Suspense fallback="loading...">
       <Await resolve={p}>
         <div>
-          A defered form. This is expected to have hydration errors. Because
-          currently there's no way for us to known the ids on the server as we
-          stream.
+          A defered form
           <SimpleForm />
           <script
             dangerouslySetInnerHTML={{ __html: 'console.log("fuck you")' }}

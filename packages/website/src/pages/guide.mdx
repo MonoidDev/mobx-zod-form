@@ -318,6 +318,25 @@ For more, please check the `MobxZodPlugin` type and the API reference.
 
 Please notice that plugins are not meant to intercept the validation results provided by Zod. To achieve that, use the original `superRefine` method.
 
+### Server-side Rendering
+
+Invoking `form.bindField` introduces unique `id` to each field, which is passed to HTML properties. This renders something like:
+
+```html
+<input name="search" id="search__:R3l8p:2" type="text">
+```
+
+The tail part `:R3l8p:2` is ensured to be unique.
+
+Normally, you don't need to worry about the sameness of the random id on the server and client, because we use [useId](https://react.dev/reference/react/useId) from react 18 to ensure that, inside the body of `useForm`.
+
+Not being a part of the public API, but the unique part is comprised of the result of `useId` and the order of the field created on the server. As long as you create the same form on the server and client during the first rendering, there is no mismatch.
+
+```
+<useId><order>
+```
+
+However, if you are using `MobxZodForm` directly, you would better provide an SSR-safe `id` to its `option` if you are doing SSR.
 
 ## Advanced Usages
 
