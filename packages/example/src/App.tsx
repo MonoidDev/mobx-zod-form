@@ -7,6 +7,7 @@ import {
   MobxZodObjectField,
   mapDecodeResult,
 } from "@monoid-dev/mobx-zod-form";
+import { ObjectInput } from "@monoid-dev/mobx-zod-form-input";
 import {
   FormContextProvider,
   getForm,
@@ -474,6 +475,44 @@ const ExtraErrorMessages = observer(() => {
   );
 });
 
+const AutoForm: React.FC = () => {
+  const form = useForm(
+    z.object({
+      string: z.string().min(1),
+      number: z.string().min(1),
+      nested: z.object({
+        string: z.string().min(1),
+        number: z.string().min(1),
+        nested: z.object({
+          string: z.string().min(1),
+          number: z.string().min(1),
+        }),
+      }),
+      enum: z.enum(["a", "b", "c"]),
+    }),
+  );
+
+  return (
+    <form
+      {...form.bindForm({
+        onSubmit(value) {
+          alert(JSON.stringify(value));
+        },
+        onSubmitError(e) {
+          console.error(e);
+        },
+      })}
+      style={{
+        border: `1px solid black`,
+        padding: "1rem",
+      }}
+    >
+      <ObjectInput field={form.root} />
+      <button type="submit">Submit</button>
+    </form>
+  );
+};
+
 function App() {
   return (
     <div className="App">
@@ -490,6 +529,8 @@ function App() {
       <OptionalField />
       <TextAreaForm />
       <ExtraErrorMessages />
+
+      <AutoForm />
     </div>
   );
 }

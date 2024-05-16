@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "outDir": "lib",
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "noEmit": false,
+    "types": ["node"]
+  },
+  "include": ["src"],
+  "extends": "./tsconfig.json"
+}

@@ -60,11 +60,14 @@ importers:
   packages/example:
     dependencies:
       '@monoid-dev/mobx-zod-form':
-        specifier: '*'
-        version: 0.11.0(mobx@6.12.3)(zod@3.23.8)
+        specifier: workspace:*
+        version: link:../mobx-zod-form
+      '@monoid-dev/mobx-zod-form-input':
+        specifier: workspace:*
+        version: link:../mobx-zod-form-input
       '@monoid-dev/mobx-zod-form-react':
-        specifier: '*'
-        version: 0.11.0(mobx@6.12.3)(react@18.3.1)(zod@3.23.8)
+        specifier: workspace:*
+        version: link:../mobx-zod-form-react
       mobx:
         specifier: ^6.10.2
         version: 6.12.3
@@ -188,11 +191,51 @@ importers:
         specifier: ^3.22.2
         version: 3.23.8
 
+  packages/mobx-zod-form-input:
+    dependencies:
+      '@monoid-dev/mobx-zod-form':
+        specifier: workspace:*
+        version: link:../mobx-zod-form
+      '@monoid-dev/mobx-zod-form-react':
+        specifier: workspace:*
+        version: link:../mobx-zod-form-react
+      mobx:
+        specifier: ^6.8.0
+        version: 6.12.3
+      react:
+        specifier: ^18.2.0
+        version: 18.3.1
+      zod:
+        specifier: ^3.22.2
+        version: 3.23.8
+    devDependencies:
+      '@testing-library/user-event':
+        specifier: ^14.5.1
+        version: 14.5.2(@testing-library/dom@9.3.4)
+      '@types/node':
+        specifier: ^20.6.2
+        version: 20.12.12
+      '@types/react':
+        specifier: ^18.2.22
+        version: 18.3.2
+      '@types/react-dom':
+        specifier: ^18.2.7
+        version: 18.3.0
+      jsdom:
+        specifier: ^21.1.2
+        version: 21.1.2
+      mobx-react:
+        specifier: ^7.6.0
+        version: 7.6.0(mobx@6.12.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      react-dom:
+        specifier: ^18.2.0
+        version: 18.3.1(react@18.3.1)
+
   packages/mobx-zod-form-react:
     dependencies:
       '@monoid-dev/mobx-zod-form':
-        specifier: ^0.11.0
-        version: 0.11.0(mobx@6.12.3)(zod@3.23.8)
+        specifier: workspace:*
+        version: link:../mobx-zod-form
       mobx:
         specifier: ^6.8.0
         version: 6.12.3

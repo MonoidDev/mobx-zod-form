@@ -8,8 +8,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@monoid-dev/mobx-zod-form": "*",
-    "@monoid-dev/mobx-zod-form-react": "*",
+    "@monoid-dev/mobx-zod-form": "workspace:*",
+    "@monoid-dev/mobx-zod-form-react": "workspace:*",
+    "@monoid-dev/mobx-zod-form-input": "workspace:*",
     "mobx": "^6.10.2",
     "mobx-react": "^7.6.0",
     "react": "^18.2.0",
