@@ -10,4 +10,5 @@ module.exports = require("nextra")({
   images: {
     unoptimized: true,
   },
+  output: "export",
 });

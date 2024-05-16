@@ -1,5 +1,9 @@
 {
   "navigationLinks": {
     "Documentation": "/"
-  }
+  },
+  "entryPoints": ["../mobx-zod-form", "../mobx-zod-form-react"],
+  "entryPointStrategy": "packages",
+  "name": "Mobx Zod Form",
+  "out": "./out/api-reference"
 }

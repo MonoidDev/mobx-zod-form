@@ -1,6 +1,15 @@
-typedoc ../mobx-zod-form/src/index.ts ../mobx-zod-form-react/src/index.ts \
-  --entryPointStrategy packages ../.. \
-  --out out/api-reference \
-  --readme none \
-  --options typedoc.json \
-  --name 'Mobx Zod Form'
+packages=("mobx-zod-form" "mobx-zod-form-react")
+
+for package in ${packages[@]}; do
+  echo $package
+  cd ../$package
+  typedoc . \
+    --entryPointStrategy packages \
+    --tsconfig ../mobx-zod-form/tsconfig.json \
+    --out out/docs \
+    --readme none \
+    --name 'Mobx Zod Form'
+  cd -
+done
+
+typedoc

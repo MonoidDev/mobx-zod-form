@@ -41,8 +41,5 @@
   "peerDependencies": {
     "mobx": "^6.8.0",
     "zod": "^3.22.2"
-  },
-  "typedoc": {
-    "entryPoint": "./src/index.ts"
   }
 }
