@@ -1,6 +1,6 @@
 {
   "name": "@monoid-dev/mobx-zod-form-input",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "type": "commonjs",
   "main": "./lib/index.js",
   "module": "./lib/index.mjs",

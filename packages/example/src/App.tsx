@@ -479,16 +479,39 @@ const AutoForm: React.FC = () => {
   const form = useForm(
     z.object({
       string: z.string().min(1),
-      number: z.string().min(1),
+      number: z.number().min(1),
       nested: z.object({
         string: z.string().min(1),
-        number: z.string().min(1),
+        number: z.number().min(1),
         nested: z.object({
           string: z.string().min(1),
-          number: z.string().min(1),
+          number: z.number().min(1),
         }),
       }),
+      partialString: z.string().optional(),
+      partialNumber: z.number().optional(),
       enum: z.enum(["a", "b", "c"]),
+      traderOptions: z
+        .object({
+          priceWindowSize: z.object({
+            A: z.number(),
+            B: z.number(),
+            C: z.number(),
+          }),
+          priceStability: z.enum(["all", "first-last", "profit-incremental"]),
+          pollInterval: z.number(),
+          lots: z.number(),
+          coolDownTime: z.number(),
+          minimumProfit: z.object({
+            open: z.number(),
+            close: z.number(),
+          }),
+          minimumMarginLevel: z.number(),
+          checkTraderStatesPeriod: z.number(),
+          tradeStrategy: z.enum(["a-first", "concurrent"]),
+          logInfo: z.boolean(),
+        })
+        .partial(),
     }),
   );
 
