@@ -1,5 +1,6 @@
 import { MobxZodField } from "@monoid-dev/mobx-zod-form";
 import {
+  ZodBoolean,
   ZodEnum,
   ZodNullable,
   ZodNumber,
@@ -9,6 +10,7 @@ import {
   ZodTypeAny,
 } from "zod";
 
+import { BooleanInput } from "./BooleanInput";
 import { EnumInput } from "./EnumInput";
 import { NumberInput } from "./NumberInput";
 import { ObjectInput } from "./ObjectInput";
@@ -30,6 +32,8 @@ export const AnyInput: React.FC<{
     <OmittableInput field={field as any} />
   ) : field.type instanceof ZodNullable ? (
     <OmittableInput field={field as any} />
+  ) : field.type instanceof ZodBoolean ? (
+    <BooleanInput field={field as any} />
   ) : (
     <div>Unsupported field type</div>
   );

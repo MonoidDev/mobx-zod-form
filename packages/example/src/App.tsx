@@ -475,7 +475,7 @@ const ExtraErrorMessages = observer(() => {
   );
 });
 
-const AutoForm: React.FC = () => {
+const AutoForm: React.FC = observer(() => {
   const form = useForm(
     z.object({
       string: z.string().min(1),
@@ -534,7 +534,7 @@ const AutoForm: React.FC = () => {
       <button type="submit">Submit</button>
     </form>
   );
-};
+});
 
 function App() {
   return (
