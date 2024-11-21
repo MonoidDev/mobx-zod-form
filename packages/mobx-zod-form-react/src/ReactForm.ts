@@ -1,4 +1,5 @@
 import {
+  isDiscriminatorType,
   MobxZodField,
   unwrapZodType,
   type MobxZodTypes,
@@ -164,7 +165,8 @@ export class ReactForm<T extends MobxZodTypes> extends MobxZodForm<T> {
             fieldType instanceof ZodString ||
             fieldType instanceof ZodBoolean ||
             fieldType instanceof ZodNumber ||
-            fieldType instanceof ZodEnum
+            fieldType instanceof ZodEnum ||
+            isDiscriminatorType(fieldType)
           ) {
             return {
               checked:

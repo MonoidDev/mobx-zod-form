@@ -129,22 +129,31 @@ export type DiscriminatorType<T extends MobxZodDiscriminatedUnion> = ZodType<
 export const discriminatorType = <T extends MobxZodDiscriminatedUnion>(
   type: T,
 ): DiscriminatorType<T> => {
-  const result = z
-    .custom<MobxZodDiscriminatedUnionFieldTypes<T>["_discriminatorOutput"]>()
-    .superRefine((arg, ctx) => {
-      // @see https://github.com/colinhacks/zod/blob/6dad90785398885f7b058f5c0760d5ae5476b833/src/types.ts#L2929
+  const innerType =
+    z.custom<MobxZodDiscriminatedUnionFieldTypes<T>["_discriminatorOutput"]>();
 
-      if (!type.optionsMap.get(arg)) {
-        ctx.addIssue({
-          code: ZodIssueCode.invalid_union_discriminator,
-          options: Array.from(type.optionsMap.keys()),
-          path: [type.discriminator],
-        });
-        return z.INVALID;
-      }
-    });
+  (innerType._def as any).__isDiscriminatorType = true;
+
+  const result = innerType.superRefine((arg, ctx) => {
+    // @see https://github.com/colinhacks/zod/blob/6dad90785398885f7b058f5c0760d5ae5476b833/src/types.ts#L2929
+
+    if (!type.optionsMap.get(arg)) {
+      ctx.addIssue({
+        code: ZodIssueCode.invalid_union_discriminator,
+        options: Array.from(type.optionsMap.keys()),
+        path: [type.discriminator],
+      });
+      return z.INVALID;
+    }
+  });
 
   return result;
+};
+
+export const isDiscriminatorType = (
+  t: ZodTypeAny,
+): t is DiscriminatorType<MobxZodDiscriminatedUnion> => {
+  return (unwrapZodType(t)._def as any).__isDiscriminatorType === true;
 };
 
 export const unwrapZodType = (t: ZodTypeAny): ZodTypeAny => {

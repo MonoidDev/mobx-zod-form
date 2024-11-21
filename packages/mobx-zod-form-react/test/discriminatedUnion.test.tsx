@@ -53,6 +53,28 @@ const DiscrimiatedUnionForm = observer(() => {
         <option value="paypal">paypal</option>
       </select>
 
+      <label>
+        <input
+          type="radio"
+          {...form.bindField(payment.discriminatorField, {
+            type: "radio",
+            value: "credit_card",
+          })}
+        />
+        credit_card
+      </label>
+
+      <label>
+        <input
+          type="radio"
+          {...form.bindField(payment.discriminatorField, {
+            type: "radio",
+            value: "paypal",
+          })}
+        />
+        paypal
+      </label>
+
       {payment.fieldsResult.success && (
         <>
           {payment.fieldsResult.fields.discriminator === "credit_card" && (
@@ -108,7 +130,7 @@ describe("discrimiatedUnion", () => {
     await screen.findByText("String must contain exactly 3 character(s)");
   });
 
-  it("switch", async () => {
+  it("switch by select", async () => {
     render(<DiscrimiatedUnionForm />);
 
     const user = userEvent.setup();
@@ -141,5 +163,17 @@ describe("discrimiatedUnion", () => {
     // Click away
     await user.click(document.body);
     await screen.findByText("String must contain exactly 3 character(s)");
+  });
+
+  it("switch by radio", async () => {
+    render(<DiscrimiatedUnionForm />);
+
+    userEvent.setup();
+
+    await userEvent.click(await screen.findByLabelText("paypal"));
+
+    await screen.findByText("paypal", {
+      selector: "h3",
+    });
   });
 });
