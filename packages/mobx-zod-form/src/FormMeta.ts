@@ -67,6 +67,13 @@ export const mapDecodeResult = <RawInput, Decoded, O>(
   }
 };
 
+export const decodeResultIsSuccessfulAnd = <RawInput, Decoded>(
+  result: SafeDecodeResult<RawInput, Decoded>,
+  predicate: (data: Decoded) => boolean,
+) => {
+  return result.success && predicate(result.data);
+};
+
 export const getDecodeResult = <RawInput, Decoded>(
   result: SafeDecodeResult<RawInput, Decoded>,
 ) => getDecodeResultOr(result, undefined);

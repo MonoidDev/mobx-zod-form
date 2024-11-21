@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { z } from "zod";
 
 import { setup } from "./utils";
+import { decodeResultIsSuccessfulAnd } from "../src";
 
 setup();
 
@@ -90,5 +91,37 @@ describe("formMeta tests", () => {
         .getFormMeta()
         .getInitialOutput(),
     ).toBe("jp");
+  });
+});
+
+describe("DecodeResult utility functions", () => {
+  it("decodeResultIsSuccessfulAnd", () => {
+    expect(
+      decodeResultIsSuccessfulAnd(
+        { success: true, data: 1 },
+        (d: number) => d < 42,
+      ),
+    ).toBe(true);
+
+    expect(
+      decodeResultIsSuccessfulAnd(
+        { success: false, input: 1 },
+        (d: number) => d < 42,
+      ),
+    ).toBe(false);
+
+    expect(
+      decodeResultIsSuccessfulAnd(
+        { success: true, data: 1 },
+        (d: number) => d >= 42,
+      ),
+    ).toBe(false);
+
+    expect(
+      decodeResultIsSuccessfulAnd(
+        { success: false, input: 1 },
+        (d: number) => d >= 42,
+      ),
+    ).toBe(false);
   });
 });

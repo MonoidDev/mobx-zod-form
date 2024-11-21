@@ -28,6 +28,11 @@ jobs:
       - run:
           name: Run Tests
           command: |
+            npx nx run-many --target=test
+      
+      - run:
+          name: Build All
+          command: |
             npx nx run-many --target=build
       - run:
           name: Publish All
