@@ -24,16 +24,15 @@ jobs:
           name: Save pnpm Package Cache
           key: pnpm-packages-{{ checksum "pnpm-lock.yaml" }}
           paths:
-            - node_modules
-      - run:
-          name: Run Tests
-          command: |
-            npx nx run-many --target=test
-      
+            - node_modules    
       - run:
           name: Build All
           command: |
             npx nx run-many --target=build
+      - run:
+          name: Run Tests
+          command: |
+            npx nx run-many --target=test
       - run:
           name: Publish All
           command: |
