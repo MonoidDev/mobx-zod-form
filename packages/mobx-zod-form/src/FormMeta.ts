@@ -16,6 +16,7 @@ import {
 
 import { MobxFatalError, MobxZodDecodeError } from "./errors";
 import { MobxZodBox, unwrapZodType } from "./zod-extra";
+import { ExcludeNeverArray } from "./type-utils";
 
 export type SafeDecodeResultSuccess<Decoded> = {
   success: true;
@@ -59,7 +60,7 @@ export const mapDecodeResult = <RawInput, Decoded, O>(
   result: SafeDecodeResult<RawInput, Decoded>,
   mapper: (data: Decoded) => O,
   defaultValue: O,
-) => {
+): O => {
   if (result.success) {
     return mapper(result.data);
   } else {
@@ -82,10 +83,10 @@ export const getDecodeResultOr = <RawInput, Decoded, O>(
   result: SafeDecodeResult<RawInput, Decoded>,
   defaultValue: O,
 ) =>
-  mapDecodeResult<RawInput, Decoded, Decoded | O>(
+  mapDecodeResult<RawInput, Decoded, Decoded | ExcludeNeverArray<O>>(
     result,
     (v) => v,
-    defaultValue,
+    defaultValue as any,
   );
 
 export const decodeResultEqual = <RawInput, Decoded>(

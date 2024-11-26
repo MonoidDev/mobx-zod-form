@@ -2,7 +2,11 @@ import { describe, expect, it } from "vitest";
 import { z } from "zod";
 
 import { setup } from "./utils";
-import { decodeResultIsSuccessfulAnd } from "../src";
+import {
+  decodeResultIsSuccessfulAnd,
+  getDecodeResult,
+  getDecodeResultOr,
+} from "../src";
 
 setup();
 
@@ -123,5 +127,17 @@ describe("DecodeResult utility functions", () => {
         (d: number) => d >= 42,
       ),
     ).toBe(false);
+  });
+
+  it("getDecodeResultOr", () => {
+    expect(
+      getDecodeResultOr(
+        {
+          success: true,
+          data: ["a"],
+        },
+        [],
+      ),
+    );
   });
 });
