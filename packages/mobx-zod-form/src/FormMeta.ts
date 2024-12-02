@@ -15,8 +15,8 @@ import {
 } from "zod";
 
 import { MobxFatalError, MobxZodDecodeError } from "./errors";
-import { MobxZodBox, unwrapZodType } from "./zod-extra";
 import { ExcludeNeverArray } from "./type-utils";
+import { MobxZodBox, unwrapZodType } from "./zod-extra";
 
 export type SafeDecodeResultSuccess<Decoded> = {
   success: true;
@@ -449,10 +449,18 @@ export const resolveDOMFormMeta = (type: ZodTypeAny): FormMeta => {
         }
 
         return Object.fromEntries(
-          Object.entries(type.shape).map(([key, value]) => [
-            key,
-            resolveDOMFormMeta(value as any).encode(output[key]),
-          ]),
+          Object.entries(type.shape).map(([key, memberType]) => {
+            const memberOutput = isPartialOutput(output)
+              ? key in output.partialValues
+                ? output.partialValues[key]
+                : empty
+              : output[key];
+
+            return [
+              key,
+              resolveDOMFormMeta(memberType as any).encode(memberOutput),
+            ];
+          }),
         );
       } else if (type instanceof ZodArray) {
         if (output === empty) {
@@ -481,6 +489,12 @@ export const resolveDOMFormMeta = (type: ZodTypeAny): FormMeta => {
         }
 
         return output;
+      }
+
+      if (isPartialOutput(output)) {
+        throw new MobxFatalError(
+          `${type.constructor.name} cannot encode PartialOutput`,
+        );
       }
 
       throw new MobxFatalError(
@@ -534,3 +548,20 @@ export const resolveDOMFormMeta = (type: ZodTypeAny): FormMeta => {
 };
 
 export const empty = Symbol("empty") as any;
+
+export type PartialOutput = {
+  __partialOutput: true;
+  partialValues: Record<string, any>;
+};
+
+export const isPartialOutput = (value: any): value is PartialOutput =>
+  value?.__partialOutput === true;
+
+export const partial = <T>(partialValues: Partial<NoInfer<T>>): T => {
+  const partialOutput: PartialOutput = {
+    __partialOutput: true,
+    partialValues,
+  };
+
+  return partialOutput as any;
+};

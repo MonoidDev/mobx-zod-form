@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { z, ZodError } from "zod";
 
 import { setup } from "./utils";
-import { resolveDOMFormMeta, MobxZodObjectField, empty } from "../src";
+import { resolveDOMFormMeta, MobxZodObjectField, empty, partial } from "../src";
 import { MobxZodForm } from "../src/MobxZodForm";
 import { discriminatorType } from "../src/zod-extra";
 
@@ -378,6 +378,21 @@ describe("field tests", () => {
         .getFormMeta()
         .encode({ a: "a", b: "b" }),
     ).toMatchObject({ a: "a", b: "b" });
+
+    // partial
+    expect(
+      z
+        .object({
+          a: z.string(),
+          b: z.string(),
+        })
+        .getFormMeta()
+        .encode(
+          partial({
+            a: "a",
+          }),
+        ),
+    ).toMatchObject({ a: "a", b: "" });
   });
 
   it("should get initial output", () => {

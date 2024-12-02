@@ -6,6 +6,7 @@ import {
   extendZodWithMobxZodForm,
   MobxZodObjectField,
   mapDecodeResult,
+  partial,
 } from "@monoid-dev/mobx-zod-form";
 import { ObjectInput } from "@monoid-dev/mobx-zod-form-input";
 import {
@@ -16,10 +17,9 @@ import {
 } from "@monoid-dev/mobx-zod-form-react";
 import { observer } from "mobx-react";
 import { z, ZodTypeAny } from "zod";
+import "./App.css";
 
 extendZodWithMobxZodForm(z);
-
-import "./App.css";
 
 const TextInput = observer(({ field }: { field: MobxZodField<ZodTypeAny> }) => {
   const form = getForm(field);
@@ -536,6 +536,28 @@ const AutoForm: React.FC = observer(() => {
   );
 });
 
+const PartialInitialOutput = () => {
+  const form = useForm(
+    z.object({
+      username: z.string().min(1),
+      password: z.string().min(6),
+    }),
+    {
+      validateOnMount: true,
+      initialOutput: partial({
+        username: "admin",
+      }),
+    },
+  );
+
+  return (
+    <div style={{ border: `1px solid black` }}>
+      <TextInput field={form.root.fields.username} />
+      <TextInput field={form.root.fields.password} />
+    </div>
+  );
+};
+
 function App() {
   return (
     <div className="App">
@@ -552,6 +574,7 @@ function App() {
       <OptionalField />
       <TextAreaForm />
       <ExtraErrorMessages />
+      <PartialInitialOutput />
 
       <AutoForm />
     </div>

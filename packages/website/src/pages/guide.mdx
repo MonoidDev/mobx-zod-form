@@ -174,7 +174,7 @@ because we are using DOM to store our values.
 
 #### Empty Token
 
-Use the empty token to represent an "emptyish" value, which will be encoded as "empty" according to the type at its position. Not necessarily a valid raw input. 
+Use the `empty` token to represent an "emptyish" value, which will be encoded as "empty" according to the type at its position. Not necessarily a valid raw input. 
 
 ```tsx
 @include "../components/examples/guide-empty.tsx"
@@ -195,6 +195,23 @@ Use the empty token to represent an "emptyish" value, which will be encoded as "
 | ZodEffects | Inner type's emtyish value | - |
 | MobxZodBox | `undefined` | `undefined`
 
+#### Partial Token
+
+Use the `partial` token to partially determine the initial values of an object, leaving other fields using `empty`. `partial` does not work for types other than objects.
+
+It is useful when you have a complicated object but just a couple of fields have their initial output.
+
+```tsx
+@include "../components/examples/guide-partial.tsx"
+```
+
+<Callout>
+  In the type definition, we have `empty: any` and `partial: <T>(partialValues: Partial<NoInfer<T>>) => T`. However, the types are only valid under the context of passing as output. The runtime type of `empty` and `partial()` is internal to the user.
+
+  Sadly, there are no typing to prevent you from using them elsewhere.
+
+  For example, you can write `customStuff(partial({ name: 'Example Name' }))` without type errors, but it goes wrong in runtime, because `partial` returns a token holding internal value instead of real `T`.
+</Callout>
 
 ### Touched and Error Messages
 

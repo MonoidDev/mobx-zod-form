@@ -2,11 +2,7 @@ import { describe, expect, it } from "vitest";
 import { z } from "zod";
 
 import { setup } from "./utils";
-import {
-  decodeResultIsSuccessfulAnd,
-  getDecodeResult,
-  getDecodeResultOr,
-} from "../src";
+import { decodeResultIsSuccessfulAnd, getDecodeResultOr } from "../src";
 
 setup();
 
