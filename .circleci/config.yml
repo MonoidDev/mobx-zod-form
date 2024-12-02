@@ -3,7 +3,7 @@ version: 2.1
 jobs:
   publish: # this can be any name you choose
     docker:
-      - image: node:19
+      - image: node:19.9.0
 
     steps:
       - checkout
