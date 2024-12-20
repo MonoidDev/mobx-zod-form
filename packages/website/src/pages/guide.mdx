@@ -262,7 +262,7 @@ Types are mapped to fields with default rules. For atomic types, i.e. `ZodString
 
 #### MobxZodField
 
-The following types are mapped to an atomic `MobxZodField`.
+The following types are mapped to an atomic `MobxZodField`. Other types are not currently supported and using them result in a runtime error.
 
 1. `ZodString`
 2. `ZodNumber`
@@ -304,8 +304,6 @@ See [interface MobxZodDiscriminatedUnionField](/api-reference/interfaces/_monoid
 
 ### Boxed Fields
 
-A boxed field is treated as an atomic value, as if it is a `string` or `boolean`. That means, even the type represents an `object` or `array`, we don't create subfields for it. This is useful for you to implement your own logic free of the defaults.
-
 Use the `box` extended ZodType method for creating a boxed field.
 
 ```ts
@@ -318,6 +316,12 @@ const form = useForm({
 ```
 
 Then `form.root.fields.file` should of type `MobxZodField`.
+
+The data in the boxed field is treated as an atomic value, as if it is a `string` or `boolean`. That means, even the type represents an `object` or `array`, we don't create subfields for it. This is useful for you to implement your own logic free of the defaults.
+
+Boxed data also escapes decoding and encoding. Therefore, the data inside a box is stored as-is.
+
+The type wrapped inside a `box` does not need to be mapped by Mobx Zod Field otherwise.
 
 ### Plugins
 

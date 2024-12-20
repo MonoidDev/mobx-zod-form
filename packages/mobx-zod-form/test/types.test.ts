@@ -245,8 +245,20 @@ describe("field tests", () => {
     expect(
       z.object({ a: z.number() }).box().getFormMeta().safeDecode(undefined),
     ).toMatchObject({
-      input: undefined,
-      success: false,
+      data: undefined,
+      success: true,
+    });
+
+    // Should decode type we don't handle yet
+    expect(
+      z.record(z.string(), z.number()).box().getFormMeta().safeDecode({
+        a: 1,
+      }),
+    ).toMatchObject({
+      data: {
+        a: 1,
+      },
+      success: true,
     });
   });
 
