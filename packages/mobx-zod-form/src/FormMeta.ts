@@ -437,9 +437,9 @@ export const resolveDOMFormMeta = (type: ZodTypeAny): FormMeta => {
 
         return output;
       } else if (type instanceof ZodObject) {
-        if (output === empty) {
-          const initialOutput = this.getInitialOutput();
+        const initialOutput = this.getInitialOutput();
 
+        if (output === empty) {
           return Object.fromEntries(
             Object.entries(type.shape).map(([key, value]) => [
               key,
@@ -453,7 +453,7 @@ export const resolveDOMFormMeta = (type: ZodTypeAny): FormMeta => {
             const memberOutput = isPartialOutput(output)
               ? key in output.partialValues
                 ? output.partialValues[key]
-                : empty
+                : resolveDOMFormMeta(memberType as any).getInitialOutput()
               : output[key];
 
             return [

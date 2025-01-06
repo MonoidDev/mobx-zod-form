@@ -405,6 +405,16 @@ describe("field tests", () => {
           }),
         ),
     ).toMatchObject({ a: "a", b: "" });
+
+    expect(
+      z
+        .object({
+          a: z.enum(["A", "B"]),
+          b: z.enum(["C", "D"]),
+        })
+        .getFormMeta()
+        .encode(partial({ b: "C" })),
+    ).toMatchObject({ a: "A", b: "C" });
   });
 
   it("should get initial output", () => {

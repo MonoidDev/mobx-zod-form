@@ -198,9 +198,9 @@ Use the `empty` token to represent an "emptyish" value, which will be encoded as
 
 #### Partial Token
 
-Use the `partial` token to partially determine the initial values of an object, leaving other fields using `empty`. `partial` does not work for types other than objects.
+Use the `partial` token to partially determine the initial values of an object, leaving other fields filled with initial output (just like using `empty` for the object). `partial` does not work for types other than objects.
 
-It is useful when you have a complicated object but just a couple of fields have their non-empty initial output.
+It is useful when you have a complicated object, but just a couple of fields have their non-empty initial output.
 
 ```tsx
 @include "../components/examples/guide-partial.tsx"
