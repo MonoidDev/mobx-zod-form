@@ -59,6 +59,7 @@ export class MobxZodBaseFieldImpl<T extends MobxZodTypes>
       _touched: observable,
       _extraErrorMessages: observable,
       rawInput: computed,
+      decodeResult: computed,
       issues: computed,
       touched: computed,
       setRawInput: action,

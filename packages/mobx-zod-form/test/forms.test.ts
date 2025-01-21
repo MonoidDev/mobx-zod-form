@@ -1,4 +1,4 @@
-import { toJS } from "mobx";
+import { runInAction, toJS } from "mobx";
 import { describe, expect, it } from "vitest";
 import { z } from "zod";
 
@@ -619,5 +619,23 @@ describe("form tests", () => {
       form.parsed.success === false &&
         form.parsed.error.issues.map((i) => i.message),
     ).toMatchObject(["Required"]);
+  });
+
+  it("should cache computed values", () => {
+    runInAction(() => {
+      const form = new MobxZodForm(
+        z.object({
+          refined: z.object({}),
+        }),
+      );
+
+      expect(form.root.fields.refined.rawInput).toBe(
+        form.root.fields.refined.rawInput,
+      );
+
+      expect(form.root.fields.refined.decodeResult).toBe(
+        form.root.fields.refined.decodeResult,
+      );
+    });
   });
 });
