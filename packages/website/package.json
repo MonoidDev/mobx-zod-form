@@ -5,6 +5,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    // Fail the deployment
     "test": "echo 'no tests'",
     "dev": "next dev",
     "build:api": "bash scripts/build-api.sh",
