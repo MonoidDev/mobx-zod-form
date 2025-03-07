@@ -75,7 +75,20 @@ export type BindInputOptions =
 export type BindFieldResult = {};
 
 export class ReactForm<T extends MobxZodTypes> extends MobxZodForm<T> {
+  _boundSubmitForm?: (e: React.FormEvent<HTMLFormElement>) => Promise<void>;
+  _submitFuture?: PromiseWithResolvers<void>;
+
   bindForm(options: BindFormOptions<T> = {}): React.ComponentProps<"form"> {
+    this._boundSubmitForm = async (e: React.FormEvent<HTMLFormElement>) => {
+      await this.handleSubmit(async () => {
+        if (this.parsed.success) {
+          await options?.onSubmit?.(this.parsed.data, e);
+        } else {
+          await options?.onSubmitError?.(this.parsed.error, e);
+        }
+      });
+    };
+
     return {
       ref: (element) => {
         this.element = element;
@@ -84,16 +97,36 @@ export class ReactForm<T extends MobxZodTypes> extends MobxZodForm<T> {
         e.preventDefault();
         e.stopPropagation();
 
-        await this.handleSubmit(async () => {
-          if (this.parsed.success) {
-            await options?.onSubmit?.(this.parsed.data, e);
-          } else {
-            await options?.onSubmitError?.(this.parsed.error, e);
-          }
-        });
+        await this._boundSubmitForm!(e).then(
+          () => {
+            this._submitFuture?.resolve();
+          },
+          (e) => {
+            this._submitFuture?.reject(e);
+          },
+        );
       },
       action: "#",
     };
+  }
+
+  /**
+   * Programatically submit the form.
+   *
+   * 1. Triggers a submit event on the form.
+   * 2. Await the submission handler to resolve or reject.
+   */
+  async submitForm() {
+    if (!this._boundSubmitForm || !this.element) {
+      throw new Error("bindForm must be called before submitForm");
+    }
+
+    this._submitFuture = Promise.withResolvers();
+
+    this.element?.dispatchEvent(
+      new Event("submit", { cancelable: true, bubbles: true }),
+    );
+    await this._submitFuture.promise;
   }
 
   static getDomName<T extends ZodTypeAny>(field: MobxZodField<T>) {

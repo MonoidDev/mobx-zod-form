@@ -558,6 +558,45 @@ const PartialInitialOutput = () => {
   );
 };
 
+const SubmitFormTest = () => {
+  const form = useForm(
+    z.object({
+      username: z.string().min(1),
+      password: z.string().min(6),
+    }),
+  );
+
+  return (
+    <form
+      style={{ border: `1px solid black` }}
+      {...form.bindForm({
+        async onSubmit(v) {
+          await new Promise((r) => setTimeout(r, 500));
+          if (v.username === "error") {
+            throw new Error("error from onSubmit");
+          }
+        },
+      })}
+    >
+      <TextInput field={form.root.fields.username} />
+      <TextInput field={form.root.fields.password} />
+
+      <button
+        onClick={async () => {
+          try {
+            await form.submitForm();
+            alert("returned");
+          } catch (e) {
+            alert(String(e));
+          }
+        }}
+      >
+        invoke submitForm
+      </button>
+    </form>
+  );
+};
+
 function App() {
   return (
     <div className="App">
@@ -577,6 +616,7 @@ function App() {
       <PartialInitialOutput />
 
       <AutoForm />
+      <SubmitFormTest />
     </div>
   );
 }
