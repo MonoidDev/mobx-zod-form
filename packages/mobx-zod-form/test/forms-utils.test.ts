@@ -1,10 +1,18 @@
-import { describe, expect, it } from "vitest";
+import { when } from "mobx";
+import { describe, expect, it, beforeAll } from "vitest";
 import { z } from "zod";
 
 import { setup } from "./utils";
 import { MobxZodForm } from "../src";
 
 setup();
+
+beforeAll(() => {
+  globalThis.requestIdleCallback = (cb) => {
+    const id = setTimeout(cb);
+    return id;
+  };
+});
 
 describe("form utils tests", () => {
   it("should set dirty", () => {
@@ -57,4 +65,17 @@ describe("form utils tests", () => {
 
   // TODO:
   it("should handle extra errors", () => {});
+
+  it("should observe isValidationPending", async () => {
+    const form = new MobxZodForm(
+      z.object({
+        username: z.string(),
+      }),
+    );
+    form.start();
+
+    form.root.fields.username.setOutput("abc");
+    expect(form.isValidationPending).toBe(true);
+    await when(() => form.isValidationPending === false);
+  });
 });

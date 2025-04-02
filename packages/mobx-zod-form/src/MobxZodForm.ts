@@ -64,6 +64,8 @@ export class MobxZodForm<T extends MobxZodTypes> {
 
   _isDirty: boolean = false;
 
+  _isValidationPending: boolean = false;
+
   _submitCount: number = 0;
 
   _isSubmitting: boolean = false;
@@ -99,11 +101,13 @@ export class MobxZodForm<T extends MobxZodTypes> {
     makeObservable(this, {
       _rawInput: observable,
       _isDirty: observable,
+      _isValidationPending: observable,
       _submitCount: observable,
       _isSubmitting: observable,
       root: observable,
       _validationTasks: observable,
       isDirty: computed,
+      isValidationPending: computed,
       submitCount: computed,
       isSubmitting: computed,
       input: computed,
@@ -132,7 +136,10 @@ export class MobxZodForm<T extends MobxZodTypes> {
       this._validationTasks.forEach((p) => p.reject?.(e));
       throw e;
     } finally {
-      this._validationTasks.length = 0;
+      runInAction(() => {
+        this._validationTasks.length = 0;
+        this._isValidationPending = false;
+      });
     }
   }
 
@@ -213,6 +220,10 @@ export class MobxZodForm<T extends MobxZodTypes> {
     return this._isDirty;
   }
 
+  get isValidationPending() {
+    return this._isValidationPending;
+  }
+
   get submitCount() {
     return this._submitCount;
   }
@@ -263,6 +274,7 @@ export class MobxZodForm<T extends MobxZodTypes> {
     if (this.resolveCurrentSetActionOptions().validateSync) {
       this.validate();
     } else {
+      this._isValidationPending = true;
       this._validationTasks.push({});
     }
   }
