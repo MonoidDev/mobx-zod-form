@@ -116,7 +116,7 @@ export class ReactForm<T extends MobxZodTypes> extends MobxZodForm<T> {
    * 1. Triggers a submit event on the form.
    * 2. Await the submission handler to resolve or reject.
    */
-  async submitForm() {
+  submitForm = async () => {
     if (!this._boundSubmitForm || !this.element) {
       throw new Error("bindForm must be called before submitForm");
     }
@@ -127,7 +127,7 @@ export class ReactForm<T extends MobxZodTypes> extends MobxZodForm<T> {
       new Event("submit", { cancelable: true, bubbles: true }),
     );
     await this._submitFuture.promise;
-  }
+  };
 
   static getDomName<T extends ZodTypeAny>(field: MobxZodField<T>) {
     return field.path.join(".");
