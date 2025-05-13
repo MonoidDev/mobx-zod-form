@@ -1,8 +1,14 @@
-import { describe, expect, it } from "vitest";
-import { z, ZodError } from "zod";
+import { describe, expect, expectTypeOf, it } from "vitest";
+import { z, ZodError, ZodNumber, ZodString } from "zod";
 
 import { setup } from "./utils";
-import { resolveDOMFormMeta, MobxZodObjectField, empty, partial } from "../src";
+import {
+  resolveDOMFormMeta,
+  MobxZodObjectField,
+  empty,
+  partial,
+  MobxZodField,
+} from "../src";
 import { MobxZodForm } from "../src/MobxZodForm";
 import { discriminatorType } from "../src/zod-extra";
 
@@ -23,6 +29,7 @@ TYPE_TESTS &&
         enum: z.enum(["A", "B", "C"]),
         nullable: z.string().nullable(),
         optional: z.string().optional(),
+        optionalNumber: z.number().optional(),
         transformEffects: z.string().transform((s) => s.length),
         transformEffects2: z
           .string()
@@ -57,6 +64,14 @@ TYPE_TESTS &&
       const _shouldGetOptional: typeof o.fields.optional.type = z
         .string()
         .optional();
+
+      expectTypeOf(o.fields.optional.innerField).toEqualTypeOf<
+        MobxZodField<ZodString>
+      >();
+
+      expectTypeOf(o.fields.optionalNumber.innerField).toEqualTypeOf<
+        MobxZodField<ZodNumber>
+      >();
 
       const _transformEffects: z.ZodEffects<z.ZodString, number, string> =
         o.fields.transformEffects.effects;

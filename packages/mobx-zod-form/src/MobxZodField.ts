@@ -29,7 +29,7 @@ import {
   MobxZodOmittableFieldImpl,
 } from "./MobxZodFieldImpl";
 import { MobxZodForm, InputSetActionOptions } from "./MobxZodForm";
-import { Expand, IdxOf, IsAny } from "./type-utils";
+import { Expand, IdxOf, IsAny, UnwrapZodNullish } from "./type-utils";
 import type {
   MobxOmittableTypes,
   MobxZodArray,
@@ -285,6 +285,16 @@ export type MobxZodOmittableFieldTypes<T extends MobxOmittableTypes> = {
   _innerField: MapZodTypeToField<T["_def"]["innerType"]>;
 };
 
+type _MobxZodOmittableFieldInnerField<
+  T extends MobxOmittableTypes,
+  Default,
+  Inner = UnwrapZodNullish<T>,
+> = Inner extends ZodNumber
+  ? MobxZodField<ZodNumber>
+  : Inner extends ZodString
+  ? MobxZodField<ZodString>
+  : Default;
+
 export interface MobxZodOmittableField<T extends MobxOmittableTypes>
   extends MobxZodField<T> {
   _types: MobxZodOmittableFieldTypes<T>;
@@ -295,7 +305,10 @@ export interface MobxZodOmittableField<T extends MobxOmittableTypes>
    * it is always not undefined,
    * because null or undefined will be encoded to empty string.
    */
-  innerField: this["_types"]["_innerField"] | undefined;
+  innerField: _MobxZodOmittableFieldInnerField<
+    T,
+    this["_types"]["_innerField"]
+  >;
 }
 
 export interface MobxZodOptionalField<T extends MobxOmittableTypes>

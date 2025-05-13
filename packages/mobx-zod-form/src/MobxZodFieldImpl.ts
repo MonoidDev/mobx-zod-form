@@ -1,10 +1,12 @@
 import { action, computed, makeObservable, observable } from "mobx";
-import type {
-  ParsePath,
-  ZodIssue,
-  ZodNullable,
-  ZodOptional,
-  ZodTypeAny,
+import {
+  ZodNumber,
+  ZodString,
+  type ParsePath,
+  type ZodIssue,
+  type ZodNullable,
+  type ZodOptional,
+  type ZodTypeAny,
 } from "zod";
 
 import { FormMeta } from "./FormMeta";
@@ -150,21 +152,28 @@ export class MobxZodOmittableFieldImpl<
     });
   }
 
-  createMaybeInnerField() {
-    if (this.rawInput == null) {
-      return undefined;
-    } else {
-      return createFieldForType(this.type.unwrap(), this.form, this.path);
+  _shouldCreateInnerField() {
+    const innerType = this.type.unwrap();
+
+    if (innerType instanceof ZodString || innerType instanceof ZodNumber) {
+      return true;
     }
+    return this.decodeResult.success && this.decodeResult.data != null;
+  }
+
+  createMaybeInnerField() {
+    return this._shouldCreateInnerField()
+      ? createFieldForType(this.type.unwrap(), this.form, this.path)
+      : undefined;
   }
 
   get innerField() {
-    return this._innerField;
+    return this._innerField as any;
   }
 
   _onInputChange(): void {
     const oldOmitted = this._innerField === undefined;
-    const newOmitted = this.rawInput == null;
+    const newOmitted = !this._shouldCreateInnerField();
 
     if (newOmitted) {
       this._innerField = undefined;

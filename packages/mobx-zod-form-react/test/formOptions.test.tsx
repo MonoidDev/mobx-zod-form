@@ -43,7 +43,7 @@ describe("formOptions", () => {
           <TextInput field={form.root.fields.password} />
           <TextInput field={form.root.fields.age} />
           <TextInput field={form.root.fields.emptyNumber} />
-          <TextInput field={form.root.fields.optionalNumber} />
+          <TextInput field={form.root.fields.optionalNumber.innerField} />
           <TextInput field={form.root.fields.optionalString} />
           <button type="submit">Submit</button>
         </form>
