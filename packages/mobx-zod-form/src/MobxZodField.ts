@@ -307,7 +307,7 @@ export interface MobxZodOmittableField<T extends MobxOmittableTypes>
    */
   innerField: _MobxZodOmittableFieldInnerField<
     T,
-    this["_types"]["_innerField"]
+    this["_types"]["_innerField"] | undefined
   >;
 }
 
