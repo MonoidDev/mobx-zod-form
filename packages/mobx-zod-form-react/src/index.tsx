@@ -45,7 +45,9 @@ export const useForm = <T extends MobxZodTypes>(
 
   useEffect(() => {
     if (options.enableReinitialize && "initialOutput" in options) {
-      form.root.setOutput(options.initialOutput as never);
+      form.withSetActionOptions({ setDirty: false }, () => {
+        form.root.setOutput(options.initialOutput as never);
+      });
     }
   }, [options.initialOutput]);
 

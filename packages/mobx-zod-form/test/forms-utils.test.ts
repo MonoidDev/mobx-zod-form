@@ -29,6 +29,40 @@ describe("form utils tests", () => {
     form.root.fields.username.setOutput("");
 
     expect(form.isDirty).toBe(true);
+
+    form.setDirty(false);
+    expect(form.isDirty).toBe(false);
+
+    form.setDirty(true);
+    expect(form.isDirty).toBe(true);
+
+    form.root.fields.username.setOutput("");
+    expect(form.isDirty).toBe(true);
+  });
+
+  it("should set dirty for arrays", () => {
+    const form = new MobxZodForm(
+      z.object({
+        array: z
+          .object({
+            name: z.string(),
+            age: z.number(),
+          })
+          .array(),
+      }),
+    );
+
+    form.root.fields.array.push({
+      name: "abc",
+      age: 1,
+    });
+
+    expect(form.isDirty).toBe(true);
+    form.setDirty(false);
+    expect(form.isDirty).toBe(false);
+
+    form.root.fields.array.splice(0, 1, []);
+    expect(form.isDirty).toBe(true);
   });
 
   it("should submit", async () => {

@@ -24,9 +24,12 @@ import { createFieldForType, type MapZodTypeToField } from "./MobxZodField";
 import { type MobxZodPlugin } from "./MobxZodPlugin";
 import { type MobxZodTypes } from "./types";
 
-export interface InputSetActionOptions {
-  // Should validate synchronously
-  validateSync?: boolean;
+export interface InputSetActionOptions extends Partial<SetActionOptions> {
+  /**
+   * Whether to set form to dirty after setting input.
+   * @default true
+   */
+  setDirty?: boolean;
 }
 
 export interface SetActionOptions {
@@ -78,7 +81,7 @@ export class MobxZodForm<T extends MobxZodTypes> {
 
   root: MapZodTypeToField<T>;
 
-  _currentSetActionOptions?: SetActionOptions;
+  _currentSetActionOptions?: InputSetActionOptions;
 
   _validationTasks: ValidationTask[] = [];
 
@@ -115,6 +118,7 @@ export class MobxZodForm<T extends MobxZodTypes> {
       validate: action,
       _setRawInputAt: action,
       _notifyChange: action,
+      setDirty: action,
     });
 
     this.root = untracked(() => createFieldForType(this.schema, this, []));
@@ -264,14 +268,19 @@ export class MobxZodForm<T extends MobxZodTypes> {
       setPath(this._rawInput, path, value);
     }
 
-    this._isDirty = true;
     this._notifyChange();
   }
 
   _notifyChange() {
     this._parsed = undefined;
 
-    if (this.resolveCurrentSetActionOptions().validateSync) {
+    const { validateSync, setDirty } = this.resolveCurrentSetActionOptions();
+
+    if (setDirty) {
+      this._isDirty = true;
+    }
+
+    if (validateSync) {
       this.validate();
     } else {
       this._isValidationPending = true;
@@ -331,8 +340,13 @@ export class MobxZodForm<T extends MobxZodTypes> {
     }
   }
 
-  resolveCurrentSetActionOptions(): SetActionOptions {
-    return this._currentSetActionOptions ?? this.options.setActionOptions;
+  resolveCurrentSetActionOptions(): Required<InputSetActionOptions> {
+    return {
+      validateSync:
+        this._currentSetActionOptions?.validateSync ??
+        this.options.setActionOptions.validateSync,
+      setDirty: this._currentSetActionOptions?.setDirty ?? true,
+    };
   }
 
   async handleSubmit(onSubmit: () => Promise<void> | void) {
@@ -405,5 +419,9 @@ export class MobxZodForm<T extends MobxZodTypes> {
       candidates.sort((a, b) => getPriority(a) - getPriority(b));
       candidates[0].focus();
     }
+  }
+
+  setDirty(dirty: boolean) {
+    this._isDirty = dirty;
   }
 }

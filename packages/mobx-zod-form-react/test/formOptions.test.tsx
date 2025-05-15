@@ -194,6 +194,8 @@ describe("formOptions", () => {
       return (
         <form
           {...form.bindForm({ onSubmit: console.info })}
+          data-testid="form"
+          data-isdirty={form.isDirty}
           style={{ border: `1px solid black` }}
         >
           <TextInput field={form.root.fields.age} />
@@ -218,7 +220,15 @@ describe("formOptions", () => {
       expect(screen.getByLabelText("Age")).toHaveValue("22");
     });
 
-    screen.getByLabelText("Age").getBoundingClientRect();
+    /**
+     * Reinitialize should not set isDirty to true
+     */
+    await waitFor(() => {
+      expect(screen.getByTestId("form")).toHaveAttribute(
+        "data-isdirty",
+        "false",
+      );
+    });
   });
 
   it("inherits FormOptionsContext", () => {
