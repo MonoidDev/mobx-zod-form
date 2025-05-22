@@ -6,7 +6,8 @@
     "prepare": "husky install",
     "build": "nx run-many -t build",
     "test": "nx run-many -t test",
-    "version-bump": "tsx scripts/version-bump.ts"
+    "version-bump": "tsx scripts/version-bump.ts",
+    "commit": "pnpm version-bump && git add -A && git commit"
   },
   "workspaces": [
     "packages/*"

@@ -373,7 +373,7 @@ describe("form tests", () => {
     expect(form.root.fields.ages.length).toBe(2);
   });
 
-  it.only("should not crash while visiting `innerField`", () => {
+  it("should not crash while visiting `innerField`", () => {
     const form = new MobxZodForm(
       z
         .object({
