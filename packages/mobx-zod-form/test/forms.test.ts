@@ -373,6 +373,40 @@ describe("form tests", () => {
     expect(form.root.fields.ages.length).toBe(2);
   });
 
+  it.only("should not crash while visiting `innerField`", () => {
+    const form = new MobxZodForm(
+      z
+        .object({
+          optional: z.string().optional(),
+        })
+        .array(),
+      {
+        initialOutput: [
+          {
+            optional: "abc",
+          },
+          {
+            optional: "def",
+          },
+          {
+            optional: "efg",
+          },
+        ],
+        setActionOptions: {
+          validateSync: true,
+        },
+      },
+    );
+
+    const ob = observeForm((ob) => {
+      ob(form.root.elements[0].fields.optional.innerField.rawInput);
+    });
+
+    form.root.splice(0, 1, []);
+
+    expect(ob.observed).toMatchObject(["abc", "def"]);
+  });
+
   it("should react on field changes for omittable types", () => {
     const form = new MobxZodForm(
       z.object({

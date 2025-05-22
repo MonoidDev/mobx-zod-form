@@ -1,4 +1,4 @@
-import { autorun } from "mobx";
+import { autorun, toJS } from "mobx";
 import { vi } from "vitest";
 import { z } from "zod";
 
@@ -14,7 +14,7 @@ export const observeForm = (observer: (observe: (v: any) => void) => void) => {
   return {
     fn,
     get observed() {
-      return fn.mock.calls.map((p) => p[0]);
+      return fn.mock.calls.map((p) => toJS(p[0]));
     },
   };
 };

@@ -183,6 +183,14 @@ export class MobxZodOmittableFieldImpl<
 
     this._innerField?._onInputChange();
   }
+
+  _updatePath(newPath: ParsePath): void {
+    if (this._innerField) {
+      this._innerField._updatePath(newPath);
+    }
+
+    super._updatePath(newPath);
+  }
 }
 
 export class MobxZodObjectFieldImpl<T extends MobxZodObject>

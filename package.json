@@ -5,7 +5,8 @@
   "scripts": {
     "prepare": "husky install",
     "build": "nx run-many -t build",
-    "test": "nx run-many -t test"
+    "test": "nx run-many -t test",
+    "version-bump": "tsx scripts/version-bump.ts"
   },
   "workspaces": [
     "packages/*"
@@ -14,6 +15,8 @@
   "devDependencies": {
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^14.3.1",
+    "@types/inquirer": "^9.0.8",
+    "@types/semver": "^7.7.0",
     "@types/testing-library__jest-dom": "^5.14.9",
     "@typescript-eslint/eslint-plugin": "^5.62.0",
     "@typescript-eslint/parser": "^5.62.0",
@@ -21,9 +24,11 @@
     "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-prettier": "^4.2.1",
     "husky": "^8.0.3",
+    "inquirer": "^12.6.1",
     "jsdom": "^21.1.2",
     "nx": "15.8.6",
     "prettier": "^2.8.8",
+    "semver": "^7.7.2",
     "tsup": "^7.3.0",
     "tsx": "^3.14.0",
     "typescript": "^5.8.2",
