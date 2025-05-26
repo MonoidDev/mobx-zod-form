@@ -41,7 +41,7 @@ export const useForm = <T extends MobxZodTypes>(
     [],
   );
 
-  useEffect(() => form.start(), []);
+  useEffect(() => form.start(), [form]);
 
   useEffect(() => {
     if (options.enableReinitialize && "initialOutput" in options) {
@@ -49,7 +49,7 @@ export const useForm = <T extends MobxZodTypes>(
         form.root.setOutput(options.initialOutput as never);
       });
     }
-  }, [options.initialOutput]);
+  }, [options.initialOutput, form]);
 
   return form;
 };
