@@ -552,6 +552,12 @@ export const resolveDOMFormMeta = (type: ZodTypeAny): FormMeta => {
         return type.value;
       } else if (type instanceof ZodAny) {
         return undefined;
+      } else if (type instanceof ZodUndefined) {
+        return undefined;
+      } else if (type instanceof ZodNull) {
+        return null;
+      } else if (type instanceof ZodDate) {
+        return undefined;
       } else if (type instanceof ZodObject) {
         return Object.fromEntries(
           Object.entries(type.shape).map(([key, value]) => [

@@ -77,7 +77,11 @@ describe("formMeta tests", () => {
     expect(z.number().getFormMeta().getInitialOutput()).toBe(undefined);
     expect(z.boolean().getFormMeta().getInitialOutput()).toBe(false);
     expect(z.enum(["cn", "jp"]).getFormMeta().getInitialOutput()).toBe("cn");
-    // TODO: more types...
+    expect(z.literal("141").getFormMeta().getInitialOutput()).toBe("141");
+    expect(z.any().getFormMeta().getInitialOutput()).toBe(undefined);
+    expect(z.undefined().getFormMeta().getInitialOutput()).toBe(undefined);
+    expect(z.null().getFormMeta().getInitialOutput()).toBe(null);
+    expect(z.date().getFormMeta().getInitialOutput()).toBe(undefined);
 
     // Should respect user getInitialOutput
     expect(
