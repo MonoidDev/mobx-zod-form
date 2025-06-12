@@ -22,10 +22,11 @@ TYPE_TESTS &&
       const schema = z.object({
         a: z.string(),
         b: z.number(),
-        deep: z.object({
-          c: z.string(),
-        }),
         literalString: z.literal("literalString"),
+        any: z.any(),
+        undefined: z.undefined(),
+        null: z.null(),
+        date: z.date(),
         enum: z.enum(["A", "B", "C"]),
         nullable: z.string().nullable(),
         optional: z.string().optional(),
@@ -35,6 +36,9 @@ TYPE_TESTS &&
           .string()
           .transform((s) => s.length)
           .transform((l) => l > 5),
+        deep: z.object({
+          c: z.string(),
+        }),
         boxed: z
           .object({
             field1: z.string(),
@@ -72,6 +76,13 @@ TYPE_TESTS &&
       expectTypeOf(o.fields.optionalNumber.innerField).toEqualTypeOf<
         MobxZodField<ZodNumber>
       >();
+
+      expectTypeOf(o.fields.any).toEqualTypeOf<MobxZodField<z.ZodAny>>();
+      expectTypeOf(o.fields.undefined).toEqualTypeOf<
+        MobxZodField<z.ZodUndefined>
+      >();
+      expectTypeOf(o.fields.null).toEqualTypeOf<MobxZodField<z.ZodNull>>();
+      expectTypeOf(o.fields.date).toEqualTypeOf<MobxZodField<z.ZodDate>>();
 
       const _transformEffects: z.ZodEffects<z.ZodString, number, string> =
         o.fields.transformEffects.effects;
@@ -248,6 +259,23 @@ describe("field tests", () => {
       input: "C",
     });
 
+    // ZodLiteral
+    expect(z.literal("114514").getFormMeta().decode("114514")).toBe("114514");
+
+    // ZodAny
+    expect(z.any().getFormMeta().decode(1)).toBe(1);
+
+    // ZodUndefined
+    expect(z.undefined().getFormMeta().decode(undefined)).toBe(undefined);
+
+    // ZodNull
+    expect(z.null().getFormMeta().decode(null)).toBe(null);
+
+    // ZodDate
+    expect(z.date().getFormMeta().decode(new Date(2024, 0, 1))).toEqual(
+      new Date(2024, 0, 1),
+    );
+
     // Should decode boxed
     expect(
       z.object({ a: z.number() }).box().getFormMeta().safeDecode({ a: 1 }),
@@ -303,6 +331,30 @@ describe("field tests", () => {
     expect(z.string().nullable().getFormMeta().encode(empty)).toBe("");
     expect(z.string().nullable().getFormMeta().encode(null)).toBe("");
     expect(z.string().nullable().getFormMeta().encode(undefined)).toBe("");
+
+    // ZodLiteral
+    expect(z.literal("114514").getFormMeta().encode(empty)).toBe(undefined);
+    expect(z.literal("114514").getFormMeta().encode("114514")).toBe("114514");
+
+    // ZodAny
+    expect(z.any().getFormMeta().encode(empty)).toBe(undefined);
+    expect(z.any().getFormMeta().encode(1)).toBe(1);
+
+    // ZodUndefined
+    expect(z.undefined().getFormMeta().encode(empty)).toBe(undefined);
+    expect(z.undefined().getFormMeta().encode(undefined)).toBe(undefined);
+    expect(z.undefined().getFormMeta().encode("114514")).toBe(undefined);
+
+    // ZodNull
+    expect(z.null().getFormMeta().encode(empty)).toBe(null);
+    expect(z.null().getFormMeta().encode(undefined)).toBe(null);
+    expect(z.null().getFormMeta().encode("114514")).toBe(null);
+
+    // ZodDate
+    expect(z.date().getFormMeta().encode(empty)).toBe(undefined);
+    expect(z.date().getFormMeta().encode(new Date(2024, 0, 1))).toEqual(
+      new Date(2024, 0, 1),
+    );
 
     // ZodArray
     expect(z.number().array().getFormMeta().encode([1, 2, 3])).toMatchObject([

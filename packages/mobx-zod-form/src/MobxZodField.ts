@@ -16,6 +16,10 @@ import {
   ZodNullable,
   ZodDiscriminatedUnion,
   ZodEffects,
+  ZodAny,
+  ZodUndefined,
+  ZodNull,
+  ZodDate,
 } from "zod";
 
 import { MobxFatalError } from "./errors";
@@ -156,6 +160,10 @@ export type MapZodTypeToField<T extends MobxZodTypes> = true extends IsAny<T>
       | ZodBoolean
       | ZodEnum<[string, ...string[]]>
       | MobxZodLiteral
+      | ZodAny
+      | ZodUndefined
+      | ZodNull
+      | ZodDate
   ? MobxZodField<T>
   : T extends ZodOptional<ZodTypeAny>
   ? MobxZodOptionalField<T>
@@ -327,7 +335,11 @@ export const createFieldForType = <T extends MobxZodTypes>(
     type instanceof ZodNumber ||
     type instanceof ZodBoolean ||
     type instanceof ZodEnum ||
-    type instanceof ZodLiteral
+    type instanceof ZodLiteral ||
+    type instanceof ZodAny ||
+    type instanceof ZodUndefined ||
+    type instanceof ZodNull ||
+    type instanceof ZodDate
   ) {
     return new MobxZodBaseFieldImpl<typeof type>(type, form, path) as any;
   } else if (type instanceof ZodOptional || type instanceof ZodNullable) {

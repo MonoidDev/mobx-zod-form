@@ -2,16 +2,19 @@ import {
   ZodAny,
   ZodArray,
   ZodBoolean,
+  ZodDate,
   ZodDiscriminatedUnion,
   ZodEffects,
   ZodEnum,
   ZodLiteral,
+  ZodNull,
   ZodNullable,
   ZodNumber,
   ZodObject,
   ZodOptional,
   ZodString,
   ZodTypeAny,
+  ZodUndefined,
 } from "zod";
 
 import { MobxFatalError, MobxZodDecodeError } from "./errors";
@@ -280,6 +283,49 @@ export const resolveDOMFormMeta = (type: ZodTypeAny): FormMeta => {
           success: true,
           data: input,
         };
+      } else if (type instanceof ZodUndefined) {
+        return {
+          success: true,
+          data: undefined,
+        };
+      } else if (type instanceof ZodNull) {
+        return {
+          success: true,
+          data: null,
+        };
+      } else if (type instanceof ZodDate) {
+        if (input instanceof Date) {
+          return {
+            success: true,
+            data: input,
+          };
+        }
+      } else if (type instanceof ZodArray) {
+        if (Array.isArray(input)) {
+          try {
+            return {
+              success: true,
+              data: input.map(
+                (v) =>
+                  unwrapDecodeResult(
+                    resolveDOMFormMeta(type.element as any).safeDecode(
+                      v,
+                      passthrough,
+                    ),
+                  ),
+                passthrough,
+              ),
+            };
+          } catch (e) {
+            if (e instanceof MobxZodDecodeError) {
+              return {
+                success: false,
+                input,
+              };
+            }
+            throw e;
+          }
+        }
       } else if (type instanceof ZodObject) {
         if (typeof input === "object" && input !== null) {
           try {
@@ -297,32 +343,6 @@ export const resolveDOMFormMeta = (type: ZodTypeAny): FormMeta => {
             return {
               success: true,
               data: decoded,
-            };
-          } catch (e) {
-            if (e instanceof MobxZodDecodeError) {
-              return {
-                success: false,
-                input,
-              };
-            }
-            throw e;
-          }
-        }
-      } else if (type instanceof ZodArray) {
-        if (Array.isArray(input)) {
-          try {
-            return {
-              success: true,
-              data: input.map(
-                (v) =>
-                  unwrapDecodeResult(
-                    resolveDOMFormMeta(type.element as any).safeDecode(
-                      v,
-                      passthrough,
-                    ),
-                  ),
-                passthrough,
-              ),
             };
           } catch (e) {
             if (e instanceof MobxZodDecodeError) {
@@ -436,6 +456,24 @@ export const resolveDOMFormMeta = (type: ZodTypeAny): FormMeta => {
         }
 
         return output;
+      } else if (type instanceof ZodUndefined) {
+        return undefined;
+      } else if (type instanceof ZodNull) {
+        return null;
+      } else if (type instanceof ZodDate) {
+        if (output === empty) {
+          return undefined;
+        }
+
+        return output;
+      } else if (type instanceof ZodArray) {
+        if (output === empty) {
+          return [];
+        }
+
+        return output.map((o: any) =>
+          resolveDOMFormMeta(type.element as any).encode(o),
+        );
       } else if (type instanceof ZodObject) {
         const initialOutput = this.getInitialOutput();
 
@@ -461,14 +499,6 @@ export const resolveDOMFormMeta = (type: ZodTypeAny): FormMeta => {
               resolveDOMFormMeta(memberType as any).encode(memberOutput),
             ];
           }),
-        );
-      } else if (type instanceof ZodArray) {
-        if (output === empty) {
-          return [];
-        }
-
-        return output.map((o: any) =>
-          resolveDOMFormMeta(type.element as any).encode(o),
         );
       } else if (type instanceof ZodDiscriminatedUnion) {
         if (output === empty) {

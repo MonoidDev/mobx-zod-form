@@ -15,6 +15,10 @@ import type {
   ZodNullable,
   ZodOptional,
   ZodEffects,
+  ZodAny,
+  ZodUndefined,
+  ZodNull,
+  ZodDate,
 } from "zod";
 
 import { DiscriminatorType, MobxZodBox } from "./zod-extra";
@@ -43,10 +47,15 @@ export type MobxZodPrimitiveTypes =
   | ZodNumber
   | ZodBoolean
   | ZodEnum<[string, ...string[]]>
-  | MobxZodLiteral;
+  | MobxZodLiteral
+  | ZodAny
+  | ZodUndefined
+  | ZodNull
+  | ZodDate;
 
 export type MobxZodTypes =
   | MobxZodPrimitiveTypes
+  | ZodAny
   | MobxOmittableTypes
   | MobxZodObject
   | MobxZodArray
