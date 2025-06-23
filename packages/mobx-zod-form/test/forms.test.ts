@@ -694,4 +694,91 @@ describe("form tests", () => {
       );
     });
   });
+
+  it("should react on nullable inner field issues", () => {
+    const form = new MobxZodForm(
+      z.object({
+        username: z.string().min(1).max(2).nullable(),
+        nested: z
+          .object({
+            age: z.number(),
+          })
+          .nullable(),
+      }),
+      {
+        initialOutput: {
+          username: "",
+          nested: {
+            age: 1,
+          },
+        },
+        setActionOptions: {
+          validateSync: true,
+        },
+      },
+    );
+
+    const obNullableField = observeForm((observe) => {
+      observe(form.root.fields.username.issues.map((i) => i.message));
+    });
+
+    const obInnerField = observeForm((observe) => {
+      observe(
+        form.root.fields.username.innerField.issues.map((i) => i.message),
+      );
+    });
+
+    form.root.fields.username.setRawInput("");
+    form.root.fields.username.setRawInput("joe");
+
+    expect(obNullableField.observed).toMatchObject([
+      [],
+      [],
+      ["String must contain at most 2 character(s)"],
+    ]);
+
+    expect(obInnerField.observed).toMatchObject([
+      [],
+      [],
+      ["String must contain at most 2 character(s)"],
+    ]);
+  });
+
+  it("should react on nullable object inner field issues", () => {
+    const form = new MobxZodForm(
+      z.object({
+        nested: z
+          .object({
+            age: z.number(),
+          })
+          .nullable(),
+      }),
+      {
+        initialOutput: {
+          nested: {
+            age: 1,
+          },
+        },
+        setActionOptions: {
+          validateSync: true,
+        },
+      },
+    );
+
+    {
+      const ob = observeForm((observe) => {
+        const mmm = form.root.fields.nested.innerField!.fields.age.issues.map(
+          (i) => i.message,
+        );
+        observe(mmm);
+      });
+
+      form.root.fields.nested.innerField!.fields.age.setRawInput("abc");
+
+      expect(ob.observed).toMatchObject([
+        [],
+        ["Expected number, received string"],
+      ]);
+    }
+  });
 });

@@ -152,6 +152,13 @@ export class MobxZodOmittableFieldImpl<
     });
   }
 
+  _walk(f: (field: MobxZodField<any>) => void): void {
+    super._walk(f);
+    if (this._innerField) {
+      this._innerField._walk(f);
+    }
+  }
+
   _shouldCreateInnerField() {
     const innerType = this.type.unwrap();
 

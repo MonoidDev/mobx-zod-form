@@ -597,6 +597,47 @@ const SubmitFormTest = () => {
   );
 };
 
+const NullableInnerFieldIssue = () => {
+  const form = useForm(
+    z.object({
+      number: z.number().min(1).nullable(),
+    }),
+    {
+      initialOutput: {
+        number: "xxx" as any,
+      },
+    },
+  );
+
+  return (
+    <form
+      style={{ border: `1px solid black` }}
+      {...form.bindForm({
+        async onSubmit() {
+          await new Promise((r) => setTimeout(r, 500));
+        },
+      })}
+    >
+      <TextInput field={form.root.fields.number.innerField} />
+
+      <TextInput field={form.root.fields.number} />
+
+      <button
+        onClick={async () => {
+          try {
+            await form.submitForm();
+            alert("returned");
+          } catch (e) {
+            alert(String(e));
+          }
+        }}
+      >
+        should display the same error for invalid input
+      </button>
+    </form>
+  );
+};
+
 function App() {
   return (
     <div className="App">
@@ -617,6 +658,7 @@ function App() {
 
       <AutoForm />
       <SubmitFormTest />
+      <NullableInnerFieldIssue />
     </div>
   );
 }
