@@ -103,6 +103,7 @@ export class ReactForm<T extends MobxZodTypes> extends MobxZodForm<T> {
           },
           (e) => {
             this._submitFuture?.reject(e);
+            throw e;
           },
         );
       },

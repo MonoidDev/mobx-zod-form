@@ -638,6 +638,23 @@ const NullableInnerFieldIssue = () => {
   );
 };
 
+const ThrowSyncForm = () => {
+  const form = useForm(z.object({}));
+
+  return (
+    <form
+      {...form.bindForm({
+        onSubmit: () => {
+          throw new Error("This is a synchronous error from onSubmit");
+        },
+      })}
+      style={{ border: `1px solid black` }}
+    >
+      <button type="submit">Should see error in console</button>
+    </form>
+  );
+};
+
 function App() {
   return (
     <div className="App">
@@ -659,6 +676,7 @@ function App() {
       <AutoForm />
       <SubmitFormTest />
       <NullableInnerFieldIssue />
+      <ThrowSyncForm />
     </div>
   );
 }
