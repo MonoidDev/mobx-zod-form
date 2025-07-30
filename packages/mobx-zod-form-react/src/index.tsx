@@ -1,10 +1,15 @@
 import React, { useMemo, useEffect, useContext, useId } from "react";
 
 import { MobxZodField, type MobxZodTypes } from "@monoid-dev/mobx-zod-form";
-import { ZodTypeAny } from "zod";
+import type { ZodTypeAny } from "zod";
 
 import { NotReactFormField } from "./errors";
 import { ReactForm, ReactFormOptions } from "./ReactForm";
+import {
+  createReactFormPlugin,
+  type ReactFormPluginEventListenerMap,
+  type ReactFormPluginHookedEvents,
+} from "./reactFormPlugin";
 
 export { ReactForm, type ReactFormOptions };
 
@@ -23,9 +28,12 @@ export const useForm = <T extends MobxZodTypes>(
 
   const id = useId();
 
-  const form = useMemo(
-    () =>
-      new ReactForm(schema, {
+  const form = useMemo(() => {
+    const { control, plugin } = createReactFormPlugin<T>();
+
+    const f = new ReactForm<T>(
+      schema,
+      {
         id,
         ...defaultOptions,
         ...options,
@@ -34,12 +42,18 @@ export const useForm = <T extends MobxZodTypes>(
           ...options.setActionOptions,
         },
         plugins: [
+          plugin,
           ...(defaultOptions.plugins ?? []),
           ...(options?.plugins ?? []),
         ],
-      }),
-    [],
-  );
+      },
+      control,
+    );
+
+    control.setForm(f);
+
+    return f;
+  }, []);
 
   useEffect(() => form.start(), [form]);
 
@@ -108,4 +122,24 @@ export const FormOptionsProvider = <T extends MobxZodTypes>({
       {children}
     </FormOptionsContext.Provider>
   );
+};
+
+/**
+ * Listen to form event for the current component.
+ */
+export const useFormEvent = <
+  T extends MobxZodTypes,
+  K extends ReactFormPluginHookedEvents,
+>(
+  form: ReactForm<T>,
+  event: K,
+  handler: ReactFormPluginEventListenerMap<T>[K],
+  deps: React.DependencyList = [],
+) => {
+  useEffect(() => {
+    form._pluginControl.addEventListener(event, handler);
+    return () => {
+      form._pluginControl.removeEventListener(event, handler);
+    };
+  }, deps);
 };

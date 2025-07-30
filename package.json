@@ -5,6 +5,7 @@
   "scripts": {
     "prepare": "husky install",
     "build": "nx run-many -t build",
+    "build:packages": "nx run-many -t build --projects='@monoid-dev/*'",
     "test": "nx run-many -t test",
     "version-bump": "tsx scripts/version-bump.ts",
     "commit": "pnpm version-bump && git add -A && git commit"

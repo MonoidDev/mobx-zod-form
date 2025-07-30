@@ -19,6 +19,7 @@ import {
 } from "zod";
 
 import { UnsupportedInputType } from "./errors";
+import { ReactFormPluginControl } from "./reactFormPlugin";
 
 export interface ReactFormOptions<T extends MobxZodTypes>
   extends MobxZodFormOptions<T> {
@@ -77,6 +78,21 @@ export type BindFieldResult = {};
 export class ReactForm<T extends MobxZodTypes> extends MobxZodForm<T> {
   _boundSubmitForm?: (e: React.FormEvent<HTMLFormElement>) => Promise<void>;
   _submitFuture?: PromiseWithResolvers<void>;
+
+  _pluginControl: ReactFormPluginControl<T>;
+
+  /**
+   * @internal
+   */
+  constructor(
+    schema: T,
+    options: ReactFormOptions<T>,
+    pluginControl: ReactFormPluginControl<T>,
+  ) {
+    super(schema, options);
+
+    this._pluginControl = pluginControl;
+  }
 
   bindForm(options: BindFormOptions<T> = {}): React.ComponentProps<"form"> {
     this._boundSubmitForm = async (e: React.FormEvent<HTMLFormElement>) => {

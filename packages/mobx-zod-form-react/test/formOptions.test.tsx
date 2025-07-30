@@ -244,7 +244,9 @@ describe("formOptions", () => {
         },
       );
 
-      expect(form.options.plugins).toMatchObject([
+      expect(
+        form.options.plugins.filter((p) => p.name !== "react-form-plugin"),
+      ).toMatchObject([
         {
           name: "plugin",
         },

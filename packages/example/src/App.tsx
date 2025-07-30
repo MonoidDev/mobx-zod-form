@@ -7,6 +7,7 @@ import {
   MobxZodObjectField,
   mapDecodeResult,
   partial,
+  getDecodeResultOr,
 } from "@monoid-dev/mobx-zod-form";
 import { ObjectInput } from "@monoid-dev/mobx-zod-form-input";
 import {
@@ -14,6 +15,7 @@ import {
   getForm,
   useForm,
   useFormContext,
+  useFormEvent,
 } from "@monoid-dev/mobx-zod-form-react";
 import { observer } from "mobx-react";
 import { z, ZodTypeAny } from "zod";
@@ -655,6 +657,46 @@ const ThrowSyncForm = () => {
   );
 };
 
+const FormEvent = () => {
+  const form = useForm(
+    z.object({
+      uppercasedOnSubmit: z.string(),
+    }),
+    {
+      initialOutput: {
+        uppercasedOnSubmit: "initial value",
+      },
+    },
+  );
+
+  useFormEvent(
+    form,
+    "onBeforeSubmit",
+    () => {
+      form.root.fields.uppercasedOnSubmit.setOutput(
+        getDecodeResultOr(
+          form.root.fields.uppercasedOnSubmit.decodeResult,
+          "",
+        ).toUpperCase(),
+      );
+    },
+    [],
+  );
+
+  return (
+    <form
+      style={{ border: `1px solid black` }}
+      {...form.bindForm({
+        async onSubmit() {},
+      })}
+    >
+      <TextInput field={form.root.fields.uppercasedOnSubmit} />
+
+      <button type="submit">Should uppercase on submit</button>
+    </form>
+  );
+};
+
 function App() {
   return (
     <div className="App">
@@ -677,6 +719,7 @@ function App() {
       <SubmitFormTest />
       <NullableInnerFieldIssue />
       <ThrowSyncForm />
+      <FormEvent />
     </div>
   );
 }
