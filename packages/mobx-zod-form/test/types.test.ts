@@ -27,10 +27,26 @@ TYPE_TESTS &&
         undefined: z.undefined(),
         null: z.null(),
         date: z.date(),
+        boolean: z.boolean(),
         enum: z.enum(["A", "B", "C"]),
         nullable: z.string().nullable(),
         optional: z.string().optional(),
         optionalNumber: z.number().optional(),
+        optionalBoolean: z.boolean().optional(),
+        optionalDate: z.date().optional(),
+        optionalAny: z.any().optional(),
+        optionalUndefined: z.undefined().optional(),
+        optionalNull: z.null().optional(),
+        optionalEnum: z.enum(["X", "Y"]).optional(),
+        optionalLiteral: z.literal("test").optional(),
+        nullableNumber: z.number().nullable(),
+        nullableBoolean: z.boolean().nullable(),
+        nullableDate: z.date().nullable(),
+        nullableAny: z.any().nullable(),
+        nullableUndefined: z.undefined().nullable(),
+        nullableNull: z.null().nullable(),
+        nullableEnum: z.enum(["X", "Y"]).nullable(),
+        nullableLiteral: z.literal("test").nullable(),
         transformEffects: z.string().transform((s) => s.length),
         transformEffects2: z
           .string()
@@ -69,12 +85,62 @@ TYPE_TESTS &&
         .string()
         .optional();
 
+      // Test innerField types for all primitive optional fields
       expectTypeOf(o.fields.optional.innerField).toEqualTypeOf<
         MobxZodField<ZodString>
       >();
-
       expectTypeOf(o.fields.optionalNumber.innerField).toEqualTypeOf<
         MobxZodField<ZodNumber>
+      >();
+      expectTypeOf(o.fields.optionalBoolean.innerField).toEqualTypeOf<
+        MobxZodField<z.ZodBoolean>
+      >();
+      expectTypeOf(o.fields.optionalDate.innerField).toEqualTypeOf<
+        MobxZodField<z.ZodDate>
+      >();
+      expectTypeOf(o.fields.optionalAny.innerField).toEqualTypeOf<
+        MobxZodField<z.ZodAny>
+      >();
+      expectTypeOf(o.fields.optionalUndefined.innerField).toEqualTypeOf<
+        MobxZodField<z.ZodUndefined>
+      >();
+      expectTypeOf(o.fields.optionalNull.innerField).toEqualTypeOf<
+        MobxZodField<z.ZodNull>
+      >();
+      expectTypeOf(o.fields.optionalEnum.innerField).toEqualTypeOf<
+        MobxZodField<z.ZodEnum<["X", "Y"]>>
+      >();
+      expectTypeOf(o.fields.optionalLiteral.innerField).toEqualTypeOf<
+        MobxZodField<z.ZodLiteral<"test">>
+      >();
+
+      // Test innerField types for all primitive nullable fields
+      expectTypeOf(o.fields.nullable.innerField).toEqualTypeOf<
+        MobxZodField<ZodString>
+      >();
+      expectTypeOf(o.fields.nullableNumber.innerField).toEqualTypeOf<
+        MobxZodField<ZodNumber>
+      >();
+      expectTypeOf(o.fields.nullableBoolean.innerField).toEqualTypeOf<
+        MobxZodField<z.ZodBoolean>
+      >();
+      expectTypeOf(o.fields.nullableDate.innerField).toEqualTypeOf<
+        MobxZodField<z.ZodDate>
+      >();
+      expectTypeOf(o.fields.nullableAny.innerField).toEqualTypeOf<
+        MobxZodField<z.ZodAny>
+      >();
+      expectTypeOf(o.fields.nullableUndefined.innerField).toEqualTypeOf<
+        MobxZodField<z.ZodUndefined>
+      >();
+      expectTypeOf(o.fields.nullableNull.innerField).toEqualTypeOf<
+        MobxZodField<z.ZodNull>
+      >();
+      expectTypeOf(o.fields.nullableEnum.innerField).toEqualTypeOf<
+        MobxZodField<z.ZodEnum<["X", "Y"]>>
+      >();
+      expectTypeOf(o.fields.nullableLiteral.innerField).toEqualTypeOf<
+        MobxZodField<z.ZodLiteral<"test">>
       >();
 
       expectTypeOf(o.fields.any).toEqualTypeOf<MobxZodField<z.ZodAny>>();

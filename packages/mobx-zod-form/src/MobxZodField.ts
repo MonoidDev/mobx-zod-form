@@ -1,25 +1,16 @@
 import {
-  ZodString,
-  ZodNumber,
   ParsePath,
-  ZodBoolean,
   ZodObject,
   ZodArray,
   ZodIssue,
   ZodTypeAny,
   SafeParseReturnType,
   ZodDiscriminatedUnionOption,
-  ZodLiteral,
   ZodError,
-  ZodEnum,
   ZodOptional,
   ZodNullable,
   ZodDiscriminatedUnion,
   ZodEffects,
-  ZodAny,
-  ZodUndefined,
-  ZodNull,
-  ZodDate,
 } from "zod";
 
 import { MobxFatalError } from "./errors";
@@ -39,11 +30,11 @@ import type {
   MobxZodArray,
   MobxZodDiscriminatedUnion,
   MobxZodEffects,
-  MobxZodLiteral,
   MobxZodObject,
+  MobxZodPrimitiveTypes,
   MobxZodTypes,
 } from "./types";
-import { DiscriminatorType, MobxZodBox } from "./zod-extra";
+import { DiscriminatorType, isPrimitiveZodType, MobxZodBox } from "./zod-extra";
 
 export interface MobxZodField<T extends ZodTypeAny> {
   /**
@@ -154,16 +145,7 @@ export type FieldWithEffects<
 
 export type MapZodTypeToField<T extends MobxZodTypes> = true extends IsAny<T>
   ? MobxZodField<T>
-  : T extends
-      | ZodString
-      | ZodNumber
-      | ZodBoolean
-      | ZodEnum<[string, ...string[]]>
-      | MobxZodLiteral
-      | ZodAny
-      | ZodUndefined
-      | ZodNull
-      | ZodDate
+  : T extends MobxZodPrimitiveTypes
   ? MobxZodField<T>
   : T extends ZodOptional<ZodTypeAny>
   ? MobxZodOptionalField<T>
@@ -297,11 +279,7 @@ type _MobxZodOmittableFieldInnerField<
   T extends MobxOmittableTypes,
   Default,
   Inner = UnwrapZodNullish<T>,
-> = Inner extends ZodNumber
-  ? MobxZodField<ZodNumber>
-  : Inner extends ZodString
-  ? MobxZodField<ZodString>
-  : Default;
+> = [Inner] extends [MobxZodPrimitiveTypes] ? MobxZodField<Inner> : Default;
 
 export interface MobxZodOmittableField<T extends MobxOmittableTypes>
   extends MobxZodField<T> {
@@ -330,17 +308,7 @@ export const createFieldForType = <T extends MobxZodTypes>(
   form: MobxZodForm<any>,
   path: ParsePath,
 ): MapZodTypeToField<T> => {
-  if (
-    type instanceof ZodString ||
-    type instanceof ZodNumber ||
-    type instanceof ZodBoolean ||
-    type instanceof ZodEnum ||
-    type instanceof ZodLiteral ||
-    type instanceof ZodAny ||
-    type instanceof ZodUndefined ||
-    type instanceof ZodNull ||
-    type instanceof ZodDate
-  ) {
+  if (isPrimitiveZodType(type)) {
     return new MobxZodBaseFieldImpl<typeof type>(type, form, path) as any;
   } else if (type instanceof ZodOptional || type instanceof ZodNullable) {
     return new MobxZodOmittableFieldImpl<typeof type>(type, form, path) as any;

@@ -14,6 +14,10 @@ import {
   ZodBoolean,
   ZodEnum,
   ZodLiteral,
+  ZodAny,
+  ZodUndefined,
+  ZodNull,
+  ZodDate,
 } from "zod";
 
 import { FormMeta, resolveDOMFormMeta } from "./FormMeta";
@@ -173,7 +177,11 @@ export const isPrimitiveZodType = (
     t instanceof ZodNumber ||
     t instanceof ZodBoolean ||
     t instanceof ZodEnum ||
-    t instanceof ZodLiteral
+    t instanceof ZodLiteral ||
+    t instanceof ZodAny ||
+    t instanceof ZodUndefined ||
+    t instanceof ZodNull ||
+    t instanceof ZodDate
   );
 };
 

@@ -1,7 +1,5 @@
 import { action, computed, makeObservable, observable } from "mobx";
 import {
-  ZodNumber,
-  ZodString,
   type ParsePath,
   type ZodIssue,
   type ZodNullable,
@@ -30,7 +28,11 @@ import {
   type MobxZodObject,
   type MobxZodEffects,
 } from "./types";
-import { DiscriminatorType, discriminatorType } from "./zod-extra";
+import {
+  DiscriminatorType,
+  discriminatorType,
+  isPrimitiveZodType,
+} from "./zod-extra";
 
 export class MobxZodBaseFieldImpl<T extends MobxZodTypes>
   implements MobxZodField<T>
@@ -162,7 +164,7 @@ export class MobxZodOmittableFieldImpl<
   _shouldCreateInnerField() {
     const innerType = this.type.unwrap();
 
-    if (innerType instanceof ZodString || innerType instanceof ZodNumber) {
+    if (isPrimitiveZodType(innerType)) {
       return true;
     }
     return this.decodeResult.success && this.decodeResult.data != null;

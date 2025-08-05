@@ -442,26 +442,75 @@ describe("form tests", () => {
     expect(obNullable.observed).toMatchObject([false, true]);
   });
 
-  it("should not react on field changes for omittable types if the inner type is String or Number because they always present", () => {
+  it("should not react on field changes for omittable types if the inner type is primitive because they always present", () => {
     const form = new MobxZodForm(
       z.object({
-        optional: z.string().optional(),
-        nullable: z.string().nullable(),
+        optionalString: z.string().optional(),
+        nullableString: z.string().nullable(),
+        optionalNumber: z.number().optional(),
+        nullableNumber: z.number().nullable(),
+        optionalBoolean: z.boolean().optional(),
+        nullableBoolean: z.boolean().nullable(),
+        optionalDate: z.date().optional(),
+        nullableDate: z.date().nullable(),
+        optionalAny: z.any().optional(),
+        nullableAny: z.any().nullable(),
+        optionalUndefined: z.undefined().optional(),
+        nullableUndefined: z.undefined().nullable(),
+        optionalNull: z.null().optional(),
+        nullableNull: z.null().nullable(),
+        optionalEnum: z.enum(["a", "b"]).optional(),
+        nullableEnum: z.enum(["a", "b"]).nullable(),
+        optionalLiteral: z.literal("test").optional(),
+        nullableLiteral: z.literal("test").nullable(),
       }),
     );
 
-    const obOptional = observeForm((ob) =>
-      ob(!!form.root.fields.optional.innerField),
-    );
-    const obNullable = observeForm((ob) =>
-      ob(!!form.root.fields.nullable.innerField),
-    );
+    const observers = [
+      observeForm((ob) => ob(!!form.root.fields.optionalString.innerField)),
+      observeForm((ob) => ob(!!form.root.fields.nullableString.innerField)),
+      observeForm((ob) => ob(!!form.root.fields.optionalNumber.innerField)),
+      observeForm((ob) => ob(!!form.root.fields.nullableNumber.innerField)),
+      observeForm((ob) => ob(!!form.root.fields.optionalBoolean.innerField)),
+      observeForm((ob) => ob(!!form.root.fields.nullableBoolean.innerField)),
+      observeForm((ob) => ob(!!form.root.fields.optionalDate.innerField)),
+      observeForm((ob) => ob(!!form.root.fields.nullableDate.innerField)),
+      observeForm((ob) => ob(!!form.root.fields.optionalAny.innerField)),
+      observeForm((ob) => ob(!!form.root.fields.nullableAny.innerField)),
+      observeForm((ob) => ob(!!form.root.fields.optionalUndefined.innerField)),
+      observeForm((ob) => ob(!!form.root.fields.nullableUndefined.innerField)),
+      observeForm((ob) => ob(!!form.root.fields.optionalNull.innerField)),
+      observeForm((ob) => ob(!!form.root.fields.nullableNull.innerField)),
+      observeForm((ob) => ob(!!form.root.fields.optionalEnum.innerField)),
+      observeForm((ob) => ob(!!form.root.fields.nullableEnum.innerField)),
+      observeForm((ob) => ob(!!form.root.fields.optionalLiteral.innerField)),
+      observeForm((ob) => ob(!!form.root.fields.nullableLiteral.innerField)),
+    ];
 
-    form.root.fields.optional.setOutput("filled");
-    form.root.fields.nullable.setOutput("filled");
+    // Set output values to trigger potential changes
+    form.root.fields.optionalString.setOutput("filled");
+    form.root.fields.nullableString.setOutput("filled");
+    form.root.fields.optionalNumber.setOutput(42);
+    form.root.fields.nullableNumber.setOutput(42);
+    form.root.fields.optionalBoolean.setOutput(true);
+    form.root.fields.nullableBoolean.setOutput(true);
+    form.root.fields.optionalDate.setOutput(new Date());
+    form.root.fields.nullableDate.setOutput(new Date());
+    form.root.fields.optionalAny.setOutput("any");
+    form.root.fields.nullableAny.setOutput("any");
+    form.root.fields.optionalUndefined.setOutput(undefined);
+    form.root.fields.nullableUndefined.setOutput(undefined);
+    form.root.fields.optionalNull.setOutput(null);
+    form.root.fields.nullableNull.setOutput(null);
+    form.root.fields.optionalEnum.setOutput("a");
+    form.root.fields.nullableEnum.setOutput("a");
+    form.root.fields.optionalLiteral.setOutput("test");
+    form.root.fields.nullableLiteral.setOutput("test");
 
-    expect(obOptional.observed).toMatchObject([true]);
-    expect(obNullable.observed).toMatchObject([true]);
+    // All primitive types should always have innerField present (no reactivity)
+    observers.forEach((observer) => {
+      expect(observer.observed).toMatchObject([true]);
+    });
   });
 
   it("should have non-nullish innerField for omittable types", () => {
