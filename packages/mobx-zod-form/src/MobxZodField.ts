@@ -73,6 +73,32 @@ export interface MobxZodField<T extends ZodTypeAny> {
    */
   decodeResult: SafeDecodeResult<unknown, T["_input"]>;
   /**
+   * Get the decoded data from decodeResult if successful, throws MobxZodDecodeError if not
+   */
+  unwrapDecodeResult(): T["_input"];
+  /**
+   * Map the decoded data with a function if successful, returns defaultValue if not
+   */
+  mapDecodeResult<O>(mapper: (data: T["_input"]) => O, defaultValue: O): O;
+  /**
+   * Check if decodeResult is successful and the data meets the predicate
+   */
+  decodeResultIsSuccessfulAnd(
+    predicate: (data: T["_input"]) => boolean,
+  ): boolean;
+  /**
+   * Get the decoded data from decodeResult, returns undefined if not successful
+   */
+  getDecodeResult(): T["_input"] | undefined;
+  /**
+   * Get the decoded data from decodeResult, returns defaultValue if not successful
+   */
+  getDecodeResultOr<O>(defaultValue: O): T["_input"] | O;
+  /**
+   * Check if the decoded result equals the given value
+   */
+  decodeResultEqual(value: T["_input"], defaultValue?: boolean): boolean;
+  /**
    * Set the raw input, triggering the form validation
    */
   setRawInput(value: unknown): void;

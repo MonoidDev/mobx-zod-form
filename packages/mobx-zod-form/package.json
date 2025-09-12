@@ -1,6 +1,6 @@
 {
   "name": "@monoid-dev/mobx-zod-form",
-  "version": "0.20.0",
+  "version": "0.21.0",
   "keywords": [
     "form",
     "zod",
@@ -40,6 +40,6 @@
   },
   "peerDependencies": {
     "mobx": "^6.8.0",
-    "zod": "^3.22.2"
+    "zod": "^3.25.76"
   }
 }

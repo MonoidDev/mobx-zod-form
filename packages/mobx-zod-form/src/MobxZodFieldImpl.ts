@@ -7,7 +7,15 @@ import {
   type ZodTypeAny,
 } from "zod";
 
-import { FormMeta } from "./FormMeta";
+import {
+  FormMeta,
+  getDecodeResult,
+  unwrapDecodeResult,
+  mapDecodeResult,
+  decodeResultIsSuccessfulAnd,
+  getDecodeResultOr,
+  decodeResultEqual,
+} from "./FormMeta";
 import { parseResultValueEqual } from "./js-utils";
 import {
   createFieldForType,
@@ -92,6 +100,30 @@ export class MobxZodBaseFieldImpl<T extends MobxZodTypes>
 
   get touched() {
     return this._touched;
+  }
+
+  unwrapDecodeResult() {
+    return unwrapDecodeResult(this.decodeResult);
+  }
+
+  mapDecodeResult<O>(mapper: (data: T["_input"]) => O, defaultValue: O) {
+    return mapDecodeResult(this.decodeResult, mapper, defaultValue);
+  }
+
+  decodeResultIsSuccessfulAnd(predicate: (data: T["_input"]) => boolean) {
+    return decodeResultIsSuccessfulAnd(this.decodeResult, predicate);
+  }
+
+  getDecodeResult() {
+    return getDecodeResult(this.decodeResult);
+  }
+
+  getDecodeResultOr<O>(defaultValue: O) {
+    return getDecodeResultOr(this.decodeResult, defaultValue);
+  }
+
+  decodeResultEqual(value: T["_input"], defaultValue?: boolean) {
+    return decodeResultEqual(this.decodeResult, value, defaultValue);
   }
 
   setTouched(touched: boolean) {
