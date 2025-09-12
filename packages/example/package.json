@@ -9,14 +9,14 @@
   },
   "dependencies": {
     "@monoid-dev/mobx-zod-form": "workspace:*",
-    "@monoid-dev/mobx-zod-form-react": "workspace:*",
     "@monoid-dev/mobx-zod-form-input": "workspace:*",
+    "@monoid-dev/mobx-zod-form-react": "workspace:*",
     "mobx": "^6.10.2",
     "mobx-react": "^7.6.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "typedoc": "^0.23.28",
-    "zod": "^3.22.2"
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@types/react": "^18.2.22",

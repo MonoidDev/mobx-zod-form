@@ -96,8 +96,8 @@ importers:
         specifier: ^0.23.28
         version: 0.23.28(typescript@5.8.2)
       zod:
-        specifier: ^3.22.2
-        version: 3.23.8
+        specifier: ^3.25.76
+        version: 3.25.76
     devDependencies:
       '@types/react':
         specifier: ^18.2.22
@@ -116,10 +116,10 @@ importers:
     dependencies:
       '@monoid-dev/mobx-zod-form':
         specifier: '*'
-        version: 0.11.0(mobx@6.12.3)(zod@3.23.8)
+        version: 0.11.0(mobx@6.12.3)(zod@3.25.76)
       '@monoid-dev/mobx-zod-form-react':
         specifier: '*'
-        version: 0.11.0(mobx@6.12.3)(react@18.3.1)(zod@3.23.8)
+        version: 0.11.0(mobx@6.12.3)(react@18.3.1)(zod@3.25.76)
       '@remix-run/node':
         specifier: ^2.8.1
         version: 2.9.2(typescript@5.8.2)
@@ -145,8 +145,8 @@ importers:
         specifier: ^18.2.0
         version: 18.3.1(react@18.3.1)
       zod:
-        specifier: ^3.22.2
-        version: 3.23.8
+        specifier: ^3.25.76
+        version: 3.25.76
     devDependencies:
       '@remix-run/dev':
         specifier: ^2.8.1
@@ -218,8 +218,8 @@ importers:
         specifier: ^18.2.0
         version: 18.3.1
       zod:
-        specifier: ^3.22.2
-        version: 3.23.8
+        specifier: ^3.25.76
+        version: 3.25.76
     devDependencies:
       '@testing-library/user-event':
         specifier: ^14.5.1
@@ -255,8 +255,8 @@ importers:
         specifier: ^18.2.0
         version: 18.3.1
       zod:
-        specifier: ^3.22.2
-        version: 3.23.8
+        specifier: ^3.25.76
+        version: 3.25.76
     devDependencies:
       '@testing-library/user-event':
         specifier: ^14.5.1
@@ -335,8 +335,8 @@ importers:
         specifier: ^1.0.0
         version: 1.0.0
       zod:
-        specifier: ^3.23.8
-        version: 3.23.8
+        specifier: ^3.25.76
+        version: 3.25.76
 
 packages:
 
@@ -6166,9 +6166,6 @@ packages:
     resolution: {integrity: sha512-cYVsTjKl8b+FrnidjibDWskAv7UKOfcwaVZdp/it9n1s9fU3IkgDbhdIRKCW4JDsAlECJY0ytoVPT3sK6kideA==}
     engines: {node: '>=18'}
 
-  zod@3.23.8:
-    resolution: {integrity: sha512-XBx9AXhXktjUqnepgTiE5flcKIYWi/rme0Eaj+5Y0lftuGBq+jyRu/md4WnuxqgP1ubdpNCsYEYPxrzVHD8d6g==}
-
   zod@3.25.76:
     resolution: {integrity: sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ==}
 
@@ -6976,17 +6973,17 @@ snapshots:
 
   '@mdx-js/util@1.6.22': {}
 
-  '@monoid-dev/mobx-zod-form-react@0.11.0(mobx@6.12.3)(react@18.3.1)(zod@3.23.8)':
+  '@monoid-dev/mobx-zod-form-react@0.11.0(mobx@6.12.3)(react@18.3.1)(zod@3.25.76)':
     dependencies:
-      '@monoid-dev/mobx-zod-form': 0.11.0(mobx@6.12.3)(zod@3.23.8)
+      '@monoid-dev/mobx-zod-form': 0.11.0(mobx@6.12.3)(zod@3.25.76)
       mobx: 6.12.3
       react: 18.3.1
-      zod: 3.23.8
+      zod: 3.25.76
 
-  '@monoid-dev/mobx-zod-form@0.11.0(mobx@6.12.3)(zod@3.23.8)':
+  '@monoid-dev/mobx-zod-form@0.11.0(mobx@6.12.3)(zod@3.25.76)':
     dependencies:
       mobx: 6.12.3
-      zod: 3.23.8
+      zod: 3.25.76
 
   '@napi-rs/simple-git-android-arm-eabi@0.1.16':
     optional: true
@@ -10973,7 +10970,7 @@ snapshots:
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
       scroll-into-view-if-needed: 3.1.0
-      zod: 3.23.8
+      zod: 3.25.76
 
   nextra@2.13.4(next@14.2.3(@babel/core@7.12.9)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
@@ -11005,7 +11002,7 @@ snapshots:
       title: 3.5.3
       unist-util-remove: 4.0.0
       unist-util-visit: 5.0.0
-      zod: 3.23.8
+      zod: 3.25.76
     transitivePeerDependencies:
       - supports-color
 
@@ -12884,8 +12881,6 @@ snapshots:
   yocto-queue@1.0.0: {}
 
   yoctocolors-cjs@2.1.2: {}
-
-  zod@3.23.8: {}
 
   zod@3.25.76: {}
 

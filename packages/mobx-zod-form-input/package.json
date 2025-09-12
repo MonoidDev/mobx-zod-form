@@ -35,18 +35,18 @@
     "access": "public"
   },
   "peerDependencies": {
-    "mobx-react": "^9.1.1",
     "mobx": "^6.8.0",
+    "mobx-react": "^9.1.1",
     "react": "^18.2.0",
-    "zod": "^3.22.2"
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@testing-library/user-event": "^14.5.1",
     "@types/node": "^20.6.2",
     "@types/react": "^18.2.22",
+    "@types/react-dom": "^18.2.7",
     "jsdom": "^21.1.2",
     "mobx-react": "^7.6.0",
-    "@types/react-dom": "^18.2.7",
     "react-dom": "^18.2.0"
   }
 }
