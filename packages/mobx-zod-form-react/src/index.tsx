@@ -1,6 +1,7 @@
 import React, { useMemo, useEffect, useContext, useId } from "react";
 
 import { MobxZodField, type MobxZodTypes } from "@monoid-dev/mobx-zod-form";
+import { MobxZodPluginHandlerName } from "@monoid-dev/mobx-zod-form";
 import type { ZodTypeAny } from "zod";
 
 import { NotReactFormField } from "./errors";
@@ -8,7 +9,6 @@ import { ReactForm, ReactFormOptions } from "./ReactForm";
 import {
   createReactFormPlugin,
   type ReactFormPluginEventListenerMap,
-  type ReactFormPluginHookedEvents,
 } from "./reactFormPlugin";
 
 export { ReactForm, type ReactFormOptions };
@@ -129,7 +129,7 @@ export const FormOptionsProvider = <T extends MobxZodTypes>({
  */
 export const useFormEvent = <
   T extends MobxZodTypes,
-  K extends ReactFormPluginHookedEvents,
+  K extends MobxZodPluginHandlerName,
 >(
   form: ReactForm<T>,
   event: K,

@@ -1,3 +1,4 @@
+import { MobxZodPluginHandlerName } from "@monoid-dev/mobx-zod-form";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { observer } from "mobx-react";
@@ -6,7 +7,6 @@ import { z } from "zod";
 
 import { TextInput } from "./TextInput";
 import { useForm, useFormEvent } from "../src";
-import type { ReactFormPluginHookedEvents } from "../src/reactFormPlugin";
 
 interface TestEventHandlers {
   onStart: ReturnType<typeof vi.fn>;
@@ -27,7 +27,7 @@ const TestFormWithEvents = observer(
     );
 
     // Register event listeners for all possible events
-    (Object.keys(eventHandlers) as ReactFormPluginHookedEvents[]).forEach(
+    (Object.keys(eventHandlers) as MobxZodPluginHandlerName[]).forEach(
       (event) => {
         useFormEvent(form, event, eventHandlers[event], []);
       },
