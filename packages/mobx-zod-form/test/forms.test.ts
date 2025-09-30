@@ -3,11 +3,8 @@ import { describe, expect, it } from "vitest";
 import { z } from "zod";
 
 import { observeForm } from "./utils";
-import { setup } from "./utils";
 import { empty, unwrapDecodeResult } from "../src";
 import { MobxZodForm } from "../src/MobxZodForm";
-
-setup();
 
 describe("form tests", () => {
   it("should observe input", () => {

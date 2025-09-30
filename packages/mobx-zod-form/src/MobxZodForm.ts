@@ -21,7 +21,7 @@ import {
 } from "./FormMeta";
 import { getPathId, setPath, shallowEqual, visitPath } from "./js-utils";
 import { createFieldForType, type MapZodTypeToField } from "./MobxZodField";
-import { type MobxZodPlugin } from "./MobxZodPlugin";
+import { type MobxZodPlugin, invokePluginHandlers } from "./MobxZodPlugin";
 import { type MobxZodTypes } from "./types";
 
 export interface InputSetActionOptions extends Partial<SetActionOptions> {
@@ -158,21 +158,25 @@ export class MobxZodForm<T extends MobxZodTypes> {
 
     const task = async () => {
       while (true) {
-        await when(() => this._validationTasks.length > 0);
+        try {
+          await when(() => this._validationTasks.length > 0);
 
-        if (validationTaskCancelled) {
-          return;
-        }
+          if (validationTaskCancelled) {
+            return;
+          }
 
-        if (this._validationTasks.some((t) => t.prior)) {
-          this.flushValidationTasks();
-        } else {
-          await new Promise<void>((r) => {
-            requestIdleCallback(() => {
-              this.flushValidationTasks();
-              r();
+          if (this._validationTasks.some((t) => t.prior)) {
+            this.flushValidationTasks();
+          } else {
+            await new Promise<void>((r) => {
+              requestIdleCallback(() => {
+                this.flushValidationTasks();
+                r();
+              });
             });
-          });
+          }
+        } catch (e) {
+          console.error("Validation worker caught error:", e);
         }
       }
     };
@@ -188,16 +192,12 @@ export class MobxZodForm<T extends MobxZodTypes> {
     const disposeValidationWorker = this.options.setActionOptions.validateSync
       ? undefined
       : this.startValidationWorker();
-    for (const plugin of this.options.plugins) {
-      plugin.onStart?.(this);
-    }
+    invokePluginHandlers(this.options.plugins, this, "onStart");
 
     return () => {
       disposeValidationWorker?.();
 
-      for (const plugin of [...this.options.plugins].reverse()) {
-        plugin.onEnd?.(this);
-      }
+      invokePluginHandlers(this.options.plugins, this, "onEnd", true);
     };
   }
 
@@ -296,9 +296,7 @@ export class MobxZodForm<T extends MobxZodTypes> {
    * Errors are compared against their error messages.
    */
   validate() {
-    this.options.plugins.forEach((plugin) => {
-      plugin?.onBeforeValidate?.(this);
-    });
+    invokePluginHandlers(this.options.plugins, this, "onBeforeValidate");
 
     const newOutput = this.parsed;
 
@@ -324,9 +322,7 @@ export class MobxZodForm<T extends MobxZodTypes> {
       }
     });
 
-    [...this.options.plugins].reverse().forEach((plugin) => {
-      plugin?.onAfterValidate?.(this);
-    });
+    invokePluginHandlers(this.options.plugins, this, "onAfterValidate", true);
   }
 
   withSetActionOptions(options: InputSetActionOptions, action: () => void) {
@@ -351,7 +347,7 @@ export class MobxZodForm<T extends MobxZodTypes> {
 
   async handleSubmit(onSubmit: () => Promise<void> | void) {
     try {
-      this.options.plugins.forEach((p) => p.onBeforeSubmit?.(this));
+      invokePluginHandlers(this.options.plugins, this, "onBeforeSubmit");
 
       let validationPromise!: Promise<void>;
       runInAction(() => {
@@ -386,9 +382,7 @@ export class MobxZodForm<T extends MobxZodTypes> {
         this.focusError();
       }
 
-      [...this.options.plugins]
-        .reverse()
-        .forEach((p) => p.onAfterSubmit?.(this));
+      invokePluginHandlers(this.options.plugins, this, "onAfterSubmit", true);
     }
   }
 

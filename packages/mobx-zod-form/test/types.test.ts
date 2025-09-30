@@ -1,7 +1,6 @@
 import { describe, expect, expectTypeOf, it } from "vitest";
 import { z, ZodError, ZodNumber, ZodString } from "zod";
 
-import { setup } from "./utils";
 import {
   resolveDOMFormMeta,
   MobxZodObjectField,
@@ -11,8 +10,6 @@ import {
 } from "../src";
 import { MobxZodForm } from "../src/MobxZodForm";
 import { discriminatorType } from "../src/zod-extra";
-
-setup();
 
 let TYPE_TESTS = false;
 

@@ -1,14 +1,11 @@
 import { describe, expect, it } from "vitest";
 import { z } from "zod";
 
-import { setup } from "./utils";
 import {
   decodeResultIsSuccessfulAnd,
   getDecodeResultOr,
   MobxZodForm,
 } from "../src";
-
-setup();
 
 describe("formMeta tests", () => {
   it("get empty meta", () => {

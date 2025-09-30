@@ -1,35 +1,31 @@
-import type { MobxZodPlugin, MobxZodTypes } from "@monoid-dev/mobx-zod-form";
+import type {
+  MobxZodPlugin,
+  MobxZodPluginHandlerName,
+  MobxZodTypes,
+} from "@monoid-dev/mobx-zod-form";
 
 import type { ReactForm } from "./ReactForm";
 
-export type ReactFormPluginHookedEvents =
-  | "onStart"
-  | "onEnd"
-  | "onBeforeValidate"
-  | "onAfterValidate"
-  | "onBeforeSubmit"
-  | "onAfterSubmit";
-
 export type ReactFormPluginEventListenerMap<T extends MobxZodTypes> = {
-  [K in ReactFormPluginHookedEvents]: (form: ReactForm<T>) => void;
+  [K in MobxZodPluginHandlerName]: (form: ReactForm<T>) => void;
 };
 
 export type ReactFormPluginEventListener = (form: any) => void;
 
 export type ReactFormPluginControl<T extends MobxZodTypes> = {
   setForm: (f: ReactForm<T>) => void;
-  addEventListener: <K extends ReactFormPluginHookedEvents>(
+  addEventListener: <K extends MobxZodPluginHandlerName>(
     event: K,
     handler: ReactFormPluginEventListenerMap<T>[K],
   ) => void;
-  removeEventListener: <K extends ReactFormPluginHookedEvents>(
+  removeEventListener: <K extends MobxZodPluginHandlerName>(
     event: K,
     handler: ReactFormPluginEventListenerMap<T>[K],
   ) => void;
 };
 
 const eventListenerOrder: Record<
-  ReactFormPluginHookedEvents,
+  MobxZodPluginHandlerName,
   "direct" | "inverted"
 > = {
   onStart: "direct",
@@ -42,13 +38,13 @@ const eventListenerOrder: Record<
 
 export const createReactFormPlugin = <T extends MobxZodTypes>() => {
   const hookedEventsRegistry = new Map<
-    ReactFormPluginHookedEvents,
+    MobxZodPluginHandlerName,
     ReactFormPluginEventListener[]
   >();
 
   let form!: ReactForm<T>;
 
-  const handleEvent = (ev: ReactFormPluginHookedEvents) => {
+  const handleEvent = (ev: MobxZodPluginHandlerName) => {
     (hookedEventsRegistry.get(ev) ?? []).forEach((listener) => {
       if (!form) {
         throw new Error(
@@ -56,7 +52,11 @@ export const createReactFormPlugin = <T extends MobxZodTypes>() => {
         );
       }
 
-      listener(form);
+      try {
+        listener(form);
+      } catch (e) {
+        console.error(`${ev} threw error:`, e);
+      }
     });
   };
 
@@ -74,7 +74,7 @@ export const createReactFormPlugin = <T extends MobxZodTypes>() => {
     setForm: (f) => {
       form = f;
     },
-    addEventListener: <K extends ReactFormPluginHookedEvents>(
+    addEventListener: <K extends MobxZodPluginHandlerName>(
       event: K,
       handler: ReactFormPluginEventListenerMap<T>[K],
     ) => {
@@ -86,7 +86,7 @@ export const createReactFormPlugin = <T extends MobxZodTypes>() => {
         ...(order === "direct" ? [handler] : []),
       ]);
     },
-    removeEventListener: <K extends ReactFormPluginHookedEvents>(
+    removeEventListener: <K extends MobxZodPluginHandlerName>(
       event: K,
       handler: ReactFormPluginEventListenerMap<T>[K],
     ) => {

@@ -2,10 +2,7 @@ import { when } from "mobx";
 import { describe, expect, it, beforeAll } from "vitest";
 import { z } from "zod";
 
-import { setup } from "./utils";
 import { MobxZodForm } from "../src";
-
-setup();
 
 beforeAll(() => {
   globalThis.requestIdleCallback = (cb) => {

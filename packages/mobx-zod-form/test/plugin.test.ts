@@ -1,10 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { z } from "zod";
 
-import { setup } from "./utils";
 import { MobxZodPlugin, MobxZodForm } from "../src";
-
-setup();
 
 describe("plugin tests", () => {
   it("should run plugins", async () => {
@@ -123,5 +120,47 @@ describe("plugin tests", () => {
         username: "aaaa",
       });
     });
+  });
+
+  it("validation worker should recover from thrown errors", async () => {
+    let throwError = true;
+    const throwingPlugin: MobxZodPlugin = {
+      name: "throwing-plugin",
+      onBeforeValidate() {
+        if (throwError) {
+          throwError = false;
+          throw new Error("Test error in validation");
+        }
+      },
+    };
+
+    const form = new MobxZodForm(
+      z.object({
+        username: z.string().min(3),
+      }),
+      {
+        plugins: [throwingPlugin],
+      },
+    );
+
+    const end = form.start();
+
+    // First change triggers error
+    form.root.fields.username.setOutput("ab");
+    await new Promise((r) => setTimeout(r, 100));
+
+    // Check error is set
+    expect(form.root.fields.username.errorMessages).toEqual([
+      "String must contain at least 3 character(s)",
+    ]);
+
+    // Second change should still work (worker recovered)
+    form.root.fields.username.setOutput("abc");
+    await new Promise((r) => setTimeout(r, 100));
+
+    // Error should be cleared
+    expect(form.root.fields.username.errorMessages).toEqual([]);
+
+    end();
   });
 });

@@ -40,3 +40,28 @@ export interface MobxZodPlugin {
     form: MobxZodForm<T>,
   ) => void;
 }
+
+export type MobxZodPluginHandlerName =
+  | "onStart"
+  | "onEnd"
+  | "onBeforeValidate"
+  | "onAfterValidate"
+  | "onBeforeSubmit"
+  | "onAfterSubmit";
+
+export const invokePluginHandlers = <T extends MobxZodTypes>(
+  plugins: MobxZodPlugin[],
+  form: MobxZodForm<T>,
+  handler: MobxZodPluginHandlerName,
+  reverse = false,
+) => {
+  const pluginList = reverse ? [...plugins].reverse() : plugins;
+
+  for (const plugin of pluginList) {
+    try {
+      plugin[handler]?.(form);
+    } catch (e) {
+      console.error(`Plugin "${plugin.name}" ${handler} threw error:`, e);
+    }
+  }
+};
