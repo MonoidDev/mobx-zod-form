@@ -256,18 +256,21 @@ export const resolveDOMFormMeta = (type: ZodTypeAny): FormMeta => {
           };
         }
 
-        // For innerType is empty number, cast it to null too.
+        // For innerType is number, decode with passthrough and check result.
+        // If the result is not a valid number (e.g. transient input like "-"),
+        // return the initial output (null/undefined) instead of failing.
         if (innerType instanceof ZodNumber) {
           const innerDecoded = resolveDOMFormMeta(innerType).safeDecode(
             input,
             true,
           );
-          if (innerDecoded.success && innerDecoded.data === undefined) {
+          if (!innerDecoded.success || typeof innerDecoded.data !== "number") {
             return {
               success: true,
               data: this.getInitialOutput(),
             };
           }
+          return innerDecoded;
         }
 
         return resolveDOMFormMeta(innerType).safeDecode(input, passthrough);

@@ -273,6 +273,92 @@ describe("DecodeResult utility functions by field methods", () => {
     expect(form.root.fields.name.decodeResultEqual(null)).toBe(true);
   });
 
+  it("nullable number decodes transient invalid input as null", () => {
+    const form = new MobxZodForm(
+      z.object({ qty: z.number().nullable() }),
+    );
+
+    // Valid number
+    form.root.fields.qty.innerField.setRawInput("7");
+    expect(form.root.fields.qty.getDecodeResult()).toBe(7);
+
+    // Empty → null
+    form.root.fields.qty.innerField.setRawInput("");
+    expect(form.root.fields.qty.getDecodeResult()).toBeNull();
+
+    // Transient invalid inputs → null (not decode failure)
+    form.root.fields.qty.innerField.setRawInput("-");
+    expect(form.root.fields.qty.getDecodeResult()).toBeNull();
+
+    form.root.fields.qty.innerField.setRawInput("abc");
+    expect(form.root.fields.qty.getDecodeResult()).toBeNull();
+
+    form.root.fields.qty.innerField.setRawInput("1e");
+    expect(form.root.fields.qty.getDecodeResult()).toBeNull();
+
+    // Recovery: typing a valid number after invalid input
+    form.root.fields.qty.innerField.setRawInput("42");
+    expect(form.root.fields.qty.getDecodeResult()).toBe(42);
+  });
+
+  it("optional number decodes transient invalid input as undefined", () => {
+    const form = new MobxZodForm(
+      z.object({ qty: z.number().optional() }),
+    );
+
+    form.root.fields.qty.innerField.setRawInput("-");
+    expect(form.root.fields.qty.getDecodeResult()).toBeUndefined();
+
+    form.root.fields.qty.innerField.setRawInput("5");
+    expect(form.root.fields.qty.getDecodeResult()).toBe(5);
+  });
+
+  it("non-nullable number still fails on invalid input", () => {
+    const form = new MobxZodForm(
+      z.object({ qty: z.number() }),
+    );
+
+    form.root.fields.qty.setRawInput("-");
+    expect(form.root.fields.qty.getDecodeResult()).toBeUndefined();
+  });
+
+  it("array with nullable number does not collapse on transient invalid input", () => {
+    const form = new MobxZodForm(
+      z.object({
+        items: z
+          .object({
+            id: z.string(),
+            qty: z.number().nullable(),
+          })
+          .array(),
+      }),
+      {
+        initialOutput: {
+          items: [
+            { id: "a", qty: 5 },
+            { id: "b", qty: 10 },
+          ],
+        },
+      },
+    );
+
+    const items = form.root.fields.items;
+
+    // Initially both elements decode
+    expect(items.getDecodeResultOr([]).length).toBe(2);
+
+    // Type "-" in first element's qty
+    items.elements[0]!.fields.qty.innerField.setRawInput("-");
+
+    // Array should NOT collapse — both elements still present
+    const result = items.getDecodeResultOr([]);
+    expect(result.length).toBe(2);
+    expect(result[0]!.id).toBe("a");
+    expect(result[0]!.qty).toBeNull();
+    expect(result[1]!.id).toBe("b");
+    expect(result[1]!.qty).toBe(10);
+  });
+
   it("field methods work with nested object fields", () => {
     const form = new MobxZodForm(
       z.object({
